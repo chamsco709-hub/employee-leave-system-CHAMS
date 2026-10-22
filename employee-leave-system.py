@@ -869,7 +869,7 @@ elif choice == "💰 الرواتب وكشف المرتبات":
         render_printable_table(payroll_df)
 
 # =========================================================
-# 🖨️ طباعة البيانات والتقارير
+# 🖨️ طباعة البيانات والتقارير (محدث بتقرير تواريخ وأنواع الإجازات)
 # =========================================================
 elif choice == "🖨️ طباعة البيانات والتقارير":
     col_t1, col_t2 = st.columns([3, 1])
@@ -878,6 +878,7 @@ elif choice == "🖨️ طباعة البيانات والتقارير":
     
     st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     report_type = st.selectbox("اختر نوع التقرير المطلوب للطباعة:", [
+        "تقرير تواريخ وألواع إجازات الموظفين (خلال فترة)",
         "تقرير الحضور والانصراف (حسب الموظف أو الفرع لفترة)",
         "دليل الموظفين والأرصدة",
         "سجل الحضور والانصراف العام",
@@ -886,7 +887,44 @@ elif choice == "🖨️ طباعة البيانات والتقارير":
     ])
     st.markdown('</div>', unsafe_allow_html=True)
     
-    if report_type == "تقرير الحضور والانصراف (حسب الموظف أو الفرع لفترة)":
+    if report_type == "تقرير تواريخ وألواع إجازات الموظفين (خلال فترة)":
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
+        col_rp1, col_rp2, col_rp3, col_rp4 = st.columns([2, 2, 2, 2])
+        
+        with col_rp1:
+            leave_filter_mode = st.selectbox("تصفية التقرير حسب:", ["كل الموظفين", "موظف معين", "فرع معين"])
+        with col_rp2:
+            if leave_filter_mode == "موظف معين":
+                emps_list = sorted(st.session_state.employees["اسم الموظف"].dropna().unique().tolist())
+                selected_rep_emp = st.selectbox("اختر الموظف:", emps_list) if emps_list else None
+            elif leave_filter_mode == "فرع معين":
+                branches_list = sorted(st.session_state.employees["الفرع"].dropna().unique().tolist())
+                selected_rep_branch = st.selectbox("اختر الفرع:", branches_list) if branches_list else None
+            else:
+                st.selectbox("النطاق الحالي:", ["جميع الموظفين"], disabled=True)
+        with col_rp3:
+            rep_leave_from = st.date_input("من تاريخ", value=date.today().replace(day=1))
+        with col_rp4:
+            rep_leave_to = st.date_input("إلى تاريخ", value=date.today())
+            
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        req_df = st.session_state.requests.copy()
+        if not req_df.empty and "من تاريخ" in req_df.columns:
+            req_df["من_تاريخ_dt"] = pd.to_datetime(req_df["من تاريخ"]).dt.date
+            req_df["إلى_تاريخ_dt"] = pd.to_datetime(req_df["إلى تاريخ"]).dt.date
+            req_df = req_df[(req_df["من_تاريخ_dt"] >= rep_leave_from) & (req_df["إلى_تاريخ_dt"] <= rep_leave_to)]
+            req_df = req_df.drop(columns=["من_تاريخ_dt", "إلى_تاريخ_dt"])
+            
+            if leave_filter_mode == "موظف معين" and 'selected_rep_emp' in locals() and selected_rep_emp:
+                req_df = req_df[req_df["اسم الموظف"] == selected_rep_emp]
+            elif leave_filter_mode == "فرع معين" and 'selected_rep_branch' in locals() and selected_rep_branch:
+                req_df = req_df[req_df["الفرع"] == selected_rep_branch]
+                
+        st.markdown(f'<div class="section-header">📄 تقرير تواريخ وأنواع إجازات الموظفين من ({rep_leave_from}) إلى ({rep_leave_to})</div>', unsafe_allow_html=True)
+        render_printable_table(req_df)
+
+    elif report_type == "تقرير الحضور والانصراف (حسب الموظف أو الفرع لفترة)":
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         col_rp1, col_rp2, col_rp3, col_rp4 = st.columns([2, 2, 2, 2])
         
@@ -1074,7 +1112,7 @@ elif choice == "إدارة وفهرس الموظفين":
     render_printable_table(st.session_state.employees)
 
 # =========================================================
-# 🔒 إدارة المستخدمين والصلاحيات (محدث مع إمكانية إضافة مستخدم جديد)
+# 🔒 إدارة المستخدمين والصلاحيات
 # =========================================================
 elif choice == "إدارة المستخدمين والصلاحيات":
     col_t1, col_t2 = st.columns([3, 1])
