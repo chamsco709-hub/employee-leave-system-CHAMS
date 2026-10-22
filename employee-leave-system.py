@@ -126,7 +126,7 @@ load_company_data()
 st.session_state.company_info["name"] = company_display_name
 st.session_state.company_info["license"] = company_license
 
-# 🎨 تصميم CSS الموحد وتنسيق الطباعة الدقيق
+# 🎨 تصميم CSS المتطور مع إجبار طباعة الخلفيات والرسوم البيانية بوضوح تام
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none !important; }
@@ -246,15 +246,18 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* 🖨️ إعدادات الطباعة بخلفية بيضاء ومحاذاة تامة لليمن */
+    /* 🖨️ إعدادات الطباعة المتقدمة وإجبار طباعة الخلفيات والرسوم */
     @media print {
         body, .stApp, .block-container {
             background-color: #ffffff !important;
             color: #000000 !important;
             direction: rtl !important;
             text-align: right !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         
+        /* إخفاء الأزرار، قوائم الفلترة، والإطارات غير المطلوبة أثناء الطباعة */
         button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"] {
             display: none !important;
         }
@@ -264,6 +267,8 @@ st.markdown("""
             color: #000000 !important;
             border: 1px solid #000;
             box-shadow: none;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         .header-top-system h2, .comp-name-txt, .comp-info-txt {
             color: #000000 !important;
@@ -445,7 +450,7 @@ if choice == "لوحة التحكم الرئيسية":
     with col3:
         st.markdown(f'<div class="dashboard-card" style="border-right-color: #5cb85c;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #5cb85c;">{accepted_count}</div></div>', unsafe_allow_html=True)
     
-    # 📊 المخططات البيانية مع فلترة مباشرة وحصرية للطباعة
+    # 📊 المخططات البيانية مع فلترة مباشرة وتخصيص دقيق للطباعة
     st.markdown(f'<div class="section-header">📊 الرسم البياني التحليلي لإحصائيات وأرصدة الموظفين (مع خيار الطباعة المخصصة)</div>', unsafe_allow_html=True)
     
     col_f_type, col_f_val, col_p_btn = st.columns([2, 2, 1])
