@@ -1,6 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
+import altair as alt
 from datetime import datetime, date
 import io
 import base64
@@ -254,7 +255,7 @@ st.markdown("""
             text-align: right !important;
         }
         
-        button, .stButton, iframe, div[data-testid="stHeader"] {
+        button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"] {
             display: none !important;
         }
 
@@ -444,25 +445,88 @@ if choice == "لوحة التحكم الرئيسية":
     with col3:
         st.markdown(f'<div class="dashboard-card" style="border-right-color: #5cb85c;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #5cb85c;">{accepted_count}</div></div>', unsafe_allow_html=True)
     
-    # 📊 المخططات البيانية المعدلة والمحسن عرضها أفقياً وعمودياً لمنع التداخل
-    st.markdown(f'<div class="section-header">📊 الرسم البياني التحليلي لإحصائيات وأرصدة الموظفين</div>', unsafe_allow_html=True)
+    # 📊 المخططات البيانية مع فلترة مباشرة وحصرية للطباعة
+    st.markdown(f'<div class="section-header">📊 الرسم البياني التحليلي لإحصائيات وأرصدة الموظفين (مع خيار الطباعة المخصصة)</div>', unsafe_allow_html=True)
     
-    if not view_employees.empty:
+    col_f_type, col_f_val, col_p_btn = st.columns([2, 2, 1])
+    with col_f_type:
+        chart_filter_type = st.selectbox("تصفية المخطط للطباعة حسب:", ["عرض الكل", "فرع معين", "موظف معين"])
+    
+    filtered_chart_emps = view_employees.copy()
+    chart_subtitle = "عرض شامل لجميع الفروع والموظفين"
+    
+    with col_f_val:
+        if chart_filter_type == "فرع معين":
+            branches_list = sorted(view_employees["الفرع"].dropna().unique().tolist())
+            selected_b = st.selectbox("اختر الفرع للمخطط:", branches_list) if branches_list else None
+            if selected_b:
+                filtered_chart_emps = filtered_chart_emps[filtered_chart_emps["الفرع"] == selected_b]
+                chart_subtitle = f"المخطط الخاص بفرع: {selected_b}"
+        elif chart_filter_type == "موظف معين":
+            emps_list = sorted(view_employees["اسم الموظف"].dropna().unique().tolist())
+            selected_e = st.selectbox("اختر الموظف للمخطط:", emps_list) if emps_list else None
+            if selected_e:
+                filtered_chart_emps = filtered_chart_emps[filtered_chart_emps["اسم الموظف"] == selected_e]
+                chart_subtitle = f"المخطط الخاص بالموظف: {selected_e}"
+        else:
+            st.selectbox("النطاق الحالي:", ["جميع الفروع والموظفين"], disabled=True)
+
+    with col_p_btn:
+        st.write("")
+        st.write("")
+        components.html("""
+            <div style="text-align: left;">
+                <button onclick="window.parent.print()" style="
+                    background-color: #1f4068;
+                    color: white;
+                    padding: 8px 14px;
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 13px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+                    font-family: 'Tahoma', sans-serif;
+                    width: 100%;
+                ">
+                    🖨️ طباعة المخطط الحقيقي
+                </button>
+            </div>
+        """, height=45)
+
+    if not filtered_chart_emps.empty:
+        st.markdown(f"**📌 {chart_subtitle}**")
         col_chart1, col_chart2 = st.columns(2)
         
         with col_chart1:
             st.markdown("##### 🟢 أرصدة الإجازات السنوية والمستهلكة")
-            chart_data = view_employees[["اسم الموظف", "رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي"]].set_index("اسم الموظف")
-            st.bar_chart(chart_data)
+            chart_df_melted = filtered_chart_emps.melt(
+                id_vars=["اسم الموظف"],
+                value_vars=["رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي"],
+                var_name="نوع الرصيد",
+                value_name="عدد الأيام"
+            )
+            c1 = alt.Chart(chart_df_melted).mark_bar().encode(
+                x=alt.X('اسم الموظف:N', title='الموظف', axis=alt.Axis(labelAngle=0)),
+                y=alt.Y('عدد الأيام:Q', title='الأيام'),
+                color='نوع الرصيد:N',
+                tooltip=['اسم الموظف', 'نوع الرصيد', 'عدد الأيام']
+            ).properties(height=280)
+            st.altair_chart(c1, use_container_width=True)
             
         with col_chart2:
-            st.markdown("##### 🏢 توزيع الموظفين حسب الفروع")
-            branch_df = view_employees["الفرع"].value_counts().reset_index()
+            st.markdown("##### 🏢 توزيع الموظفين والأرصدة")
+            branch_df = filtered_chart_emps["الفرع"].value_counts().reset_index()
             branch_df.columns = ["الفرع", "عدد الموظفين"]
-            branch_df = branch_df.set_index("الفرع")
-            st.bar_chart(branch_df)
+            
+            c2 = alt.Chart(branch_df).mark_bar(color="#1f4068").encode(
+                x=alt.X('الفرع:N', title='الفرع', axis=alt.Axis(labelAngle=0)),
+                y=alt.Y('عدد الموظفين:Q', title='عدد الموظفين'),
+                tooltip=['الفرع', 'عدد الموظفين']
+            ).properties(height=280)
+            st.altair_chart(c2, use_container_width=True)
     else:
-        st.info("لا توجد بيانات كافية لعرض المخططات البيانية.")
+        st.info("لا توجد بيانات متاحة للمخطط حسب الفلتر المختار.")
 
     st.markdown(f'<div class="section-header">📋 أرصدة إجازات موظفي الشركة: {company_display_name}</div>', unsafe_allow_html=True)
     render_printable_table(view_employees)
@@ -748,11 +812,23 @@ elif choice == "إدارة المستخدمين والصلاحيات":
 elif choice == "🖨️ طباعة البيانات والتقارير":
     report_type = st.selectbox("اختر نوع التقرير المراد طباعته:", [
         "تقرير شامل لجميع الموظفين وأرصدتهم",
+        "تقرير مخصص حسب الفرع",
+        "تقرير مخصص حسب اسم الموظف",
         "سجل طلبات الإجازات الكامل",
         "سجل الطلبات المعلقة فقط",
         "تقرير مستخدمي الصلاحيات والنظام"
     ])
     
+    target_branch = ""
+    target_emp = ""
+    
+    if report_type == "تقرير مخصص حسب الفرع":
+        branches = sorted(st.session_state.employees["الفرع"].dropna().astype(str).unique().tolist())
+        target_branch = st.selectbox("اختر الفرع المراد طباعة تقريره:", branches)
+    elif report_type == "تقرير مخصص حسب اسم الموظف":
+        employees_list = sorted(st.session_state.employees["اسم الموظف"].dropna().astype(str).unique().tolist())
+        target_emp = st.selectbox("اختر اسم الموظف المراد طباعة تقريره:", employees_list)
+        
     st.markdown("---")
     
     components.html("""
@@ -777,6 +853,14 @@ elif choice == "🖨️ طباعة البيانات والتقارير":
     if report_type == "تقرير شامل لجميع الموظفين وأرصدتهم":
         st.markdown(f'<h3 class="printable-right-align">📋 التقرير الشامل لجميع الموظفين وأرصدتهم - {company_display_name}</h3>', unsafe_allow_html=True)
         render_printable_table(st.session_state.employees)
+    elif report_type == "تقرير مخصص حسب الفرع":
+        st.markdown(f'<h3 class="printable-right-align">🏢 تقرير فرع: {target_branch} - {company_display_name}</h3>', unsafe_allow_html=True)
+        filtered_branch_df = st.session_state.employees[st.session_state.employees["الفرع"] == target_branch]
+        render_printable_table(filtered_branch_df)
+    elif report_type == "تقرير مخصص حسب اسم الموظف":
+        st.markdown(f'<h3 class="printable-right-align">👤 تقرير أرصدة وطلبات الموظف: {target_emp} - {company_display_name}</h3>', unsafe_allow_html=True)
+        filtered_emp_df = st.session_state.employees[st.session_state.employees["اسم الموظف"] == target_emp]
+        render_printable_table(filtered_emp_df)
     elif report_type == "سجل طلبات الإجازات الكامل":
         st.markdown(f'<h3 class="printable-right-align">📋 سجل طلبات الإجازات الكامل - {company_display_name}</h3>', unsafe_allow_html=True)
         render_printable_table(st.session_state.requests)
