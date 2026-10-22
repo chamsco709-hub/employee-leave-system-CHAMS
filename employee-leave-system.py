@@ -876,14 +876,44 @@ elif choice == "📥 تحميل البيانات (Excel)":
     output.seek(0)
     st.download_button(label="تحميل ملف الإكسيل الآن", data=output, file_name=f"Leave_System_{company_id}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
+# 9. النسخة الاحتياطية
 elif choice == "💾 النسخة الاحتياطية":
-    st.subheader("💾 إدارة النسخ الاحتياطية")
-    backup_dict = {
-        "employees": st.session_state.employees.to_dict(orient='records'),
-        "requests": st.session_state.requests.to_dict(orient='records'),
-        "users": st.session_state.users.to_dict(orient='records')
-    }
-    st.download_button("تحميل النسخة الاحتياطية (JSON)", data=json.dumps(backup_dict, ensure_ascii=False, indent=4), file_name=f"backup_{company_id}.json", mime="application/json")
+    st.subheader("💾 إدارة النسخ الاحتياطية (تنزيل واستعادة)")
+    col_b1, col_b2 = st.columns(2)
+    with col_b1:
+        st.markdown("### 📤 تنزيل نسخة احتياطية جديدة")
+        backup_dict = {
+            "employees": st.session_state.employees.to_dict(orient='records'),
+            "requests": st.session_state.requests.to_dict(orient='records'),
+            "users": st.session_state.users.to_dict(orient='records')
+        }
+        backup_json_str = json.dumps(backup_dict, ensure_ascii=False, indent=4)
+        st.download_button(
+            label="💾 تحميل ملف النسخة الاحتياطية (JSON)",
+            data=backup_json_str,
+            file_name=f"backup_leave_system_{datetime.now().strftime('%Y-%m-%d_%H-%M')}.json",
+            mime="application/json",
+            use_container_width=True
+        )
+    with col_b2:
+        st.markdown("### 📥 استعادة النسخة الاحتياطية")
+        uploaded_backup = st.file_uploader("اختر ملف النسخة الاحتياطية (.json)", type=["json"])
+        if uploaded_backup is not None:
+            if st.button("🔄 تأكيد واستعادة البيانات الآن", use_container_width=True):
+                try:
+                    data = json.load(uploaded_backup)
+                    if "employees" in data and "requests" in data:
+                        st.session_state.employees = pd.DataFrame(data["employees"])
+                        st.session_state.requests = pd.DataFrame(data["requests"])
+                        if "users" in data:
+                            st.session_state.users = pd.DataFrame(data["users"])
+                        auto_save_data()  # 💾 حفظ البيانات المستعادة تلقائياً
+                        st.success("✅ تم استعادة النسخة الاحتياطية وتحديث البيانات بنجاح!")
+                        st.rerun()
+                    else:
+                        st.error("❌ ملف النسخة الاحتياطية غير صالح!")
+                except Exception as e:
+                    st.error(f"❌ حدث خطأ أثناء قراءة الملف: {e}")
 
 elif choice == "🗑️ مسح وحذف البيانات":
     st.subheader("🗑️ مسح كافة بيانات الشركة الحالية")
