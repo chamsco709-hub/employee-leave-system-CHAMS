@@ -484,10 +484,9 @@ with col_logout_bar:
 choice = st.session_state.active_tab
 
 # =========================================================
-# 📈 لوحة التحكم الرئيسية
-# =========================================================
+# 1. لوحة التحكم
 if choice == "لوحة التحكم الرئيسية":
-    st.markdown(f'<div class="section-header">📈 مؤشرات الأداء العامة لشركة: {company_display_name}</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">📈 مؤشرات الأداء العامة للنظام</div>', unsafe_allow_html=True)
     
     branch_filter = st.session_state.current_user_branch
     dept_filter = st.session_state.current_user_dept
@@ -505,96 +504,48 @@ if choice == "لوحة التحكم الرئيسية":
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown(f'<div class="dashboard-card"><div class="dashboard-card-title">👥 إجمالي موظفي الشركة</div><div class="dashboard-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="dashboard-card"><div class="dashboard-card-title">👥 إجمالي موظفي الفرع ({branch_filter})</div><div class="dashboard-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
     with col2:
         st.markdown(f'<div class="dashboard-card" style="border-right-color: #f0ad4e;"><div class="dashboard-card-title">⏳ الطلبات المعلقة</div><div class="dashboard-card-value" style="color: #f0ad4e;">{pending_count}</div></div>', unsafe_allow_html=True)
     with col3:
         st.markdown(f'<div class="dashboard-card" style="border-right-color: #5cb85c;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #5cb85c;">{accepted_count}</div></div>', unsafe_allow_html=True)
     
-    st.markdown(f'<div class="section-header">📊 الرسم البياني التحليلي لإحصائيات وأرصدة الموظفين</div>', unsafe_allow_html=True)
-    
-    col_f_type, col_f_val, col_p_btn = st.columns([2, 2, 1])
-    with col_f_type:
-        chart_filter_type = st.selectbox("تصفية المخطط للطباعة حسب:", ["عرض الكل", "فرع معين", "موظف معين"])
-    
-    filtered_chart_emps = view_employees.copy()
-    chart_subtitle = "عرض شامل لجميع الفروع والموظفين"
-    
-    with col_f_val:
-        if chart_filter_type == "فرع معين":
-            branches_list = sorted(view_employees["الفرع"].dropna().unique().tolist())
-            selected_b = st.selectbox("اختر الفرع للمخطط:", branches_list) if branches_list else None
-            if selected_b:
-                filtered_chart_emps = filtered_chart_emps[filtered_chart_emps["الفرع"] == selected_b]
-                chart_subtitle = f"المخطط الخاص بفرع: {selected_b}"
-        elif chart_filter_type == "موظف معين":
-            emps_list = sorted(view_employees["اسم الموظف"].dropna().unique().tolist())
-            selected_e = st.selectbox("اختر الموظف للمخطط:", emps_list) if emps_list else None
-            if selected_e:
-                filtered_chart_emps = filtered_chart_emps[filtered_chart_emps["اسم الموظف"] == selected_e]
-                chart_subtitle = f"المخطط الخاص بالموظف: {selected_e}"
-        else:
-            st.selectbox("النطاق الحالي:", ["جميع الفروع والموظفين"], disabled=True)
-
-    with col_p_btn:
-        st.write("")
-        st.write("")
-        components.html("""
-            <div style="text-align: left;">
-                <button onclick="window.parent.print()" style="
-                    background-color: #1f4068;
-                    color: white;
-                    padding: 8px 14px;
-                    border: none;
-                    border-radius: 4px;
-                    font-size: 13px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-                    font-family: 'Tahoma', sans-serif;
-                    width: 100%;
-                ">
-                    🖨️ طباعة المخطط فقط
-                </button>
-            </div>
-        """, height=45)
-
-    if not filtered_chart_emps.empty:
-        st.markdown(f'<div style="text-align: right; direction: rtl; font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1f4068;">📌 {chart_subtitle}</div>', unsafe_allow_html=True)
-        
-        chart_df_melted = filtered_chart_emps.melt(
-            id_vars=["اسم الموظف"],
-            value_vars=["رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي"],
-            var_name="نوع الرصيد",
-            value_name="عدد الأيام"
-        )
-        
-        c1 = alt.Chart(chart_df_melted).mark_bar().encode(
-            x=alt.X('اسم الموظف:N', title='الموظف', axis=alt.Axis(labelAngle=0, labelColor='#333333', titleColor='#1f4068')),
-            y=alt.Y('عدد الأيام:Q', title='عدد الأيام', axis=alt.Axis(labelColor='#333333', titleColor='#1f4068')),
-            color=alt.Color('نوع الرصيد:N', legend=alt.Legend(
-                orient='bottom', 
-                direction='horizontal',
-                title='نوع الرصيد:',
-                titleColor='#1f4068',
-                labelColor='#333333',
-                titleAnchor='middle'
-            )),
-            tooltip=['اسم الموظف', 'نوع الرصيد', 'عدد الأيام']
-        ).properties(
-            height=320,
-            background='white'
-        ).configure_view(
-            fill='white',
-            stroke=None
-        )
-        
-        st.altair_chart(c1, use_container_width=True)
-    else:
-        st.info("لا توجد بيانات متاحة للمخطط حسب الفلتر المختار.")
-
-    st.markdown(f'<div class="section-header">📋 أرصدة إجازات موظفي الشركة: {company_display_name}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-header">📋 أرصدة إجازات موظفي الفرع ({branch_filter})</div>', unsafe_allow_html=True)
     render_printable_table(view_employees)
+    
+    st.markdown('<div class="section-header">⚡ مراجعة واعتماد طلبات الإجازات المباشرة</div>', unsafe_allow_html=True)
+    if view_requests.empty:
+        st.info("لا توجد طلبات إجازات مسجلة حالياً لفرعك.")
+    else:
+        render_printable_table(view_requests)
+        pending_reqs = view_requests[view_requests["الحالة"] == "قيد الانتظار"]
+        if not pending_reqs.empty:
+            st.markdown("#### 🔄 اتخاذ قرار بشأن الطلبات المعلقة:")
+            col_id, col_action, col_btn = st.columns([2, 2, 1])
+            with col_id: req_id = st.selectbox("اختر رقم الطلب", pending_reqs["رقم الطلب"].tolist(), key="quick_req_id")
+            with col_action: action = st.radio("القرار", ["مقبول", "مرفوض"], horizontal=True, key="quick_action")
+            with col_btn:
+                st.write("")
+                if st.button("تنفيذ القرار", use_container_width=True):
+                    st.session_state.requests.loc[st.session_state.requests["رقم الطلب"] == req_id, "الحالة"] = action
+                    if action == "مقبول":
+                        row = st.session_state.requests[st.session_state.requests["رقم الطلب"] == req_id].iloc[0]
+                        emp_code = row["كود الموظف"]
+                        days = row["عدد الأيام"]
+                        l_type = row["نوع الإجازة"]
+                        if "سنوية" in l_type:
+                            st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "سنوي مستهلك"] += days
+                            st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "سنوي متبقي"] -= days
+                        elif "أسبوعية" in l_type:
+                            st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "أسبوعي مستهلك"] += days
+                            st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "أسبوعي متبقي"] -= days
+                        elif "رسمية" in l_type:
+                            st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "رسمي مستهلك"] += days
+                            st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "رسمي متبقي"] -= days
+                    
+                    auto_save_data()  # 💾 حفظ تلقائي
+                    st.success(f"تم تحديث الطلب #{req_id} وحفظ التغييرات تلقائياً!")
+                    st.rerun()
 
 # =========================================================
 # ⏱️ الحضور والانصراف (إظهار الفرع في السجل)
