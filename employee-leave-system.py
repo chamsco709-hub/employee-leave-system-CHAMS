@@ -246,7 +246,7 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* 🖨️ إعدادات الطباعة المخصصة لإظهار المخطط فقط بخلفية بيضاء إجباريًا */
+    /* 🖨️ إعدادات الطباعة المخصصة لإخفاء الأرصدة والطلبات والاعتماد وإظهار المخطط فقط */
     @media print {
         body, .stApp, .block-container {
             background-color: #ffffff !important;
@@ -257,8 +257,10 @@ st.markdown("""
             print-color-adjust: exact !important;
         }
         
+        /* إخفاء الأزرار والقوائم وأقسام الجداول والطلبات والاعتماد أثناء الطباعة */
         button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"],
-        .dashboard-card, table, .custom-table, div[data-testid="stForm"] {
+        .dashboard-card, table, .custom-table, div[data-testid="stForm"],
+        .no-print {
             display: none !important;
         }
 
@@ -303,7 +305,7 @@ def render_printable_table(df):
     if df.empty:
         st.info("لا توجد بيانات متاحة للعرض.")
         return
-    html = f'<div class="printable-right-align">{df.to_html(classes="custom-table", index=False, escape=False)}</div>'
+    html = f'<div class="printable-right-align no-print">{df.to_html(classes="custom-table", index=False, escape=False)}</div>'
     st.markdown(html, unsafe_allow_html=True)
 
 def render_company_header():
@@ -420,7 +422,7 @@ choice = st.session_state.active_tab
 
 # المحتوى حسب التبويب المختار
 if choice == "لوحة التحكم الرئيسية":
-    st.markdown(f'<div class="section-header">📈 مؤشرات الأداء العامة لشركة: {company_display_name}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-header no-print">📈 مؤشرات الأداء العامة لشركة: {company_display_name}</div>', unsafe_allow_html=True)
     
     branch_filter = st.session_state.current_user_branch
     dept_filter = st.session_state.current_user_dept
@@ -438,11 +440,11 @@ if choice == "لوحة التحكم الرئيسية":
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown(f'<div class="dashboard-card"><div class="dashboard-card-title">👥 إجمالي موظفي الشركة</div><div class="dashboard-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="dashboard-card no-print"><div class="dashboard-card-title">👥 إجمالي موظفي الشركة</div><div class="dashboard-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown(f'<div class="dashboard-card" style="border-right-color: #f0ad4e;"><div class="dashboard-card-title">⏳ الطلبات المعلقة</div><div class="dashboard-card-value" style="color: #f0ad4e;">{pending_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="dashboard-card no-print" style="border-right-color: #f0ad4e;"><div class="dashboard-card-title">⏳ الطلبات المعلقة</div><div class="dashboard-card-value" style="color: #f0ad4e;">{pending_count}</div></div>', unsafe_allow_html=True)
     with col3:
-        st.markdown(f'<div class="dashboard-card" style="border-right-color: #5cb85c;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #5cb85c;">{accepted_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="dashboard-card no-print" style="border-right-color: #5cb85c;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #5cb85c;">{accepted_count}</div></div>', unsafe_allow_html=True)
     
     # 📊 المخططات البيانية
     st.markdown(f'<div class="section-header">📊 الرسم البياني التحليلي لإحصائيات وأرصدة الموظفين</div>', unsafe_allow_html=True)
@@ -528,17 +530,18 @@ if choice == "لوحة التحكم الرئيسية":
     else:
         st.info("لا توجد بيانات متاحة للمخطط حسب الفلتر المختار.")
 
-    st.markdown(f'<div class="section-header">📋 أرصدة إجازات موظفي الشركة: {company_display_name}</div>', unsafe_allow_html=True)
+    # إخفاء الجداول وأقسام الاعتماد أثناء طباعة المخطط بإضافة كلاس no-print
+    st.markdown(f'<div class="section-header no-print">📋 أرصدة إجازات موظفي الشركة: {company_display_name}</div>', unsafe_allow_html=True)
     render_printable_table(view_employees)
     
-    st.markdown('<div class="section-header">⚡ مراجعة واعتماد طلبات الإجازات المباشرة</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header no-print">⚡ مراجعة واعتماد طلبات الإجازات المباشرة</div>', unsafe_allow_html=True)
     if view_requests.empty:
         st.info("لا توجد طلبات إجازات مسجلة حالياً.")
     else:
         render_printable_table(view_requests)
         pending_reqs = view_requests[view_requests["الحالة"] == "قيد الانتظار"]
         if not pending_reqs.empty:
-            st.markdown("#### 🔄 اتخاذ قرار بشأن الطلبات المعلقة:")
+            st.markdown('<div class="no-print">#### 🔄 اتخاذ قرار بشأن الطلبات المعلقة:</div>', unsafe_allow_html=True)
             col_id, col_action, col_btn = st.columns([2, 2, 1])
             with col_id: req_id = st.selectbox("اختر رقم الطلب", pending_reqs["رقم الطلب"].tolist(), key="quick_req_id")
             with col_action: action = st.radio("القرار", ["مقبول", "مرفوض"], horizontal=True, key="quick_action")
