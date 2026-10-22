@@ -126,7 +126,7 @@ load_company_data()
 st.session_state.company_info["name"] = company_display_name
 st.session_state.company_info["license"] = company_license
 
-# 🎨 تصميم CSS المطور وخيارات الطباعة المخصصة
+# 🎨 تصميم CSS المتطور وإعدادات الطباعة المخصصة
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none !important; }
@@ -246,7 +246,7 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* 🖨️ إعدادات الطباعة المخصصة لإظهار المخطط بخلفية بيضاء إجباريًا */
+    /* 🖨️ إعدادات الطباعة المخصصة لإظهار المخطط فقط بخلفية بيضاء إجباريًا */
     @media print {
         body, .stApp, .block-container {
             background-color: #ffffff !important;
@@ -257,7 +257,6 @@ st.markdown("""
             print-color-adjust: exact !important;
         }
         
-        /* إخفاء الأزرار، أدوات الاختيار، الجداول غير المطلوبة والعناصر الإضافية أثناء الطباعة */
         button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"],
         .dashboard-card, table, .custom-table, div[data-testid="stForm"] {
             display: none !important;
@@ -495,7 +494,7 @@ if choice == "لوحة التحكم الرئيسية":
         """, height=45)
 
     if not filtered_chart_emps.empty:
-        # 🟢 النص محاذى لليمين تماماً وبخط واضح وبلا حواف تداخل
+        # 🟢 النص محاذى لليمين تماماً بوضوح تام
         st.markdown(f'<div style="text-align: right; direction: rtl; font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1f4068;">📌 {chart_subtitle}</div>', unsafe_allow_html=True)
         
         chart_df_melted = filtered_chart_emps.melt(
@@ -506,12 +505,14 @@ if choice == "لوحة التحكم الرئيسية":
         )
         
         c1 = alt.Chart(chart_df_melted).mark_bar().encode(
-            x=alt.X('اسم الموظف:N', title='الموظف', axis=alt.Axis(labelAngle=0)),
-            y=alt.Y('عدد الأيام:Q', title='عدد الأيام'),
+            x=alt.X('اسم الموظف:N', title='الموظف', axis=alt.Axis(labelAngle=0, labelColor='#333333', titleColor='#1f4068')),
+            y=alt.Y('عدد الأيام:Q', title='عدد الأيام', axis=alt.Axis(labelColor='#333333', titleColor='#1f4068')),
             color=alt.Color('نوع الرصيد:N', legend=alt.Legend(
                 orient='bottom', 
                 direction='horizontal',
-                title='نوع الرصيد',
+                title='نوع الرصيد:',
+                titleColor='#1f4068',
+                labelColor='#333333',
                 titleAnchor='middle'
             )),
             tooltip=['اسم الموظف', 'نوع الرصيد', 'عدد الأيام']
@@ -519,7 +520,8 @@ if choice == "لوحة التحكم الرئيسية":
             height=320,
             background='white'
         ).configure_view(
-            fill='white'
+            fill='white',
+            stroke=None
         )
         
         st.altair_chart(c1, use_container_width=True)
