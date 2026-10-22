@@ -126,7 +126,7 @@ load_company_data()
 st.session_state.company_info["name"] = company_display_name
 st.session_state.company_info["license"] = company_license
 
-# 🎨 تصميم CSS المتطور وإعدادات الطباعة المرنة لنتائج البحث والمخطط
+# 🎨 تصميم CSS المتطور وإعدادات الطباعة
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none !important; }
@@ -246,7 +246,6 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* 🖨️ إعدادات الطباعة العامة */
     @media print {
         body, .stApp, .block-container {
             background-color: #ffffff !important;
@@ -256,13 +255,10 @@ st.markdown("""
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
-        
-        /* إخفاء الأزرار، القوائم المنسدلة، النماذج، وأدوات التحكم أثناء الطباعة */
         button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"],
         .dashboard-card, div[data-testid="stForm"], .no-print {
             display: none !important;
         }
-
         .company-header-container {
             background: #ffffff !important;
             color: #000000 !important;
@@ -274,7 +270,6 @@ st.markdown("""
         .header-top-system h2, .comp-name-txt, .comp-info-txt {
             color: #000000 !important;
         }
-
         div[data-testid="stVegaLiteChart"] {
             background-color: #ffffff !important;
             border: 1px solid #ddd;
@@ -304,7 +299,6 @@ def render_printable_table(df):
     if df.empty:
         st.info("لا توجد بيانات متاحة للعرض.")
         return
-    # السماح بظهور جدول البحث والتقارير عند الطباعة بشكل طبيعي
     html = f'<div class="printable-right-align">{df.to_html(classes="custom-table", index=False, escape=False)}</div>'
     st.markdown(html, unsafe_allow_html=True)
 
@@ -338,7 +332,7 @@ def render_company_header():
         unsafe_allow_html=True
     )
 
-# 🔐 شاشة تسجيل الدخول المخصصة للشركة
+# 🔐 شاشة تسجيل الدخول
 if not st.session_state.is_authenticated:
     st.markdown(
         f"""
@@ -446,7 +440,6 @@ if choice == "لوحة التحكم الرئيسية":
     with col3:
         st.markdown(f'<div class="dashboard-card" style="border-right-color: #5cb85c;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #5cb85c;">{accepted_count}</div></div>', unsafe_allow_html=True)
     
-    # 📊 المخططات البيانية
     st.markdown(f'<div class="section-header">📊 الرسم البياني التحليلي لإحصائيات وأرصدة الموظفين</div>', unsafe_allow_html=True)
     
     col_f_type, col_f_val, col_p_btn = st.columns([2, 2, 1])
@@ -531,40 +524,6 @@ if choice == "لوحة التحكم الرئيسية":
 
     st.markdown(f'<div class="section-header">📋 أرصدة إجازات موظفي الشركة: {company_display_name}</div>', unsafe_allow_html=True)
     render_printable_table(view_employees)
-    
-    st.markdown('<div class="section-header">⚡ مراجعة واعتماد طلبات الإجازات المباشرة</div>', unsafe_allow_html=True)
-    if view_requests.empty:
-        st.info("لا توجد طلبات إجازات مسجلة حالياً.")
-    else:
-        render_printable_table(view_requests)
-        pending_reqs = view_requests[view_requests["الحالة"] == "قيد الانتظار"]
-        if not pending_reqs.empty:
-            st.markdown("#### 🔄 اتخاذ قرار بشأن الطلبات المعلقة:")
-            col_id, col_action, col_btn = st.columns([2, 2, 1])
-            with col_id: req_id = st.selectbox("اختر رقم الطلب", pending_reqs["رقم الطلب"].tolist(), key="quick_req_id")
-            with col_action: action = st.radio("القرار", ["مقبول", "مرفوض"], horizontal=True, key="quick_action")
-            with col_btn:
-                st.write("")
-                if st.button("تنفيذ القرار", use_container_width=True):
-                    st.session_state.requests.loc[st.session_state.requests["رقم الطلب"] == req_id, "الحالة"] = action
-                    if action == "مقبول":
-                        row = st.session_state.requests[st.session_state.requests["رقم الطلب"] == req_id].iloc[0]
-                        emp_code = row["كود الموظف"]
-                        days = row["عدد الأيام"]
-                        l_type = row["نوع الإجازة"]
-                        if "سنوية" in l_type:
-                            st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "سنوي مستهلك"] += days
-                            st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "سنوي متبقي"] -= days
-                        elif "أسبوعية" in l_type:
-                            st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "أسبوعي مستهلك"] += days
-                            st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "أسبوعي متبقي"] -= days
-                        elif "رسمية" in l_type:
-                            st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "رسمي مستهلك"] += days
-                            st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "رسمي متبقي"] -= days
-                    
-                    auto_save_data()
-                    st.success(f"تم تحديث الطلب #{req_id} وحفظ البيانات بنجاح!")
-                    st.rerun()
 
 elif choice == "تسجيل طلب إجازة":
     st.subheader(f"📝 تقديم طلب إجازة جديد - {company_display_name}")
@@ -700,7 +659,6 @@ elif choice == "🔍 بحث متقدم":
         if not req_df.empty and "من تاريخ" in req_df.columns:
             req_df["من_تاريخ_dt"] = pd.to_datetime(req_df["من تاريخ"]).dt.date
             req_df["إلى_تاريخ_dt"] = pd.to_datetime(req_df["إلى تاريخ"]).dt.date
-            
             req_df = req_df[(req_df["من_تاريخ_dt"] >= date_from) & (req_df["إلى_تاريخ_dt"] <= date_to)]
             req_df = req_df.drop(columns=["من_تاريخ_dt", "إلى_تاريخ_dt"])
         
@@ -708,6 +666,15 @@ elif choice == "🔍 بحث متقدم":
         st.markdown(f'<h3 class="printable-right-align">{search_result_title}</h3>', unsafe_allow_html=True)
         render_printable_table(req_df)
     
+    elif search_category == "اسم المستخدم":
+        user_df = st.session_state.users.copy()
+        search_result_title = f"🔒 تقرير بيانات المستخدمين والصلاحيات - {company_display_name}"
+        if selected_value != "الكل":
+            user_df = user_df[user_df["اسم المستخدم"] == selected_value]
+            search_result_title = f"🔒 تقرير المستخدم: {selected_value} - {company_display_name}"
+        st.markdown(f'<h3 class="printable-right-align">{search_result_title}</h3>', unsafe_allow_html=True)
+        render_printable_table(user_df.drop(columns=["الرسم السري"], errors="ignore"))
+
     else:
         emp_df = st.session_state.employees.copy()
         search_result_title = f"📋 نتيجة البحث الشاملة - {company_display_name}"
@@ -724,13 +691,6 @@ elif choice == "🔍 بحث متقدم":
         elif search_category == "كود الموظف" and selected_value != "الكل":
             emp_df = emp_df[emp_df["كود الموظف"] == selected_value]
             search_result_title = f"📋 نتيجة البحث للكود: {selected_value} - {company_display_name}"
-        elif search_category == "اسم المستخدم" and selected_value != "الكل":
-            user_record = st.session_state.users[st.session_state.users["اسم المستخدم"] == selected_value]
-            if not user_record.empty:
-                u_branch = user_record.iloc[0]["الفرع التابع"]
-                if u_branch and u_branch != "المركز الرئيسي":
-                    emp_df = emp_df[emp_df["الفرع"] == u_branch]
-            search_result_title = f"📋 نتيجة البحث للمستخدم: {selected_value} - {company_display_name}"
 
         st.markdown(f'<h3 class="printable-right-align">{search_result_title}</h3>', unsafe_allow_html=True)
         render_printable_table(emp_df)
