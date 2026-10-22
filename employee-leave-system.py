@@ -77,7 +77,7 @@ def load_company_data():
                     st.session_state.attendance = pd.DataFrame(data["attendance"])
                 else:
                     st.session_state.attendance = pd.DataFrame(columns=[
-                        "التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "بداية العمل الرسمية", "وقت الحضور", "وقت الانصراف", "دقائق التأخير", "ساعات الإضافي", "الحالة"
+                        "التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور", "وقت الانصراف", "دقائق التأخير", "ساعات الإضافي", "الحالة"
                     ])
 
                 if "financial_transactions" in data and len(data["financial_transactions"]) > 0:
@@ -113,7 +113,7 @@ def load_company_data():
             "رقم الطلب", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", "نوع الإجازة", "من تاريخ", "إلى تاريخ", "عدد الأيام", "الحالة"
         ])
         st.session_state.attendance = pd.DataFrame(columns=[
-            "التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "بداية العمل الرسمية", "وقت الحضور", "وقت الانصراف", "دقائق التأخير", "ساعات الإضافي", "الحالة"
+            "التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور", "وقت الانصراف", "دقائق التأخير", "ساعات الإضافي", "الحالة"
         ])
         st.session_state.financial_transactions = pd.DataFrame(columns=[
             "التاريخ", "كود الموظف", "اسم الموظف", "النوع", "المبلغ / القيمة", "البيان / السبب"
@@ -151,7 +151,7 @@ load_company_data()
 st.session_state.company_info["name"] = company_display_name
 st.session_state.company_info["license"] = company_license
 
-# دالة لاختيار الوقت بأسلوب 12 ساعة مع نطاق الدقائق من 0 إلى 59 (حتى 60 دقيقة)
+# دالة لاختيار الوقت بأسلوب 12 ساعة مع نطاق الدقائق من 0 إلى 59
 def select_time_12h(label_prefix, key_prefix, default_hour=8, default_minute=0, default_period="صباحاً (AM)"):
     st.markdown(f"**{label_prefix}**")
     c1, c2, c3 = st.columns([1, 1, 1.2])
@@ -593,26 +593,28 @@ if choice == "لوحة التحكم الرئيسية":
     render_printable_table(view_employees)
 
 # =========================================================
-# ⏱️ الحضور والانصراف
+# ⏱️ الحضور والانصراف (نموذج التسجيل بعرض الشاشة والسجل بأسفل الصفحة)
 # =========================================================
 elif choice == "⏱️ الحضور والانصراف":
     col_t1, col_t2 = st.columns([3, 1])
     with col_t1: st.subheader("⏱️ تسجيل الحضور والانصراف واحتساب التأخير والإضافي والإجازات")
     with col_t2: render_print_button()
     
-    col_a1, col_a2 = st.columns([1, 1])
+    st.markdown("---")
+    st.markdown("#### 📥 تسجيل حركة حضور / انصراف / إجازة جديدة (بعرض الصفحة)")
     
-    with col_a1:
-        st.markdown("#### 📥 تسجيل حركة حضور / انصراف / إجازة جديدة")
-        emp_names = st.session_state.employees["اسم الموظف"].tolist()
-        if not emp_names:
-            st.warning("لا توجد موظفون متاحون.")
-        else:
+    emp_names = st.session_state.employees["اسم الموظف"].tolist()
+    if not emp_names:
+        st.warning("لا توجد موظفون متاحون.")
+    else:
+        # نموذج التسجيل بعرض الصفحة الكامل
+        col_f1, col_f2, col_f3 = st.columns([2, 2, 2])
+        with col_f1:
             selected_emp = st.selectbox("اختر الموظف", emp_names)
             emp_data = st.session_state.employees[st.session_state.employees["اسم الموظف"] == selected_emp].iloc[0]
-            
-            att_date = st.date_input("التاريخ", value=date.today())
-            
+        with col_f2:
+            att_date = st.date_input("تاريخ اليوم", value=date.today())
+        with col_f3:
             att_status = st.selectbox("حالة اليوم", [
                 "حضور", 
                 "إجازة أسبوعية", 
@@ -623,64 +625,73 @@ elif choice == "⏱️ الحضور والانصراف":
                 "مأمورية"
             ])
             
+        st.markdown("##### ⏰ تحديد مواعيد العمل الرسمية والنهائية والحضور الفعلي لهذا اليوم:")
+        col_w1, col_w2 = st.columns(2)
+        with col_w1:
             t_official_start, t_official_start_str = select_time_12h("بداية العمل الرسمية لهذا اليوم", "att_start", default_hour=8, default_minute=0, default_period="صباحاً (AM)")
-            
-            t_in_str, t_out_str = "-", "-"
-            delay_minutes = 0
-            overtime_hours = 0.0
+        with col_w2:
+            t_official_end, t_official_end_str = select_time_12h("نهاية العمل الرسمية لهذا اليوم", "att_end", default_hour=4, default_minute=0, default_period="مساءً (PM)")
+
+        t_in_str, t_out_str = "-", "-"
+        delay_minutes = 0
+        overtime_hours = 0.0
+        
+        if att_status == "حضور":
+            col_act1, col_act2 = st.columns(2)
+            with col_act1:
+                t_in, t_in_str = select_time_12h("وقت الحضور الفعلي", "att_in", default_hour=8, default_minute=0, default_period="صباحاً (AM)")
+            with col_act2:
+                t_out, t_out_str = select_time_12h("وقت الانصراف الفعلي", "att_out", default_hour=4, default_minute=0, default_period="مساءً (PM)")
+        else:
+            st.info(f"💡 تم إعداد الحالة كـ ({att_status})، فلن يتم احتساب تأخير أو وقت إضافي لهذا اليوم.")
+
+        if st.button("💾 حفظ حركة اليوم بجميع التفاصيل", use_container_width=True):
+            emp_code = emp_data["كود الموظف"]
+            emp_branch = emp_data["الفرع"]
             
             if att_status == "حضور":
-                t_in, t_in_str = select_time_12h("وقت الحضور الفعلي", "att_in", default_hour=8, default_minute=0, default_period="صباحاً (AM)")
-                t_out, t_out_str = select_time_12h("وقت الانصراف الفعلي", "att_out", default_hour=4, default_minute=0, default_period="مساءً (PM)")
-            else:
-                st.info(f"💡 تم إعداد الحالة كـ ({att_status})، فلن يتم احتساب تأخير أو وقت إضافي لهذا اليوم.")
+                dt_in = datetime.combine(att_date, t_in)
+                dt_official_start = datetime.combine(att_date, t_official_start)
+                if dt_in > dt_official_start:
+                    delay_minutes = int((dt_in - dt_official_start).total_seconds() / 60)
+                    
+                dt_out = datetime.combine(att_date, t_out)
+                dt_official_end = datetime.combine(att_date, t_official_end)
+                if dt_out > dt_official_end:
+                    overtime_hours = round((dt_out - dt_official_end).total_seconds() / 3600, 2)
+            
+            if att_status == "إجازة سنوية":
+                st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "سنوي مستهلك"] += 1
+                st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "سنوي متبقي"] -= 1
+            elif att_status == "إجازة أسبوعية":
+                st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "أسبوعي مستهلك"] += 1
+                st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "أسبوعي متبقي"] -= 1
+            elif att_status == "إجازة مرضية":
+                if "إجازات مرضية (أيام)" in st.session_state.employees.columns:
+                    st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "إجازات مرضية (أيام)"] += 1
+            
+            new_att = {
+                "التاريخ": str(att_date),
+                "كود الموظف": emp_code,
+                "اسم الموظف": selected_emp,
+                "الفرع": emp_branch,
+                "بداية العمل الرسمية": t_official_start_str,
+                "نهاية العمل الرسمية": t_official_end_str,
+                "وقت الحضور": t_in_str,
+                "وقت الانصراف": t_out_str,
+                "دقائق التأخير": delay_minutes,
+                "ساعات الإضافي": overtime_hours,
+                "الحالة": att_status
+            }
+            
+            st.session_state.attendance = pd.concat([st.session_state.attendance, pd.DataFrame([new_att])], ignore_index=True)
+            auto_save_data()
+            st.success(f"تم تسجيل حركة ({att_status}) بنجاح!")
+            st.rerun()
 
-            if st.button("حفظ حركة اليوم", use_container_width=True):
-                emp_code = emp_data["كود الموظف"]
-                emp_branch = emp_data["الفرع"]
-                
-                if att_status == "حضور":
-                    dt_in = datetime.combine(att_date, t_in)
-                    dt_official_start = datetime.combine(att_date, t_official_start)
-                    if dt_in > dt_official_start:
-                        delay_minutes = int((dt_in - dt_official_start).total_seconds() / 60)
-                        
-                    dt_out = datetime.combine(att_date, t_out)
-                    dt_official_end = datetime.combine(att_date, time(16, 0))
-                    if dt_out > dt_official_end:
-                        overtime_hours = round((dt_out - dt_official_end).total_seconds() / 3600, 2)
-                
-                if att_status == "إجازة سنوية":
-                    st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "سنوي مستهلك"] += 1
-                    st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "سنوي متبقي"] -= 1
-                elif att_status == "إجازة أسبوعية":
-                    st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "أسبوعي مستهلك"] += 1
-                    st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "أسبوعي متبقي"] -= 1
-                elif att_status == "إجازة مرضية":
-                    if "إجازات مرضية (أيام)" in st.session_state.employees.columns:
-                        st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_code, "إجازات مرضية (أيام)"] += 1
-                
-                new_att = {
-                    "التاريخ": str(att_date),
-                    "كود الموظف": emp_code,
-                    "اسم الموظف": selected_emp,
-                    "الفرع": emp_branch,
-                    "بداية العمل الرسمية": t_official_start_str,
-                    "وقت الحضور": t_in_str,
-                    "وقت الانصراف": t_out_str,
-                    "دقائق التأخير": delay_minutes,
-                    "ساعات الإضافي": overtime_hours,
-                    "الحالة": att_status
-                }
-                
-                st.session_state.attendance = pd.concat([st.session_state.attendance, pd.DataFrame([new_att])], ignore_index=True)
-                auto_save_data()
-                st.success(f"تم تسجيل حركة ({att_status}) بنجاح!")
-                st.rerun()
-
-    with col_a2:
-        st.markdown("#### 📋 سجل الحضور والانصراف والإجازات المسجل")
-        render_printable_table(st.session_state.attendance)
+    st.markdown("---")
+    st.markdown("#### 📋 سجل الحضور والانصراف والإجازات المسجل (أسفل نموذج التسجيل)")
+    render_printable_table(st.session_state.attendance)
 
 # =========================================================
 # 💰 السلف والماليات
@@ -1048,6 +1059,7 @@ elif choice == "🖨️ طباعة البيانات والتقارير":
     is_admin_or_top = "Admin" in st.session_state.current_user_role or "الإدارة العليا" in dept_filter
     base_emps = st.session_state.employees if is_admin_or_top else st.session_state.employees[st.session_state.employees["الفرع"] == branch_filter]
 
+
 elif choice == "⚙️ إعدادات وبيانات الشركة":
     st.subheader("⚙️ إعدادات وتعديل بيانات الشركة")
     with st.form("company_settings_form"):
@@ -1104,7 +1116,7 @@ elif choice == "🗑️ مسح وحذف البيانات":
     if confirm_text == "تأكيد الحذف" and st.button("حذف كافة البيانات", type="primary"):
         st.session_state.employees = pd.DataFrame(columns=["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "صلاحية الموظف", "الراتب الأساسي", "رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي", "رصيد أسبوعي (إجمالي)", "أسبوعي مستهلك", "أسبوعي متبقي", "رصيد رسمي (إجمالي)", "رسمي مستهلك", "رسمي متبقي", "إجازات مرضية (أيام)"])
         st.session_state.requests = pd.DataFrame(columns=["رقم الطلب", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", "نوع الإجازة", "من تاريخ", "إلى تاريخ", "عدد الأيام", "الحالة"])
-        st.session_state.attendance = pd.DataFrame(columns=["التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "بداية العمل الرسمية", "وقت الحضور", "وقت الانصراف", "دقائق التأخير", "ساعات الإضافي", "الحالة"])
+        st.session_state.attendance = pd.DataFrame(columns=["التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور", "وقت الانصراف", "دقائق التأخير", "ساعات الإضافي", "الحالة"])
         st.session_state.financial_transactions = pd.DataFrame(columns=["التاريخ", "كود الموظف", "اسم الموظف", "النوع", "المبلغ / القيمة", "البيان / السبب"])
         auto_save_data()
         st.success("تم المسح بنجاح!")
