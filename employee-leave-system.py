@@ -444,21 +444,23 @@ if choice == "لوحة التحكم الرئيسية":
     with col3:
         st.markdown(f'<div class="dashboard-card" style="border-right-color: #5cb85c;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #5cb85c;">{accepted_count}</div></div>', unsafe_allow_html=True)
     
-    # 📊 إضافة المخططات البيانية التفاعلية
+    # 📊 المخططات البيانية المعدلة والمحسن عرضها أفقياً وعمودياً لمنع التداخل
     st.markdown(f'<div class="section-header">📊 الرسم البياني التحليلي لإحصائيات وأرصدة الموظفين</div>', unsafe_allow_html=True)
     
     if not view_employees.empty:
         col_chart1, col_chart2 = st.columns(2)
         
         with col_chart1:
-            st.markdown("##### 🟢 أرصدة الإجازات السنوية والمستهلكة لكل موظف")
-            chart_data = view_employees.set_index("اسم الموظف")[["رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي"]]
+            st.markdown("##### 🟢 أرصدة الإجازات السنوية والمستهلكة")
+            chart_data = view_employees[["اسم الموظف", "رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي"]].set_index("اسم الموظف")
             st.bar_chart(chart_data)
             
         with col_chart2:
             st.markdown("##### 🏢 توزيع الموظفين حسب الفروع")
-            branch_counts = view_employees["الفرع"].value_counts()
-            st.bar_chart(branch_counts)
+            branch_df = view_employees["الفرع"].value_counts().reset_index()
+            branch_df.columns = ["الفرع", "عدد الموظفين"]
+            branch_df = branch_df.set_index("الفرع")
+            st.bar_chart(branch_df)
     else:
         st.info("لا توجد بيانات كافية لعرض المخططات البيانية.")
 
@@ -566,7 +568,6 @@ elif choice == "إدارة وفهرس الموظفين":
     render_printable_table(st.session_state.employees)
 
 elif choice == "🔍 بحث متقدم":
-    # 🗂️ القوائم المنسدلة للبحث المتقدم
     col_f1, col_f2, col_f3 = st.columns([2, 2, 1])
     
     with col_f1:
@@ -629,7 +630,6 @@ elif choice == "🔍 بحث متقدم":
             </div>
         """, height=50)
 
-    # تطبيق الفلترة وتحديد العنوان المخصص بناءً على الاختيار
     if search_category == "بحث بالفترة (طلبات الإجازات)":
         req_df = st.session_state.requests.copy()
         if not req_df.empty and "من تاريخ" in req_df.columns:
