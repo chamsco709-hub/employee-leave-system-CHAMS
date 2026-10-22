@@ -126,7 +126,7 @@ load_company_data()
 st.session_state.company_info["name"] = company_display_name
 st.session_state.company_info["license"] = company_license
 
-# 🎨 تصميم CSS المتطور مع إجبار طباعة الخلفيات والرسوم البيانية بوضوح تام
+# 🎨 تصميم CSS المطور وخيارات الطباعة المخصصة
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none !important; }
@@ -246,7 +246,7 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* 🖨️ إعدادات الطباعة المتقدمة وإجبار طباعة الخلفيات والرسوم */
+    /* 🖨️ إعدادات الطباعة المخصصة لإظهار المخطط بخلفية بيضاء إجباريًا */
     @media print {
         body, .stApp, .block-container {
             background-color: #ffffff !important;
@@ -257,8 +257,9 @@ st.markdown("""
             print-color-adjust: exact !important;
         }
         
-        /* إخفاء الأزرار، قوائم الفلترة، والإطارات غير المطلوبة أثناء الطباعة */
-        button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"] {
+        /* إخفاء الأزرار، أدوات الاختيار، الجداول غير المطلوبة والعناصر الإضافية أثناء الطباعة */
+        button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"],
+        .dashboard-card, table, .custom-table, div[data-testid="stForm"] {
             display: none !important;
         }
 
@@ -273,18 +274,12 @@ st.markdown("""
         .header-top-system h2, .comp-name-txt, .comp-info-txt {
             color: #000000 !important;
         }
-        
-        .printable-right-align {
-            text-align: right !important;
-            direction: rtl !important;
-            margin-right: 0 !important;
-            padding-right: 0 !important;
-        }
-        
-        table.custom-table {
-            margin-right: 0 !important;
-            width: 100% !important;
-            text-align: right !important;
+
+        div[data-testid="stVegaLiteChart"] {
+            background-color: #ffffff !important;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
         }
     }
     </style>
@@ -450,8 +445,8 @@ if choice == "لوحة التحكم الرئيسية":
     with col3:
         st.markdown(f'<div class="dashboard-card" style="border-right-color: #5cb85c;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #5cb85c;">{accepted_count}</div></div>', unsafe_allow_html=True)
     
-    # 📊 المخططات البيانية مع فلترة مباشرة وتخصيص دقيق للطباعة
-    st.markdown(f'<div class="section-header">📊 الرسم البياني التحليلي لإحصائيات وأرصدة الموظفين (مع خيار الطباعة المخصصة)</div>', unsafe_allow_html=True)
+    # 📊 المخططات البيانية
+    st.markdown(f'<div class="section-header">📊 الرسم البياني التحليلي لإحصائيات وأرصدة الموظفين</div>', unsafe_allow_html=True)
     
     col_f_type, col_f_val, col_p_btn = st.columns([2, 2, 1])
     with col_f_type:
@@ -494,42 +489,40 @@ if choice == "لوحة التحكم الرئيسية":
                     font-family: 'Tahoma', sans-serif;
                     width: 100%;
                 ">
-                    🖨️ طباعة المخطط الحقيقي
+                    🖨️ طباعة المخطط فقط
                 </button>
             </div>
         """, height=45)
 
     if not filtered_chart_emps.empty:
-        st.markdown(f"**📌 {chart_subtitle}**")
-        col_chart1, col_chart2 = st.columns(2)
+        # 🟢 النص محاذى لليمين تماماً وبخط واضح وبلا حواف تداخل
+        st.markdown(f'<div style="text-align: right; direction: rtl; font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1f4068;">📌 {chart_subtitle}</div>', unsafe_allow_html=True)
         
-        with col_chart1:
-            st.markdown("##### 🟢 أرصدة الإجازات السنوية والمستهلكة")
-            chart_df_melted = filtered_chart_emps.melt(
-                id_vars=["اسم الموظف"],
-                value_vars=["رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي"],
-                var_name="نوع الرصيد",
-                value_name="عدد الأيام"
-            )
-            c1 = alt.Chart(chart_df_melted).mark_bar().encode(
-                x=alt.X('اسم الموظف:N', title='الموظف', axis=alt.Axis(labelAngle=0)),
-                y=alt.Y('عدد الأيام:Q', title='الأيام'),
-                color='نوع الرصيد:N',
-                tooltip=['اسم الموظف', 'نوع الرصيد', 'عدد الأيام']
-            ).properties(height=280)
-            st.altair_chart(c1, use_container_width=True)
-            
-        with col_chart2:
-            st.markdown("##### 🏢 توزيع الموظفين والأرصدة")
-            branch_df = filtered_chart_emps["الفرع"].value_counts().reset_index()
-            branch_df.columns = ["الفرع", "عدد الموظفين"]
-            
-            c2 = alt.Chart(branch_df).mark_bar(color="#1f4068").encode(
-                x=alt.X('الفرع:N', title='الفرع', axis=alt.Axis(labelAngle=0)),
-                y=alt.Y('عدد الموظفين:Q', title='عدد الموظفين'),
-                tooltip=['الفرع', 'عدد الموظفين']
-            ).properties(height=280)
-            st.altair_chart(c2, use_container_width=True)
+        chart_df_melted = filtered_chart_emps.melt(
+            id_vars=["اسم الموظف"],
+            value_vars=["رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي"],
+            var_name="نوع الرصيد",
+            value_name="عدد الأيام"
+        )
+        
+        c1 = alt.Chart(chart_df_melted).mark_bar().encode(
+            x=alt.X('اسم الموظف:N', title='الموظف', axis=alt.Axis(labelAngle=0)),
+            y=alt.Y('عدد الأيام:Q', title='عدد الأيام'),
+            color=alt.Color('نوع الرصيد:N', legend=alt.Legend(
+                orient='bottom', 
+                direction='horizontal',
+                title='نوع الرصيد',
+                titleAnchor='middle'
+            )),
+            tooltip=['اسم الموظف', 'نوع الرصيد', 'عدد الأيام']
+        ).properties(
+            height=320,
+            background='white'
+        ).configure_view(
+            fill='white'
+        )
+        
+        st.altair_chart(c1, use_container_width=True)
     else:
         st.info("لا توجد بيانات متاحة للمخطط حسب الفلتر المختار.")
 
