@@ -640,7 +640,7 @@ if choice == "لوحة التحكم الرئيسية":
     render_printable_table(view_employees)
 
 # =========================================================
-# ⏱️ الحضور والانصراف
+# ⏱️ الحضور والانصراف (بدون أرقام صفوف - مع إظهار خانات التعديل الحية)
 # =========================================================
 elif choice == "⏱️ الحضور والانصراف":
     col_t1, col_t2 = st.columns([3, 1])
@@ -782,7 +782,7 @@ elif choice == "⏱️ الحضور والانصراف":
                     st.rerun()
 
 # =========================================================
-# 💰 السلف والماليات
+# 💰 السلف والماليات (بدون أرقام صفوف - مع إظهار خانات التعديل الحية)
 # =========================================================
 elif choice == "💰 السلف والماليات":
     col_t1, col_t2 = st.columns([3, 1])
@@ -1103,7 +1103,7 @@ elif choice == "🖨️ طباعة البيانات والتقارير":
         render_printable_table(pd.DataFrame(payroll_data))
 
 # =========================================================
-# 📝 تسجيل طلب إجازة
+# 📝 تسجيل طلب إجازة (بدون أرقام صفوف - مع إظهار خانات التعديل الحية)
 # =========================================================
 elif choice == "تسجيل طلب إجازة":
     col_t1, col_t2 = st.columns([3, 1])
@@ -1192,7 +1192,7 @@ elif choice == "تسجيل طلب إجازة":
                     st.rerun()
 
 # =========================================================
-# 👥 إدارة وفهرس الموظفين
+# 👥 إدارة وفهرس الموظفين (بدون أرقام صفوف - مع إظهار خانات التعديل الحية)
 # =========================================================
 elif choice == "إدارة وفهرس الموظفين":
     col_t1, col_t2 = st.columns([3, 1])
@@ -1274,7 +1274,7 @@ elif choice == "إدارة وفهرس الموظفين":
                     st.rerun()
 
 # =========================================================
-# 🔒 إدارة المستخدمين والصلاحيات
+# 🔒 إدارة المستخدمين والصلاحيات (بدون أرقام صفوف - مع إظهار خانات التعديل الحية)
 # =========================================================
 elif choice == "إدارة المستخدمين والصلاحيات":
     col_t1, col_t2 = st.columns([3, 1])
@@ -1419,28 +1419,17 @@ elif choice == "🔍 بحث متقدم":
         elif search_category == "كود الموظف" and selected_value != "الكل": emp_df = emp_df[emp_df["كود الموظف"] == selected_value]
         render_printable_table(emp_df)
 
-# 7. إعدادات الشركة
 elif choice == "⚙️ إعدادات وبيانات الشركة":
-    st.subheader("⚙️ إعدادات وتعديل بيانات الشركة والشعار")
+    st.subheader("⚙️ إعدادات وتعديل بيانات الشركة")
     with st.form("company_settings_form"):
-        c_name = st.text_input("اسم الشركة / المؤسسة", value=st.session_state.company_info.get("name", ""))
+        c_name = st.text_input("اسم الشركة", value=st.session_state.company_info.get("name", ""))
         c_address = st.text_input("عنوان الشركة", value=st.session_state.company_info.get("address", ""))
-        col_s1, col_s2 = st.columns(2)
-        with col_s1: c_cr = st.text_input("رقم السجل التجاري", value=st.session_state.company_info.get("cr", ""))
-        with col_s2: c_tax = st.text_input("رقم البطاقة الضريبية", value=st.session_state.company_info.get("tax", ""))
-        c_contact = st.text_area("بيانات التواصل", value=st.session_state.company_info.get("contact", ""))
-        uploaded_logo = st.file_uploader("رفع أو تحديث شعار الشركة (Logo)", type=["png", "jpg", "jpeg"])
         save_settings = st.form_submit_button("حفظ التغييرات")
-        
         if save_settings:
             st.session_state.company_info["name"] = c_name
             st.session_state.company_info["address"] = c_address
-            st.session_state.company_info["cr"] = c_cr
-            st.session_state.company_info["tax"] = c_tax
-            st.session_state.company_info["contact"] = c_contact
-            if uploaded_logo is not None:
-                st.session_state.company_info["logo"] = uploaded_logo
-            st.success("تم تحديث بيانات الشركة بنجاح!")
+            auto_save_data()
+            st.success("تم التحديث!")
             st.rerun()
 
 elif choice == "📥 تحميل البيانات (Excel)":
