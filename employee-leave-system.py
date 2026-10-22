@@ -444,6 +444,24 @@ if choice == "لوحة التحكم الرئيسية":
     with col3:
         st.markdown(f'<div class="dashboard-card" style="border-right-color: #5cb85c;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #5cb85c;">{accepted_count}</div></div>', unsafe_allow_html=True)
     
+    # 📊 إضافة المخططات البيانية التفاعلية
+    st.markdown(f'<div class="section-header">📊 الرسم البياني التحليلي لإحصائيات وأرصدة الموظفين</div>', unsafe_allow_html=True)
+    
+    if not view_employees.empty:
+        col_chart1, col_chart2 = st.columns(2)
+        
+        with col_chart1:
+            st.markdown("##### 🟢 أرصدة الإجازات السنوية والمستهلكة لكل موظف")
+            chart_data = view_employees.set_index("اسم الموظف")[["رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي"]]
+            st.bar_chart(chart_data)
+            
+        with col_chart2:
+            st.markdown("##### 🏢 توزيع الموظفين حسب الفروع")
+            branch_counts = view_employees["الفرع"].value_counts()
+            st.bar_chart(branch_counts)
+    else:
+        st.info("لا توجد بيانات كافية لعرض المخططات البيانية.")
+
     st.markdown(f'<div class="section-header">📋 أرصدة إجازات موظفي الشركة: {company_display_name}</div>', unsafe_allow_html=True)
     render_printable_table(view_employees)
     
@@ -618,7 +636,6 @@ elif choice == "🔍 بحث متقدم":
             req_df["من_تاريخ_dt"] = pd.to_datetime(req_df["من تاريخ"]).dt.date
             req_df["إلى_تاريخ_dt"] = pd.to_datetime(req_df["إلى تاريخ"]).dt.date
             
-            # فلترة الإجازات الواقعة ضمن الفترة المحددة
             req_df = req_df[(req_df["من_تاريخ_dt"] >= date_from) & (req_df["إلى_تاريخ_dt"] <= date_to)]
             req_df = req_df.drop(columns=["من_تاريخ_dt", "إلى_تاريخ_dt"])
         
