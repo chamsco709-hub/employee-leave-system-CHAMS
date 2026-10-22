@@ -640,7 +640,7 @@ if choice == "لوحة التحكم الرئيسية":
     render_printable_table(view_employees)
 
 # =========================================================
-# ⏱️ الحضور والانصراف (مع إمكانية التعديل والحذف)
+# ⏱️ الحضور والانصراف (بدون أرقام صفوف - مع إظهار خانات التعديل الحية)
 # =========================================================
 elif choice == "⏱️ الحضور والانصراف":
     col_t1, col_t2 = st.columns([3, 1])
@@ -742,15 +742,21 @@ elif choice == "⏱️ الحضور والانصراف":
 
     if not st.session_state.attendance.empty:
         with st.expander("✏️ تعديل أو حذف حركة حضور وانصراف مسجلة"):
-            att_indices = list(st.session_state.attendance.index)
-            selected_att_idx = st.selectbox("اختر رقم الصف (Index) للحركة المراد تعديلها أو حذفها:", att_indices)
+            att_records = [f"الموظف: {row['اسم الموظف']} | التاريخ: {row['التاريخ']} | الحالة: {row['الحالة']}" for _, row in st.session_state.attendance.iterrows()]
+            selected_att_label = st.selectbox("اختر الحركة المراد تعديلها أو حذفها:", att_records)
+            selected_att_idx = att_records.index(selected_att_label)
             
             row_to_edit = st.session_state.attendance.loc[selected_att_idx]
             
             with st.form("edit_attendance_form"):
+                st.markdown(f"**تعديل بيانات الحركة للموظف: {row_to_edit['اسم الموظف']} (بتاريخ {row_to_edit['التاريخ']})**")
                 ed_emp = st.text_input("اسم الموظف", value=str(row_to_edit["اسم الموظف"]))
                 ed_date = st.text_input("التاريخ", value=str(row_to_edit["التاريخ"]))
-                ed_status = st.selectbox("الحالة", ["حضور", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "غياب", "إجازة رسمية", "مأمورية"], index=0)
+                
+                status_options = ["حضور", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "غياب", "إجازة رسمية", "مأمورية"]
+                current_st_idx = status_options.index(row_to_edit["الحالة"]) if row_to_edit["الحالة"] in status_options else 0
+                ed_status = st.selectbox("الحالة", status_options, index=current_st_idx)
+                
                 ed_delay = st.number_input("دقائق التأخير", min_value=0, value=int(row_to_edit["دقائق التأخير"]))
                 ed_overtime = st.number_input("ساعات الإضافي", min_value=0.0, value=float(row_to_edit["ساعات الإضافي"]))
                 
@@ -776,7 +782,7 @@ elif choice == "⏱️ الحضور والانصراف":
                     st.rerun()
 
 # =========================================================
-# 💰 السلف والماليات (مع إمكانية التعديل والحذف)
+# 💰 السلف والماليات (بدون أرقام صفوف - مع إظهار خانات التعديل الحية)
 # =========================================================
 elif choice == "💰 السلف والماليات":
     col_t1, col_t2 = st.columns([3, 1])
@@ -831,14 +837,20 @@ elif choice == "💰 السلف والماليات":
 
     if not st.session_state.financial_transactions.empty:
         with st.expander("✏️ تعديل أو حذف معاملة مالية مسجلة"):
-            fin_indices = list(st.session_state.financial_transactions.index)
-            selected_fin_idx = st.selectbox("اختر رقم الصف (Index) للمعاملة المراد تعديلها أو حذفها:", fin_indices)
+            fin_records = [f"الموظف: {row['اسم الموظف']} | النوع: {row['النوع']} | المبلغ: {row['المبلغ / القيمة']} | التاريخ: {row['التاريخ']}" for _, row in st.session_state.financial_transactions.iterrows()]
+            selected_fin_label = st.selectbox("اختر المعاملة المراد تعديلها أو حذفها:", fin_records)
+            selected_fin_idx = fin_records.index(selected_fin_label)
             
             fin_to_edit = st.session_state.financial_transactions.loc[selected_fin_idx]
             
             with st.form("edit_fin_form"):
+                st.markdown(f"**تعديل المعاملة المالية للموظف: {fin_to_edit['اسم الموظف']}**")
                 ed_f_emp = st.text_input("اسم الموظف", value=str(fin_to_edit["اسم الموظف"]))
-                ed_f_type = st.selectbox("نوع المعاملة", ["سلفة", "جزاء (خصم)", "مكافأة (إضافي)"], index=0)
+                
+                fin_types = ["سلفة", "جزاء (خصم)", "مكافأة (إضافي)"]
+                current_f_idx = fin_types.index(fin_to_edit["النوع"]) if fin_to_edit["النوع"] in fin_types else 0
+                ed_f_type = st.selectbox("نوع المعاملة", fin_types, index=current_f_idx)
+                
                 ed_f_amt = st.number_input("المبلغ / القيمة", min_value=0.0, value=float(fin_to_edit["المبلغ / القيمة"]))
                 ed_f_reason = st.text_input("البيان / السبب", value=str(fin_to_edit["البيان / السبب"]))
                 
@@ -1091,7 +1103,7 @@ elif choice == "🖨️ طباعة البيانات والتقارير":
         render_printable_table(pd.DataFrame(payroll_data))
 
 # =========================================================
-# 📝 تسجيل طلب إجازة (مع إمكانية التعديل والحذف)
+# 📝 تسجيل طلب إجازة (بدون أرقام صفوف - مع إظهار خانات التعديل الحية)
 # =========================================================
 elif choice == "تسجيل طلب إجازة":
     col_t1, col_t2 = st.columns([3, 1])
@@ -1139,18 +1151,24 @@ elif choice == "تسجيل طلب إجازة":
                     st.success("تم تقديم طلب الإجازة وحفظه تلقائياً في ملف الشركة!")
 
     st.markdown("---")
-    st.markdown("#### 📋 سجل طلبات الإجازات المسجلة (مع إمكانية التعديل أو الحذف)")
+    st.markdown("#### 📋 سجل طلبات الإجازات المسجلة")
     render_printable_table(st.session_state.requests)
 
     if not st.session_state.requests.empty:
         with st.expander("✏️ تعديل أو حذف طلب إجازة مسجل"):
-            req_indices = list(st.session_state.requests.index)
-            selected_req_idx = st.selectbox("اختر رقم الصف (Index) للطلب المراد تعديله أو حذفه:", req_indices)
+            req_records = [f"طلب رقم #{row['رقم الطلب']} - الموظف: {row['اسم الموظف']} ({row['نوع الإجازة']}) - الحالة: {row['الحالة']}" for _, row in st.session_state.requests.iterrows()]
+            selected_req_label = st.selectbox("اختر الطلب المراد تعديله أو حذفه:", req_records)
+            selected_req_idx = req_records.index(selected_req_label)
             
             req_to_edit = st.session_state.requests.loc[selected_req_idx]
             
             with st.form("edit_req_form"):
-                ed_req_status = st.selectbox("حالة الطلب", ["قيد الانتظار", "مقبول", "مرفوض"], index=0 if req_to_edit["الحالة"]=="قيد الانتظار" else (1 if req_to_edit["الحالة"]=="مقبول" else 2))
+                st.markdown(f"**تعديل طلب الإجازة رقم #{req_to_edit['رقم الطلب']} للموظف: {req_to_edit['اسم الموظف']}**")
+                
+                status_list = ["قيد الانتظار", "مقبول", "مرفوض"]
+                current_st_idx = status_list.index(req_to_edit["الحالة"]) if req_to_edit["الحالة"] in status_list else 0
+                ed_req_status = st.selectbox("حالة الطلب", status_list, index=current_st_idx)
+                
                 ed_req_type = st.text_input("نوع الإجازة", value=str(req_to_edit["نوع الإجازة"]))
                 ed_req_days = st.number_input("عدد الأيام", min_value=1, value=int(req_to_edit["عدد الأيام"]))
                 
@@ -1174,7 +1192,7 @@ elif choice == "تسجيل طلب إجازة":
                     st.rerun()
 
 # =========================================================
-# 👥 إدارة وفهرس الموظفين (مع إمكانية التعديل والحذف)
+# 👥 إدارة وفهرس الموظفين 
 # =========================================================
 elif choice == "إدارة وفهرس الموظفين":
     col_t1, col_t2 = st.columns([3, 1])
@@ -1216,12 +1234,14 @@ elif choice == "إدارة وفهرس الموظفين":
 
     if not st.session_state.employees.empty:
         with st.expander("✏️ تعديل أو حذف بيانات موظف مسجل"):
-            emp_indices = list(st.session_state.employees.index)
-            selected_emp_idx = st.selectbox("اختر رقم الصف (Index) للموظف المراد تعديله أو حذفه:", emp_indices)
+            emp_records = [f"الكود: {row['كود الموظف']} - الاسم: {row['اسم الموظف']} ({row['الوظيفة']})" for _, row in st.session_state.employees.iterrows()]
+            selected_emp_label = st.selectbox("اختر الموظف المراد تعديله أو حذفه:", emp_records)
+            selected_emp_idx = emp_records.index(selected_emp_label)
             
             emp_to_edit = st.session_state.employees.loc[selected_emp_idx]
             
             with st.form("edit_emp_form"):
+                st.markdown(f"**تعديل بيانات الموظف: {emp_to_edit['اسم الموظف']} (كود: {emp_to_edit['كود الموظف']})**")
                 ed_emp_name = st.text_input("اسم الموظف", value=str(emp_to_edit["اسم الموظف"]))
                 ed_emp_job = st.text_input("الوظيفة", value=str(emp_to_edit["الوظيفة"]))
                 ed_emp_dept = st.text_input("القسم", value=str(emp_to_edit["القسم"]))
@@ -1254,7 +1274,7 @@ elif choice == "إدارة وفهرس الموظفين":
                     st.rerun()
 
 # =========================================================
-# 🔒 إدارة المستخدمين والصلاحيات (مع إمكانية التعديل والحذف)
+# 🔒 إدارة المستخدمين والصلاحيات 
 # =========================================================
 elif choice == "إدارة المستخدمين والصلاحيات":
     col_t1, col_t2 = st.columns([3, 1])
@@ -1298,16 +1318,22 @@ elif choice == "إدارة المستخدمين والصلاحيات":
 
     if not st.session_state.users.empty:
         with st.expander("✏️ تعديل أو حذف مستخدم نظام مسجل"):
-            user_indices = list(st.session_state.users.index)
-            selected_user_idx = st.selectbox("اختر رقم الصف (Index) للمستخدم المراد تعديله أو حذفه:", user_indices)
+            user_records = [f"المستخدم: {row['اسم المستخدم']} - الاسم: {row['الاسم الكامل']} ({row['الصلاحية']})" for _, row in st.session_state.users.iterrows()]
+            selected_user_label = st.selectbox("اختر المستخدم المراد تعديله أو حذفه:", user_records)
+            selected_user_idx = user_records.index(selected_user_label)
             
             user_to_edit = st.session_state.users.loc[selected_user_idx]
             
             with st.form("edit_user_form"):
+                st.markdown(f"**تعديل بيانات المستخدم: {user_to_edit['اسم المستخدم']}**")
                 ed_u_fullname = st.text_input("الاسم الكامل", value=str(user_to_edit["الاسم الكامل"]))
                 ed_u_branch = st.text_input("الفرع التابع", value=str(user_to_edit["الفرع التابع"]))
                 ed_u_dept = st.text_input("القسم التابع", value=str(user_to_edit["القسم التابع"]))
-                ed_u_role = st.selectbox("الصلاحية", ["مشرف عام (Admin)", "مدير شؤون إدارية", "متابع فرع", "موظف إدخال"], index=0)
+                
+                roles_list = ["مشرف عام (Admin)", "مدير شؤون إدارية", "متابع فرع", "موظف إدخال"]
+                current_role_idx = roles_list.index(user_to_edit["الصلاحية"]) if user_to_edit["الصلاحية"] in roles_list else 0
+                ed_u_role = st.selectbox("الصلاحية", roles_list, index=current_role_idx)
+                
                 ed_u_pattern = st.text_input("الرسم السري الجديد", value=str(user_to_edit["الرسم السري"]))
                 
                 col_u1, col_u2 = st.columns(2)
@@ -1380,10 +1406,80 @@ elif choice == "🔍 بحث متقدم":
             req_df = req_df.drop(columns=["من_تاريخ_dt", "إلى_تاريخ_dt"])
         render_printable_table(req_df)
     
-    elif search_category == "اسم المستخدم":
-        user_df = st.session_state.users.copy()
-        if selected_value != "الكل": user_df = user_df[user_df["اسم المستخدم"] == selected_value]
-        render_printable_table(user_df.drop(columns=["الرسم السري"], errors="ignore"))
+   # 5. إدارة المستخدمين
+elif choice == "إدارة المستخدمين والصلاحيات":
+    st.subheader("🔒 إدارة مستخدمي النظام وفروعهم وأقسامهم والصلاحيات والرسوم السرية")
+    
+    with st.expander("➕ إضافة مستخدم جديد"):
+        with st.form("add_user_form"):
+            u_username = st.text_input("اسم المستخدم (Username)")
+            u_fullname = st.text_input("الاسم الكامل للمستخدم")
+            u_email = st.text_input("البريد الإلكتروني")
+            u_branch_target = st.text_input("الفرع التابع له")
+            u_dept_target = st.text_input("القسم التابع له")
+            u_role = st.selectbox("صلاحية المستخدم", ["مشرف عام (Admin)", "مفوض الموارد البشرية (HR Manager)", "مدير فرع / قسم", "مستخدم عادي (Viewer)"])
+            u_status = st.selectbox("حالة الحساب", ["نشط", "موقوف"])
+            u_pattern = st.text_input("الرسم السري (Pattern)", placeholder="مثل: 1-2-3")
+            
+            add_user_btn = st.form_submit_button("إضافة المستخدم")
+            if add_user_btn:
+                if u_username and u_fullname and u_pattern and u_branch_target:
+                    if u_username in st.session_state.users["اسم المستخدم"].values:
+                        st.error("اسم المستخدم موجوة مسبقاً!")
+                    else:
+                        new_user = {
+                            "اسم المستخدم": u_username, "الاسم الكامل": u_fullname, "الفرع التابع": u_branch_target,
+                            "القسم التابع": u_dept_target, "الصلاحية": u_role, "البريد الإلكتروني": u_email,
+                            "الحالة": u_status, "الرسم السري": u_pattern
+                        }
+                        st.session_state.users = pd.concat([st.session_state.users, pd.DataFrame([new_user])], ignore_index=True)
+                        auto_save_data()  # 💾 حفظ تلقائي
+                        st.success("تم إضافة المستخدم وحفظه تلقائياً!")
+                        st.rerun()
+
+    st.markdown("---")
+    user_list = st.session_state.users["اسم المستخدم"].dropna().astype(str).tolist()
+    if user_list:
+        selected_username = st.selectbox("اختر اسم المستخدم للتعديل أو الحذف", user_list)
+        user_row = st.session_state.users[st.session_state.users["اسم المستخدم"] == selected_username].iloc[0]
+        
+        with st.form("edit_delete_user_form"):
+            e_uname = st.text_input("اسم المستخدم", value=str(user_row["اسم المستخدم"]), disabled=True)
+            e_fullname = st.text_input("الاسم الكامل", value=str(user_row["الاسم الكامل"]))
+            e_branch_target = st.text_input("الفرع التابع", value=str(user_row["الفرع التابع"]))
+            e_dept_target = st.text_input("القسم التابع", value=str(user_row["القسم التابع"]))
+            e_email = st.text_input("البريد الإلكتروني", value=str(user_row["البريد الإلكتروني"]))
+            
+            roles_list = ["مشرف عام (Admin)", "مفوض الموارد البشرية (HR Manager)", "مدير فرع / قسم", "مستخدم عادي (Viewer)"]
+            e_role = st.selectbox("صلاحية المستخدم", roles_list, index=roles_list.index(user_row["الصلاحية"]) if user_row["الصلاحية"] in roles_list else 0)
+            
+            status_list = ["نشط", "موقوف"]
+            e_status = st.selectbox("حالة الحساب", status_list, index=status_list.index(user_row["الحالة"]) if user_row["الحالة"] in status_list else 0)
+            e_pattern = st.text_input("الرسم السري الجديد", value=str(user_row["الرسم السري"]))
+            
+            col_u1, col_u2 = st.columns(2)
+            with col_u1: update_user_btn = st.form_submit_button("💾 حفظ تعديلات المستخدم", use_container_width=True)
+            with col_u2: delete_user_btn = st.form_submit_button("🗑️ حذف المستخدم نهائياً", use_container_width=True)
+                
+            if update_user_btn:
+                st.session_state.users.loc[st.session_state.users["اسم المستخدم"] == selected_username, [
+                    "الاسم الكامل", "الفرع التابع", "القسم التابع", "البريد الإلكتروني", "الصلاحية", "الحالة", "الرسم السري"
+                ]] = [e_fullname, e_branch_target, e_dept_target, e_email, e_role, e_status, e_pattern]
+                auto_save_data()  # 💾 حفظ تلقائي
+                st.success("تم تحديث بيانات المستخدم وحفظها تلقائياً!")
+                st.rerun()
+                
+            if delete_user_btn:
+                if len(st.session_state.users) <= 1:
+                    st.error("لا يمكن حذف آخر مستخدم في النظام!")
+                else:
+                    st.session_state.users = st.session_state.users[st.session_state.users["اسم المستخدم"] != selected_username].reset_index(drop=True)
+                    auto_save_data()  # 💾 حفظ تلقائي
+                    st.warning("تم حذف المستخدم بنجاح!")
+                    st.rerun()
+
+    display_users_df = st.session_state.users.drop(columns=["الرسم السري"], errors="ignore")
+    render_printable_table(display_users_df)
 
     else:
         emp_df = st.session_state.employees.copy()
