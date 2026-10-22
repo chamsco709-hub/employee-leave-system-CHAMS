@@ -640,7 +640,7 @@ if choice == "لوحة التحكم الرئيسية":
     render_printable_table(view_employees)
 
 # =========================================================
-# ⏱️ الحضور والانصراف (بدون أرقام صفوف - مع إظهار خانات التعديل الحية)
+# ⏱️ الحضور والانصراف
 # =========================================================
 elif choice == "⏱️ الحضور والانصراف":
     col_t1, col_t2 = st.columns([3, 1])
@@ -782,7 +782,7 @@ elif choice == "⏱️ الحضور والانصراف":
                     st.rerun()
 
 # =========================================================
-# 💰 السلف والماليات (بدون أرقام صفوف - مع إظهار خانات التعديل الحية)
+# 💰 السلف والماليات
 # =========================================================
 elif choice == "💰 السلف والماليات":
     col_t1, col_t2 = st.columns([3, 1])
@@ -1103,7 +1103,7 @@ elif choice == "🖨️ طباعة البيانات والتقارير":
         render_printable_table(pd.DataFrame(payroll_data))
 
 # =========================================================
-# 📝 تسجيل طلب إجازة (بدون أرقام صفوف - مع إظهار خانات التعديل الحية)
+# 📝 تسجيل طلب إجازة
 # =========================================================
 elif choice == "تسجيل طلب إجازة":
     col_t1, col_t2 = st.columns([3, 1])
@@ -1192,7 +1192,7 @@ elif choice == "تسجيل طلب إجازة":
                     st.rerun()
 
 # =========================================================
-# 👥 إدارة وفهرس الموظفين 
+# 👥 إدارة وفهرس الموظفين
 # =========================================================
 elif choice == "إدارة وفهرس الموظفين":
     col_t1, col_t2 = st.columns([3, 1])
@@ -1274,7 +1274,7 @@ elif choice == "إدارة وفهرس الموظفين":
                     st.rerun()
 
 # =========================================================
-# 🔒 إدارة المستخدمين والصلاحيات 
+# 🔒 إدارة المستخدمين والصلاحيات
 # =========================================================
 elif choice == "إدارة المستخدمين والصلاحيات":
     col_t1, col_t2 = st.columns([3, 1])
@@ -1406,80 +1406,10 @@ elif choice == "🔍 بحث متقدم":
             req_df = req_df.drop(columns=["من_تاريخ_dt", "إلى_تاريخ_dt"])
         render_printable_table(req_df)
     
-   # 5. إدارة المستخدمين
-elif choice == "إدارة المستخدمين والصلاحيات":
-    st.subheader("🔒 إدارة مستخدمي النظام وفروعهم وأقسامهم والصلاحيات والرسوم السرية")
-    
-    with st.expander("➕ إضافة مستخدم جديد"):
-        with st.form("add_user_form"):
-            u_username = st.text_input("اسم المستخدم (Username)")
-            u_fullname = st.text_input("الاسم الكامل للمستخدم")
-            u_email = st.text_input("البريد الإلكتروني")
-            u_branch_target = st.text_input("الفرع التابع له")
-            u_dept_target = st.text_input("القسم التابع له")
-            u_role = st.selectbox("صلاحية المستخدم", ["مشرف عام (Admin)", "مفوض الموارد البشرية (HR Manager)", "مدير فرع / قسم", "مستخدم عادي (Viewer)"])
-            u_status = st.selectbox("حالة الحساب", ["نشط", "موقوف"])
-            u_pattern = st.text_input("الرسم السري (Pattern)", placeholder="مثل: 1-2-3")
-            
-            add_user_btn = st.form_submit_button("إضافة المستخدم")
-            if add_user_btn:
-                if u_username and u_fullname and u_pattern and u_branch_target:
-                    if u_username in st.session_state.users["اسم المستخدم"].values:
-                        st.error("اسم المستخدم موجوة مسبقاً!")
-                    else:
-                        new_user = {
-                            "اسم المستخدم": u_username, "الاسم الكامل": u_fullname, "الفرع التابع": u_branch_target,
-                            "القسم التابع": u_dept_target, "الصلاحية": u_role, "البريد الإلكتروني": u_email,
-                            "الحالة": u_status, "الرسم السري": u_pattern
-                        }
-                        st.session_state.users = pd.concat([st.session_state.users, pd.DataFrame([new_user])], ignore_index=True)
-                        auto_save_data()  # 💾 حفظ تلقائي
-                        st.success("تم إضافة المستخدم وحفظه تلقائياً!")
-                        st.rerun()
-
-    st.markdown("---")
-    user_list = st.session_state.users["اسم المستخدم"].dropna().astype(str).tolist()
-    if user_list:
-        selected_username = st.selectbox("اختر اسم المستخدم للتعديل أو الحذف", user_list)
-        user_row = st.session_state.users[st.session_state.users["اسم المستخدم"] == selected_username].iloc[0]
-        
-        with st.form("edit_delete_user_form"):
-            e_uname = st.text_input("اسم المستخدم", value=str(user_row["اسم المستخدم"]), disabled=True)
-            e_fullname = st.text_input("الاسم الكامل", value=str(user_row["الاسم الكامل"]))
-            e_branch_target = st.text_input("الفرع التابع", value=str(user_row["الفرع التابع"]))
-            e_dept_target = st.text_input("القسم التابع", value=str(user_row["القسم التابع"]))
-            e_email = st.text_input("البريد الإلكتروني", value=str(user_row["البريد الإلكتروني"]))
-            
-            roles_list = ["مشرف عام (Admin)", "مفوض الموارد البشرية (HR Manager)", "مدير فرع / قسم", "مستخدم عادي (Viewer)"]
-            e_role = st.selectbox("صلاحية المستخدم", roles_list, index=roles_list.index(user_row["الصلاحية"]) if user_row["الصلاحية"] in roles_list else 0)
-            
-            status_list = ["نشط", "موقوف"]
-            e_status = st.selectbox("حالة الحساب", status_list, index=status_list.index(user_row["الحالة"]) if user_row["الحالة"] in status_list else 0)
-            e_pattern = st.text_input("الرسم السري الجديد", value=str(user_row["الرسم السري"]))
-            
-            col_u1, col_u2 = st.columns(2)
-            with col_u1: update_user_btn = st.form_submit_button("💾 حفظ تعديلات المستخدم", use_container_width=True)
-            with col_u2: delete_user_btn = st.form_submit_button("🗑️ حذف المستخدم نهائياً", use_container_width=True)
-                
-            if update_user_btn:
-                st.session_state.users.loc[st.session_state.users["اسم المستخدم"] == selected_username, [
-                    "الاسم الكامل", "الفرع التابع", "القسم التابع", "البريد الإلكتروني", "الصلاحية", "الحالة", "الرسم السري"
-                ]] = [e_fullname, e_branch_target, e_dept_target, e_email, e_role, e_status, e_pattern]
-                auto_save_data()  # 💾 حفظ تلقائي
-                st.success("تم تحديث بيانات المستخدم وحفظها تلقائياً!")
-                st.rerun()
-                
-            if delete_user_btn:
-                if len(st.session_state.users) <= 1:
-                    st.error("لا يمكن حذف آخر مستخدم في النظام!")
-                else:
-                    st.session_state.users = st.session_state.users[st.session_state.users["اسم المستخدم"] != selected_username].reset_index(drop=True)
-                    auto_save_data()  # 💾 حفظ تلقائي
-                    st.warning("تم حذف المستخدم بنجاح!")
-                    st.rerun()
-
-    display_users_df = st.session_state.users.drop(columns=["الرسم السري"], errors="ignore")
-    render_printable_table(display_users_df)
+    elif search_category == "اسم المستخدم":
+        user_df = st.session_state.users.copy()
+        if selected_value != "الكل": user_df = user_df[user_df["اسم المستخدم"] == selected_value]
+        render_printable_table(user_df.drop(columns=["الرسم السري"], errors="ignore"))
 
     else:
         emp_df = st.session_state.employees.copy()
