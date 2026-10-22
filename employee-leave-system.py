@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
 import io
 import base64
 import json
@@ -125,7 +125,7 @@ load_company_data()
 st.session_state.company_info["name"] = company_display_name
 st.session_state.company_info["license"] = company_license
 
-# 🎨 تصميم CSS المتطور مع التحكم التام في الطباعة وإخفاء القوائم المنسدلة للتقارير
+# 🎨 تصميم CSS الموحد وتنسيق الطباعة الدقيق
 st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none !important; }
@@ -245,7 +245,7 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* 🖨️ إعدادات الطباعة المتقدمة وإخفاء عناصر اختيار التقارير */
+    /* 🖨️ إعدادات الطباعة بخلفية بيضاء ومحاذاة تامة لليمن */
     @media print {
         body, .stApp, .block-container {
             background-color: #ffffff !important;
@@ -254,8 +254,7 @@ st.markdown("""
             text-align: right !important;
         }
         
-        /* إخفاء الأزرار، الإطارات، وصناديق اختيار التقارير أثناء الطباعة */
-        button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"] {
+        button, .stButton, iframe, div[data-testid="stHeader"] {
             display: none !important;
         }
 
@@ -517,17 +516,15 @@ elif choice == "تسجيل طلب إجازة":
                     auto_save_data()
                     st.success("تم تقديم طلب الإجازة وحفظه تلقائياً في ملف الشركة!")
 
-# 3. إدارة الموظفين
 elif choice == "إدارة وفهرس الموظفين":
-    st.subheader("👥 دليل وأقسام الموظفين والفروع والوظائف والصلاحيات")
-    
+    st.subheader(f"👥 دليل الموظفين والأرصدة - {company_display_name}")
     with st.expander("➕ إضافة موظف جديد"):
         with st.form("add_employee_form"):
             c_code = st.text_input("كود الموظف")
             c_name = st.text_input("اسم الموظف الكامل")
             c_job = st.text_input("الوظيفة")
             c_dept = st.text_input("القسم")
-            c_branch = st.text_input("الفرع", value=st.session_state.current_user_branch if "Admin" not in st.session_state.current_user_role else "")
+            c_branch = st.text_input("الفرع")
             c_emp_permission = st.selectbox("صلاحية الموظف المخصصة", ["إدخال طلبات فقط", "اعتماد الطلبات", "مدير شؤون إدارية", "صلاحيات كاملة للقسم"])
             
             col_b1, col_b2, col_b3 = st.columns(3)
@@ -538,82 +535,17 @@ elif choice == "إدارة وفهرس الموظفين":
             add_emp_btn = st.form_submit_button("إضافة الموظف")
             if add_emp_btn:
                 if c_code and c_name:
-                    if c_code in st.session_state.employees["كود الموظف"].values:
-                        st.error("كود الموظف موجود مسبقاً!")
-                    else:
-                        new_emp = {
-                            "كود الموظف": c_code, "اسم الموظف": c_name, "الوظيفة": c_job, "القسم": c_dept, "الفرع": c_branch, "صلاحية الموظف": c_emp_permission,
-                            "رصيد سنوي (إجمالي)": c_annual, "سنوي مستهلك": 0, "سنوي متبقي": c_annual,
-                            "رصيد أسبوعي (إجمالي)": c_weekly, "أسبوعي مستهلك": 0, "أسبوعي متبقي": c_weekly,
-                            "رصيد رسمي (إجمالي)": c_official, "رسمي مستهلك": 0, "رسمي متبقي": c_official
-                        }
-                        st.session_state.employees = pd.concat([st.session_state.employees, pd.DataFrame([new_emp])], ignore_index=True)
-                        auto_save_data()  # 💾 حفظ تلقائي
-                        st.success("تم إضافة الموظف وحفظ البيانات تلقائياً!")
-                        st.rerun()
-
-    st.markdown("---")
-    st.markdown("### 🛠️ تعديل أو حذف موظف")
-    branch_filter = st.session_state.current_user_branch
-    dept_filter = st.session_state.current_user_dept
-    
-    editable_emps = st.session_state.employees if ("Admin" in st.session_state.current_user_role or "الإدارة العليا" in dept_filter) else st.session_state.employees[st.session_state.employees["الفرع"] == branch_filter]
-    emp_names_list = editable_emps["اسم الموظف"].dropna().astype(str).tolist()
-    
-    if emp_names_list:
-        selected_emp_name = st.selectbox("اختر الموظف للتعديل أو الحذف", emp_names_list)
-        emp_row = st.session_state.employees[st.session_state.employees["اسم الموظف"] == selected_emp_name].iloc[0]
-        
-        with st.form("edit_delete_employee_form"):
-            e_code = st.text_input("كود الموظف", value=str(emp_row["كود الموظف"]), disabled=True)
-            e_name = st.text_input("اسم الموظف", value=str(emp_row["اسم الموظف"]))
-            e_job = st.text_input("الوظيفة", value=str(emp_row.get("الوظيفة", "")))
-            e_dept = st.text_input("القسم", value=str(emp_row["القسم"]))
-            e_branch = st.text_input("الفرع", value=str(emp_row["الفرع"]))
-            
-            perms_list = ["إدخال طلبات فقط", "اعتماد الطلبات", "مدير شؤون إدارية", "صلاحيات كاملة للقسم"]
-            current_perm = emp_row["صلاحية الموظف"] if "صلاحية الموظف" in emp_row and emp_row["صلاحية الموظف"] in perms_list else "إدخال طلبات فقط"
-            e_emp_permission = st.selectbox("صلاحية الموظف المخصصة", perms_list, index=perms_list.index(current_perm))
-            
-            col_e1, col_e2, col_e3 = st.columns(3)
-            with col_e1:
-                e_annual = st.number_input("الرصيد السنوي", min_value=0, value=int(emp_row["رصيد سنوي (إجمالي)"]))
-                e_annual_cons = st.number_input("سنوي مستهلك", min_value=0, value=int(emp_row["سنوي مستهلك"]))
-            with col_e2:
-                e_weekly = st.number_input("الرصيد الأسبوعي", min_value=0, value=int(emp_row["رصيد أسبوعي (إجمالي)"]))
-                e_weekly_cons = st.number_input("أسبوعي مستهلك", min_value=0, value=int(emp_row["أسبوعي مستهلك"]))
-            with col_e3:
-                e_official = st.number_input("رصيد رسمي", min_value=0, value=int(emp_row["رصيد رسمي (إجمالي)"]))
-                e_official_cons = st.number_input("رسمي مستهلك", min_value=0, value=int(emp_row["رسمي مستهلك"]))
-                
-            e_annual_rem = e_annual - e_annual_cons
-            e_weekly_rem = e_weekly - e_weekly_cons
-            e_official_rem = e_official - e_official_cons
-            
-            col_f1, col_f2 = st.columns(2)
-            with col_f1: update_btn = st.form_submit_button("💾 حفظ التعديلات", use_container_width=True)
-            with col_f2: delete_btn = st.form_submit_button("🗑️ حذف الموظف نهائياً", use_container_width=True)
-                
-            if update_btn:
-                st.session_state.employees.loc[st.session_state.employees["كود الموظف"] == emp_row["كود الموظف"], [
-                    "اسم الموظف", "الوظيفة", "القسم", "الفرع", "صلاحية الموظف",
-                    "رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي",
-                    "رصيد أسبوعي (إجمالي)", "أسبوعي مستهلك", "أسبوعي متبقي",
-                    "رصيد رسمي (إجمالي)", "رسمي مستهلك", "رسمي متبقي"
-                ]] = [e_name, e_job, e_dept, e_branch, e_emp_permission, e_annual, e_annual_cons, e_annual_rem, e_weekly, e_weekly_cons, e_weekly_rem, e_official, e_official_cons, e_official_rem]
-                
-                auto_save_data()  # 💾 حفظ تلقائي
-                st.success("تم تحديث البيانات وحفظها تلقائياً!")
-                st.rerun()
-                
-            if delete_btn:
-                st.session_state.employees = st.session_state.employees[st.session_state.employees["كود الموظف"] != emp_row["كود الموظف"]].reset_index(drop=True)
-                auto_save_data()  # 💾 حفظ تلقائي
-                st.warning("تم حذف الموظف وتحديث الحفظ التلقائي!")
-                st.rerun()
-
-    st.markdown("---")
-    render_printable_table(editable_emps)
+                    new_emp = {
+                        "كود الموظف": c_code, "اسم الموظف": c_name, "الوظيفة": c_job, "القسم": c_dept, "الفرع": c_branch, "صلاحية الموظف": c_emp_permission,
+                        "رصيد سنوي (إجمالي)": c_annual, "سنوي مستهلك": 0, "سنوي متبقي": c_annual,
+                        "رصيد أسبوعي (إجمالي)": c_weekly, "أسبوعي مستهلك": 0, "أسبوعي متبقي": c_weekly,
+                        "رصيد رسمي (إجمالي)": c_official, "رسمي مستهلك": 0, "رسمي متبقي": c_official
+                    }
+                    st.session_state.employees = pd.concat([st.session_state.employees, pd.DataFrame([new_emp])], ignore_index=True)
+                    auto_save_data()
+                    st.success("تم إضافة الموظف وحفظ البيانات تلقائياً!")
+                    st.rerun()
+    render_printable_table(st.session_state.employees)
 
 elif choice == "🔍 بحث متقدم":
     # 🗂️ القوائم المنسدلة للبحث المتقدم
@@ -626,11 +558,14 @@ elif choice == "🔍 بحث متقدم":
             "الفرع",
             "الوظيفة",
             "كود الموظف",
-            "اسم المستخدم"
+            "اسم المستخدم",
+            "بحث بالفترة (طلبات الإجازات)"
         ])
         
     with col_f2:
         selected_value = "الكل"
+        date_from, date_to = None, None
+        
         if search_category == "اسم الموظف":
             options = ["الكل"] + sorted(st.session_state.employees["اسم الموظف"].dropna().astype(str).unique().tolist())
             selected_value = st.selectbox("اختر اسم الموظف:", options)
@@ -646,6 +581,10 @@ elif choice == "🔍 بحث متقدم":
         elif search_category == "اسم المستخدم":
             options = ["الكل"] + sorted(st.session_state.users["اسم المستخدم"].dropna().astype(str).unique().tolist())
             selected_value = st.selectbox("اختر اسم المستخدم:", options)
+        elif search_category == "بحث بالفترة (طلبات الإجازات)":
+            col_date1, col_date2 = st.columns(2)
+            with col_date1: date_from = st.date_input("من تاريخ", value=date.today())
+            with col_date2: date_to = st.date_input("إلى تاريخ", value=date.today())
         else:
             st.selectbox("القيمة:", ["الكل"])
 
@@ -672,32 +611,47 @@ elif choice == "🔍 بحث متقدم":
             </div>
         """, height=50)
 
-    # تطبيق الفلترة وتحديد العنوان المخصص
-    emp_df = st.session_state.employees.copy()
+    # تطبيق الفلترة وتحديد العنوان المخصص بناءً على الاختيار
+    if search_category == "بحث بالفترة (طلبات الإجازات)":
+        req_df = st.session_state.requests.copy()
+        if not req_df.empty and "من تاريخ" in req_df.columns:
+            req_df["من_تاريخ_dt"] = pd.to_datetime(req_df["من تاريخ"]).dt.date
+            req_df["إلى_تاريخ_dt"] = pd.to_datetime(req_df["إلى تاريخ"]).dt.date
+            
+            # فلترة الإجازات الواقعة ضمن الفترة المحددة
+            req_df = req_df[(req_df["من_تاريخ_dt"] >= date_from) & (req_df["إلى_تاريخ_dt"] <= date_to)]
+            req_df = req_df.drop(columns=["من_تاريخ_dt", "إلى_تاريخ_dt"])
+        
+        search_result_title = f"📋 تقرير طلبات الإجازات بالفترة من {date_from} إلى {date_to} - {company_display_name}"
+        st.markdown(f'<h3 class="printable-right-align">{search_result_title}</h3>', unsafe_allow_html=True)
+        render_printable_table(req_df)
     
-    search_result_title = f"📋 نتيجة البحث الشاملة - {company_display_name}"
-    if search_category == "اسم الموظف" and selected_value != "الكل":
-        emp_df = emp_df[emp_df["اسم الموظف"] == selected_value]
-        search_result_title = f"📋 نتيجة البحث للموظف: {selected_value} - {company_display_name}"
-    elif search_category == "الفرع" and selected_value != "الكل":
-        emp_df = emp_df[emp_df["الفرع"] == selected_value]
-        search_result_title = f"📋 نتيجة البحث لفرع: {selected_value} - {company_display_name}"
-    elif search_category == "الوظيفة" and selected_value != "الكل":
-        emp_df = emp_df[emp_df["الوظيفة"] == selected_value]
-        search_result_title = f"📋 نتيجة البحث لوظيفة: {selected_value} - {company_display_name}"
-    elif search_category == "كود الموظف" and selected_value != "الكل":
-        emp_df = emp_df[emp_df["كود الموظف"] == selected_value]
-        search_result_title = f"📋 نتيجة البحث للكود: {selected_value} - {company_display_name}"
-    elif search_category == "اسم المستخدم" and selected_value != "الكل":
-        user_record = st.session_state.users[st.session_state.users["اسم المستخدم"] == selected_value]
-        if not user_record.empty:
-            u_branch = user_record.iloc[0]["الفرع التابع"]
-            if u_branch and u_branch != "المركز الرئيسي":
-                emp_df = emp_df[emp_df["الفرع"] == u_branch]
-        search_result_title = f"📋 نتيجة البحث للمستخدم: {selected_value} - {company_display_name}"
+    else:
+        emp_df = st.session_state.employees.copy()
+        search_result_title = f"📋 نتيجة البحث الشاملة - {company_display_name}"
+        
+        if search_category == "اسم الموظف" and selected_value != "الكل":
+            emp_df = emp_df[emp_df["اسم الموظف"] == selected_value]
+            search_result_title = f"📋 نتيجة البحث للموظف: {selected_value} - {company_display_name}"
+        elif search_category == "الفرع" and selected_value != "الكل":
+            emp_df = emp_df[emp_df["الفرع"] == selected_value]
+            search_result_title = f"📋 نتيجة البحث لفرع: {selected_value} - {company_display_name}"
+        elif search_category == "الوظيفة" and selected_value != "الكل":
+            emp_df = emp_df[emp_df["الوظيفة"] == selected_value]
+            search_result_title = f"📋 نتيجة البحث لوظيفة: {selected_value} - {company_display_name}"
+        elif search_category == "كود الموظف" and selected_value != "الكل":
+            emp_df = emp_df[emp_df["كود الموظف"] == selected_value]
+            search_result_title = f"📋 نتيجة البحث للكود: {selected_value} - {company_display_name}"
+        elif search_category == "اسم المستخدم" and selected_value != "الكل":
+            user_record = st.session_state.users[st.session_state.users["اسم المستخدم"] == selected_value]
+            if not user_record.empty:
+                u_branch = user_record.iloc[0]["الفرع التابع"]
+                if u_branch and u_branch != "المركز الرئيسي":
+                    emp_df = emp_df[emp_df["الفرع"] == u_branch]
+            search_result_title = f"📋 نتيجة البحث للمستخدم: {selected_value} - {company_display_name}"
 
-    st.markdown(f'<h3 class="printable-right-align">{search_result_title}</h3>', unsafe_allow_html=True)
-    render_printable_table(emp_df)
+        st.markdown(f'<h3 class="printable-right-align">{search_result_title}</h3>', unsafe_allow_html=True)
+        render_printable_table(emp_df)
 
 # 5. إدارة المستخدمين
 elif choice == "إدارة المستخدمين والصلاحيات":
