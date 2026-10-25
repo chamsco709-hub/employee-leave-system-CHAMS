@@ -8,7 +8,7 @@ import base64
 import json
 import os
 
-# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة وإبقاء الشريط الجانبي ظاهراً دائماً
+# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة مع إبقاء القائمة الجانبية مفتوحة افتراضياً
 st.set_page_config(
     page_title="النظام المتكامل لإدارة الإجازات والموارد البشرية",
     page_icon="🏢",
@@ -196,10 +196,9 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم الواجهة وتثبيت القائمة الجانبية على اليمين بشكل قياسي وآمن تماماً
+# 🎨 تصميم الواجهة وتثبيت وإجبار ظهور القائمة الجانبية على اليمين بشكل دائم
 st.markdown("""
     <style>
-    /* إخفاء شريط أدوات Streamlit العلوي المزعج فقط وليس القائمة الجانبية */
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
     
     html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6, label {
@@ -216,12 +215,16 @@ st.markdown("""
         background-color: #F8FAFC !important;
     }
     
-    /* تثبيت القائمة الجانبية (Sidebar) على اليمين بشكل سليم ودون أي اختفاء */
+    /* فرض ظهور القائمة الجانبية (Sidebar) دائماً وتثبيتها على اليمين ومنع انغلاقها */
     [data-testid="stSidebar"] {
+        transform: none !important;
+        visibility: visible !important;
+        display: block !important;
         background-color: #0F172A !important;
         color: #F8FAFC !important;
         padding-top: 1rem;
         border-left: 1px solid #334155;
+        min-width: 280px !important;
     }
     
     [data-testid="stSidebar"] div, [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] h3 {
@@ -474,7 +477,7 @@ if not st.session_state.is_authenticated:
 render_company_header()
 
 # =========================================================
-# 🗂️ القائمة الجانبية للنظام الآمنة والمستقرة
+# 🗂️ القائمة الجانبية الثابتة والمجبرة على الظهور دائماً
 # =========================================================
 with st.sidebar:
     st.markdown("### 🗂️ لوحة التحكم الرئيسية")
