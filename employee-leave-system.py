@@ -8,7 +8,7 @@ import base64
 import json
 import os
 
-# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة وبقاء القائمة الجانبية مفتوحة دائماً
+# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة
 st.set_page_config(
     page_title="النظام المتكامل لإدارة الإجازات والموارد البشرية",
     page_icon="🏢",
@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم الواجهة الاحترافية وضبط ألوان عناوين الحقول والنصوص بوضوح تام
+# 🎨 تصميم الواجهة الاحترافية وضبط تنسيق القائمة الجانبية والمحتوى لعدم التداخل
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { display: none !important; }
@@ -215,6 +215,18 @@ st.markdown("""
         background-color: #F8FAFC !important;
     }
     
+    /* منع تداخل القائمة الجانبية وجعلها ثابتة ومنظمة بصرياً */
+    [data-testid="stSidebar"] {
+        background-color: #0F172A !important;
+        color: #F8FAFC !important;
+        padding-top: 1rem;
+        box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        z-index: 99999 !important;
+    }
+    [data-testid="stSidebar"] .stMarkdown h1, [data-testid="stSidebar"] .stMarkdown h2, [data-testid="stSidebar"] .stMarkdown h3, [data-testid="stSidebar"] label {
+        color: #E2E8F0 !important;
+    }
+    
     /* ضمان وضوح عناوين الحقول والتسميات باللون الداكن */
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
         color: #1E293B !important;
@@ -229,17 +241,6 @@ st.markdown("""
         -webkit-text-fill-color: #0F172A !important;
         font-size: 13px !important;
         font-weight: bold !important;
-    }
-    
-    /* تخصيص الشريط الجانبي الاحترافي الثابت والظاهر تماماً */
-    [data-testid="stSidebar"] {
-        background-color: #0F172A !important;
-        color: #F8FAFC !important.
-        padding-top: 1rem;
-        min-width: 280px !important;
-    }
-    [data-testid="stSidebar"] .stMarkdown h1, [data-testid="stSidebar"] .stMarkdown h2, [data-testid="stSidebar"] .stMarkdown h3, [data-testid="stSidebar"] label {
-        color: #E2E8F0 !important;
     }
     
     /* الهيدر العلوي للشركة */
@@ -470,13 +471,12 @@ if not st.session_state.is_authenticated:
 render_company_header()
 
 # =========================================================
-# 🗂️ القائمة الجانبية للنظام مع القوائم التابعة الذكية الثابتة
+# 🗂️ القائمة الجانبية للنظام والثابتة
 # =========================================================
 with st.sidebar:
     st.markdown("### 🗂️ لوحة التحكم الرئيسية")
     st.markdown("---")
     
-    # اختيار القسم الرئيسي الأول
     main_menu = st.radio("اختر القسم الرئيسي:", [
         "🏠 الشاشة الرئيسية",
         "⏱️ الحضور والانصراف",
@@ -489,7 +489,6 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 📋 القائمة التابعة للقسم:")
     
-    # إظهار القائمة الفرعية التابعة حصرياً بناءً على اختيار القسم الرئيسي
     if main_menu == "🏠 الشاشة الرئيسية":
         sub_options = ["لوحة المؤشرات والتحكم"]
     elif main_menu == "⏱️ الحضور والانصراف":
@@ -529,7 +528,6 @@ with st.sidebar:
             "مسح البيانات"
         ]
     
-    # قائمة اختيار الإجراء التابع
     choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     
     st.markdown("---")
