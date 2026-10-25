@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم الواجهة الاحترافية وضبط ألوان الحقول والنصوص لتكون واضحة ونقية تماماً
+# 🎨 تصميم الواجهة الاحترافية وضبط ألوان عناوين الحقول والنصوص بوضوح تام
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { display: none !important; }
@@ -393,7 +393,6 @@ if 'current_logged_user' not in st.session_state: st.session_state.current_logge
 if 'current_user_dept' not in st.session_state: st.session_state.current_user_dept = ""
 if 'current_user_branch' not in st.session_state: st.session_state.current_user_branch = ""
 if 'current_user_role' not in st.session_state: st.session_state.current_user_role = ""
-if 'active_tab' not in st.session_state: st.session_state.active_tab = "الشاشة الرئيسية"
 
 def render_printable_table(df):
     if df.empty:
@@ -461,7 +460,6 @@ if not st.session_state.is_authenticated:
                     st.session_state.current_user_dept = user_record["القسم التابع"]
                     st.session_state.current_user_branch = user_record["الفرع التابع"]
                     st.session_state.current_user_role = user_record["الصلاحية"]
-                    st.session_state.active_tab = "الشاشة الرئيسية"
                     st.success(f"مرحباً بك يا {user_record['الاسم الكامل']}! تم تسجيل الدخول بنجاح.")
                     st.rerun()
                 else:
@@ -471,12 +469,13 @@ if not st.session_state.is_authenticated:
 render_company_header()
 
 # =========================================================
-# 🗂️ القائمة الجانبية الاحترافية للتنقل المباشر
+# 🗂️ القائمة الجانبية للنظام مع زر الإظهار والإخفاء والتحكم
 # =========================================================
 with st.sidebar:
     st.markdown("### 🗂️ لوحة التحكم الرئيسية")
     st.markdown("---")
     
+    # اختيار القسم الرئيسي الأول
     main_menu = st.radio("اختر القسم الرئيسي:", [
         "🏠 الشاشة الرئيسية",
         "⏱️ الحضور والانصراف",
@@ -485,6 +484,52 @@ with st.sidebar:
         "👥 شؤون الموظفين",
         "⚙️ الأدوات والنظام"
     ], index=0)
+    
+    st.markdown("---")
+    st.markdown("### 📋 القائمة التابعة للقسم:")
+    
+    # إظهار القائمة الفرعية التابعة حصرياً بناءً على اختيار القسم الرئيسي
+    if main_menu == "🏠 الشاشة الرئيسية":
+        sub_options = ["لوحة المؤشرات والتحكم"]
+    elif main_menu == "⏱️ الحضور والانصراف":
+        sub_options = [
+            "تسجيل حضور وانصراف", 
+            "سجل الحضور والانصراف", 
+            "تعديل أو حذف حركة حضور"
+        ]
+    elif main_menu == "💰 المعاملات المالية":
+        sub_options = [
+            "تسجيل معاملة مالية", 
+            "سجل المعاملات المالية", 
+            "تعديل أو حذف معاملة مالية"
+        ]
+    elif main_menu == "📝 طلبات الإجازات":
+        sub_options = [
+            "تسجيل طلب إجازة جديد", 
+            "سجل طلبات قيد الانتظار", 
+            "سجل الطلبات المقبولة", 
+            "سجل الطلبات المرفوضة", 
+            "تعديل أو حذف طلب إجازة"
+        ]
+    elif main_menu == "👥 شؤون الموظفين":
+        sub_options = [
+            "إضافة موظف جديد", 
+            "سجل الموظفين والأرصدة", 
+            "تعديل أو حذف موظف"
+        ]
+    elif main_menu == "⚙️ الأدوات والنظام":
+        sub_options = [
+            "إدارة المستخدمين والصلاحيات", 
+            "كشف الرواتب والمستحقات", 
+            "طباعة التقارير", 
+            "إعدادات الشركة", 
+            "تصدير وتحميل Excel", 
+            "نسخة احتياطية واستعادة", 
+            "مسح البيانات"
+        ]
+    
+    # قائمة اختيار الإجراء التابع
+    choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     
     st.markdown("---")
     st.markdown(f"**👤 المستخدم:** {st.session_state.current_logged_user}")
@@ -497,55 +542,27 @@ with st.sidebar:
         st.session_state.current_logged_user = ""
         st.rerun()
 
-# اختيار القسم الفرعي تلقائياً بناءً على القائمة الجانبية بدون أي تكرار
-if main_menu == "🏠 الشاشة الرئيسية":
-    choice = "الشاشة الرئيسية"
-elif main_menu == "⏱️ الحضور والانصراف":
-    sub_choice = st.selectbox("اختر إجراء الحضور والانصراف:", [
-        "1. تسجيل حضور وانصراف", 
-        "2. سجل الحضور والانصراف", 
-        "3. تعديل أو حذف حركة حضور"
-    ])
-    choice = sub_choice.split(". ", 1)[1]
-elif main_menu == "💰 المعاملات المالية":
-    sub_choice = st.selectbox("اختر إجراء المعاملات المالية:", [
-        "1. تسجيل معاملة مالية", 
-        "2. سجل المعاملات المالية", 
-        "3. تعديل أو حذف معاملة مالية"
-    ])
-    choice = sub_choice.split(". ", 1)[1]
-elif main_menu == "📝 طلبات الإجازات":
-    sub_choice = st.selectbox("اختر إجراء طلبات الإجازات:", [
-        "1. تسجيل طلب إجازة جديد", 
-        "2. سجل طلبات قيد الانتظار", 
-        "3. سجل الطلبات المقبولة", 
-        "4. سجل الطلبات المرفوضة", 
-        "5. تعديل أو حذف طلب إجازة"
-    ])
-    choice = sub_choice.split(". ", 1)[1]
-elif main_menu == "👥 شؤون الموظفين":
-    sub_choice = st.selectbox("اختر إجراء شؤون الموظفين:", [
-        "1. إضافة موظف جديد", 
-        "2. سجل الموظفين والأرصدة", 
-        "3. تعديل أو حذف موظف"
-    ])
-    choice = sub_choice.split(". ", 1)[1]
-elif main_menu == "⚙️ الأدوات والنظام":
-    sub_choice = st.selectbox("اختر أداة النظام:", [
-        "1. إدارة المستخدمين والصلاحيات", 
-        "2. كشف الرواتب والمستحقات", 
-        "3. طباعة التقارير", 
-        "4. إعدادات الشركة", 
-        "5. تصدير وتحميل Excel", 
-        "6. نسخة احتياطية واستعادة", 
-        "7. مسح البيانات"
-    ])
-    choice = sub_choice.split(". ", 1)[1]
+# زر مخصص في الواجهة الرئيسية لإظهار أو إخفاء لوحة التحكم (الشريط الجانبي) بضغطة زر
+c_btn_toggle, _ = st.columns([2, 8])
+with c_btn_toggle:
+    if st.button("🎛️ إظهار/إخفاء لوحة التحكم", use_container_width=True):
+        # استخدام مكون جافاسكريبت لتبديل حالة الشريط الجانبي في Streamlit
+        components.html("""
+            <script>
+                const sidebarToggle = window.parent.document.querySelector('button[kind="header"]');
+                if (sidebarToggle) {
+                    sidebarToggle.click();
+                } else {
+                    const altToggle = window.parent.document.querySelector('[data-testid="collapsedControl"]');
+                    if (altToggle) altToggle.click();
+                }
+            </script>
+        """, height=0)
 
 # =========================================================
-# 🏠 الشاشة الرئيسية
+# 🏠 الشاشة الرئيسية / لوحة المؤشرات
 # =========================================================
-if choice == "الشاشة الرئيسية":
+if choice == "لوحة المؤشرات والتحكم" or choice == "الشاشة الرئيسية":
     st.markdown(f'<div class="section-header">📈 مؤشرات الأداء العامة - شركة: {company_display_name}</div>', unsafe_allow_html=True)
     
     branch_filter = st.session_state.current_user_branch
@@ -897,7 +914,7 @@ elif choice == "تعديل أو حذف حركة حضور":
                 st.rerun()
 
 # =========================================================
-# 💰 1. تسجيل معاملة مالية (مع البدلات والإضافي)
+# 💰 1. تسجيل معاملة مالية
 # =========================================================
 elif choice == "تسجيل معاملة مالية":
     st.subheader("💰 1. إضافة معاملة مالية جديدة (سلفة / جزاء / مكافأة / بدلات / إضافي)")
