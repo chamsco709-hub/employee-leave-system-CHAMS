@@ -13,7 +13,7 @@ st.set_page_config(
     page_title="النظام المتكامل لإدارة الإجازات والموارد البشرية",
     page_icon="🏢",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # 🔑 ملف الترخيص الخاص بهذه النسخة
@@ -178,17 +178,17 @@ def select_time_12h(label_prefix, key_prefix, default_hour=8, default_minute=0, 
 
 def render_print_button():
     components.html("""
-        <div style="text-align: left; margin-bottom: 10px;">
+        <div style="text-align: left; margin-bottom: 12px;">
             <button onclick="window.parent.print()" style="
-                background-color: #1f4068;
+                background-color: #1E3A8A;
                 color: white;
                 padding: 8px 18px;
                 border: none;
-                border-radius: 5px;
+                border-radius: 6px;
                 font-size: 13px;
                 font-weight: bold;
                 cursor: pointer;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 font-family: 'Tahoma', sans-serif;
             ">
                 🖨️ طباعة السجل الحالي
@@ -196,9 +196,9 @@ def render_print_button():
         </div>
     """, height=45)
 
+# 🎨 تصميم الواجهة والأنماط الاحترافية الحديثة (Modern CSS Styling)
 st.markdown("""
     <style>
-    [data-testid="stSidebar"] { display: none !important; }
     header[data-testid="stHeader"] { display: none !important; }
     
     html, body, [class*="css"], .stMarkdown, .stSelectbox, .stTextInput, .stNumberInput, .stRadio, .stDateInput, div, span, p, h1, h2, h3, h4, h5, h6 {
@@ -208,40 +208,44 @@ st.markdown("""
     }
     
     .block-container {
-        padding-top: 0.3rem !important;
-        padding-bottom: 0.5rem !important;
+        padding-top: 1rem !important;
+        padding-bottom: 2rem !important;
         max-width: 100% !important;
+        background-color: #F8FAFC;
     }
     
-    /* إصلاح عرض النص داخل القوائم المنسدلة لعدم قص الكلمات */
-    div[data-baseweb="select"] span {
-        white-space: normal !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        font-size: 11px !important;
+    /* تخصيص الشريط الجانبي الاحترافي */
+    [data-testid="stSidebar"] {
+        background-color: #0F172A !important;
+        color: #F8FAFC !important;
+        padding-top: 1rem;
+    }
+    [data-testid="stSidebar"] .stMarkdown h1, [data-testid="stSidebar"] .stMarkdown h2, [data-testid="stSidebar"] .stMarkdown h3, [data-testid="stSidebar"] label {
+        color: #E2E8F0 !important;
     }
     
+    /* الهيدر العلوي للشركة */
     .company-header-container {
-        background: linear-gradient(135deg, #1f4068 0%, #162447 100%);
+        background: linear-gradient(135deg, #1E3A8A 15%, #0F172A 100%);
         color: white;
-        padding: 8px 12px;
-        border-radius: 6px;
-        margin-bottom: 6px !important;
+        padding: 16px 20px;
+        border-radius: 10px;
+        margin-bottom: 15px !important;
         width: 100%;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         box-sizing: border-box;
     }
     .header-top-system {
         text-align: center !important;
         width: 100%;
-        margin-bottom: 4px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        padding-bottom: 3px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        padding-bottom: 6px;
     }
     .header-top-system h2 {
-        font-size: 15px !important;
+        font-size: 16px !important;
         font-weight: bold !important;
-        color: #ffffff !important;
+        color: #FFFFFF !important;
         margin: 0 !important;
         padding: 0 !important;
         text-align: center !important;
@@ -262,74 +266,84 @@ st.markdown("""
         padding-left: 5px;
     }
     .comp-name-txt {
-        font-size: 13px !important;
+        font-size: 15px !important;
         font-weight: bold !important;
-        margin-bottom: 1px !important;
-        color: #ffffff !important;
+        margin-bottom: 4px !important;
+        color: #F8FAFC !important;
     }
     .comp-info-txt {
-        font-size: 10px !important;
-        margin: 1px 0 !important;
-        color: #e0e0e0 !important;
-        line-height: 1.2;
+        font-size: 11px !important;
+        margin: 2px 0 !important;
+        color: #CBD5E1 !important;
+        line-height: 1.4;
     }
+    
+    /* بطاقات المؤشرات الإحصائية الاحترافية */
     .dashboard-card {
-        background: #ffffff;
-        border-right: 4px solid #1f4068;
-        padding: 8px 10px;
-        border-radius: 5px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        background: #FFFFFF;
+        border-right: 5px solid #1E3A8A;
+        padding: 14px 18px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         text-align: right !important;
-        margin-bottom: 6px;
+        margin-bottom: 10px;
     }
     .dashboard-card-title {
-        font-size: 11px;
-        color: #555555;
+        font-size: 12px;
+        color: #64748B;
         font-weight: bold;
-        margin-bottom: 2px;
+        margin-bottom: 4px;
     }
     .dashboard-card-value {
-        font-size: 20px;
-        color: #1f4068;
+        font-size: 22px;
+        color: #1E3A8A;
         font-weight: bold;
     }
+    
+    /* عناوين الأقسام */
     .section-header {
-        font-size: 13px !important;
+        font-size: 15px !important;
         font-weight: bold !important;
-        color: #1f4068 !important;
-        border-bottom: 2px solid #1f4068;
-        padding-bottom: 2px;
-        margin-top: 6px !important;
-        margin-bottom: 4px !important;
+        color: #1E3A8A !important;
+        border-bottom: 2px solid #1E3A8A;
+        padding-bottom: 6px;
+        margin-top: 12px !important;
+        margin-bottom: 10px !important;
         text-align: right !important;
         direction: rtl !important;
     }
+    
+    /* الجداول الاحترافية */
     table.custom-table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 2px !important;
-        margin-bottom: 6px !important;
-        background-color: #ffffff;
-        color: #000000;
+        margin-top: 6px !important;
+        margin-bottom: 12px !important;
+        background-color: #FFFFFF;
+        color: #0F172A;
         direction: rtl !important;
         text-align: right !important;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     table.custom-table th, table.custom-table td {
-        border: 1px solid #333333;
-        padding: 4px 8px;
+        border: 1px solid #E2E8F0;
+        padding: 8px 12px;
         text-align: right !important;
-        font-size: 11px;
-        color: #000000 !important;
-        background-color: #ffffff !important;
+        font-size: 12px;
+        color: #0F172A !important;
+        background-color: #FFFFFF !important;
     }
     table.custom-table th {
-        background-color: #f0f2f6 !important;
+        background-color: #F1F5F9 !important;
         font-weight: bold;
+        color: #1E3A8A !important;
     }
     
     @media print {
         body, .stApp, .block-container {
-            background-color: #ffffff !important;
+            background-color: #FFFFFF !important;
             color: #000000 !important;
             direction: rtl !important;
             text-align: right !important;
@@ -337,16 +351,14 @@ st.markdown("""
             print-color-adjust: exact !important;
         }
         button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"],
-        .dashboard-card, div[data-testid="stForm"], .no-print, .entry-form-area, hr, .stselectbox, .stsidebar {
+        .dashboard-card, div[data-testid="stForm"], .no-print, .entry-form-area, hr, div[data-testid="stSidebar"] {
             display: none !important;
         }
         .company-header-container {
-            background: #ffffff !important;
+            background: #FFFFFF !important;
             color: #000000 !important;
             border: 1px solid #000;
             box-shadow: none;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
         }
         .header-top-system h2, .comp-name-txt, .comp-info-txt {
             color: #000000 !important;
@@ -375,10 +387,10 @@ def render_printable_table(df):
 
 def render_company_header():
     info = st.session_state.company_info
-    logo_html = '<div style="padding: 2px 4px; border: 1px dashed white; border-radius: 3px; font-size: 8px; color: white;">🏢 الشعار</div>'
+    logo_html = '<div style="padding: 4px 8px; border: 1px dashed rgba(255,255,255,0.4); border-radius: 4px; font-size: 9px; color: white;">🏢 الشعار</div>'
     if info.get("logo") is not None:
         try:
-            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 38px; max-width: 75px; object-fit: contain; background: white; border-radius: 3px; padding: 1px;" />'
+            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 45px; max-width: 90px; object-fit: contain; background: white; border-radius: 4px; padding: 2px;" />'
         except Exception:
             pass
             
@@ -386,12 +398,12 @@ def render_company_header():
         f"""
         <div class="company-header-container">
             <div class="header-top-system">
-                <h2>🏢 النظام المتكامل للموارد البشرية - شركة: {info.get("name", "")} &nbsp;|&nbsp; ترخيص التشغيل: {info.get("license", "")}</h2>
+                <h2>🏢 النظام المتكامل لإدارة الموارد البشرية والشؤون الإدارية &nbsp;|&nbsp; شركة: {info.get("name", "")}</h2>
             </div>
             <div class="header-bottom-content">
                 <div class="header-right-info">
                     <div class="comp-name-txt">{info.get("name", "")}</div>
-                    <div class="comp-info-txt">📍 {info.get("address", "")} &nbsp;|&nbsp; 📋 سجل تجاري: {info.get("cr", "")} &nbsp;|&nbsp; 🧾 رقم ضريبي: {info.get("tax", "")} &nbsp;|&nbsp; 🔑 رخصة: {info.get("license", "")}</div>
+                    <div class="comp-info-txt">📍 {info.get("address", "")} &nbsp;|&nbsp; 📋 سجل تجاري: {info.get("cr", "")} &nbsp;|&nbsp; 🧾 رقم ضريبي: {info.get("tax", "")} &nbsp;|&nbsp; 🔑 ترخيص التشغيل: {info.get("license", "")}</div>
                     <div class="comp-info-txt">📞 {info.get("contact", "")}</div>
                 </div>
                 <div class="header-left-logo">
@@ -406,9 +418,9 @@ def render_company_header():
 if not st.session_state.is_authenticated:
     st.markdown(
         f"""
-        <div style="max-width: 450px; margin: 40px auto; background: #ffffff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; direction: rtl;">
-            <h2 style="color: #1f4068; margin-bottom: 10px;">🔐 تسجيل الدخول - {company_display_name}</h2>
-            <p style="color: #666; font-size: 13px;">رخصة النظام النشطة: {company_license}</p>
+        <div style="max-width: 450px; margin: 60px auto; background: #FFFFFF; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; direction: rtl;">
+            <h2 style="color: #1E3A8A; margin-bottom: 12px; font-size: 20px;">🔐 تسجيل الدخول للنظام</h2>
+            <p style="color: #64748B; font-size: 13px; margin-bottom: 20px;">{company_display_name} | رخصة التشغيل: {company_license}</p>
         </div>
         """,
         unsafe_allow_html=True
@@ -442,58 +454,67 @@ if not st.session_state.is_authenticated:
 render_company_header()
 
 # =========================================================
-# 🗂️ القوائم المنسدلة للتنقل السريع مع وظيفة On Change الفورية
+# 🗂️ القائمة الجانبية الاحترافية للتنقل (Sidebar Navigation)
 # =========================================================
-st.markdown("---")
+with st.sidebar:
+    st.markdown("### 🗂️ لوحة التحكم الرئيسية")
+    st.markdown("---")
+    
+    main_menu = st.radio("اختر القسم:", [
+        "🏠 الشاشة الرئيسية",
+        "⏱️ الحضور والانصراف",
+        "💰 المعاملات المالية",
+        "📝 طلبات الإجازات",
+        "👥 شؤون الموظفين",
+        "⚙️ الأدوات والنظام"
+    ], index=0)
+    
+    st.markdown("---")
+    st.markdown(f"**👤 المستخدم:** {st.session_state.current_logged_user}")
+    st.markdown(f"**🛡️ الصلاحية:** {st.session_state.current_user_role}")
+    st.markdown(f"**🏢 الفرع:** {st.session_state.current_user_branch}")
+    
+    st.markdown("---")
+    if st.button("🚪 تسجيل خروج آمن", use_container_width=True):
+        st.session_state.is_authenticated = False
+        st.session_state.current_logged_user = ""
+        st.rerun()
 
-def handle_menu_change(menu_key):
-    val = st.session_state.get(menu_key, "اختر القائمة...")
-    if val != "اختر القائمة...":
-        st.session_state.active_tab = val.split(". ", 1)[1]
-
-nav_col1, nav_col2, nav_col3, nav_col4, nav_col5, nav_col6 = st.columns(6)
-
-with nav_col1:
-    if st.button("🏠 الشاشة الرئيسية", use_container_width=True): 
-        st.session_state.active_tab = "الشاشة الرئيسية"
-
-with nav_col2:
-    st.selectbox("⏱️ الحضور والانصراف", [
-        "اختر القائمة...", 
+# تفرع الأقسام الفرعية بناءً على اختيار الشريط الجانبي الرئيسي
+if main_menu == "🏠 الشاشة الرئيسية":
+    choice = "الشاشة الرئيسية"
+elif main_menu == "⏱️ الحضور والانصراف":
+    sub_choice = st.selectbox("إدارة الحضور والانصراف:", [
         "1. تسجيل حضور وانصراف", 
         "2. سجل الحضور والانصراف", 
         "3. تعديل أو حذف حركة حضور"
-    ], key="att_menu_select", on_change=handle_menu_change, args=("att_menu_select",))
-
-with nav_col3:
-    st.selectbox("💰 المعاملات المالية", [
-        "اختر القائمة...", 
+    ])
+    choice = sub_choice.split(". ", 1)[1]
+elif main_menu == "💰 المعاملات المالية":
+    sub_choice = st.selectbox("إدارة المعاملات المالية:", [
         "1. تسجيل معاملة مالية", 
         "2. سجل المعاملات المالية", 
         "3. تعديل أو حذف معاملة مالية"
-    ], key="fin_menu_select", on_change=handle_menu_change, args=("fin_menu_select",))
-
-with nav_col4:
-    st.selectbox("📝 طلبات الإجازات", [
-        "اختر القائمة...", 
+    ])
+    choice = sub_choice.split(". ", 1)[1]
+elif main_menu == "📝 طلبات الإجازات":
+    sub_choice = st.selectbox("إدارة طلبات الإجازات:", [
         "1. تسجيل طلب إجازة جديد", 
         "2. سجل طلبات قيد الانتظار", 
         "3. سجل الطلبات المقبولة", 
         "4. سجل الطلبات المرفوضة", 
         "5. تعديل أو حذف طلب إجازة"
-    ], key="leave_menu_select", on_change=handle_menu_change, args=("leave_menu_select",))
-
-with nav_col5:
-    st.selectbox("👥 شؤون الموظفين", [
-        "اختر القائمة...", 
+    ])
+    choice = sub_choice.split(". ", 1)[1]
+elif main_menu == "👥 شؤون الموظفين":
+    sub_choice = st.selectbox("إدارة شؤون الموظفين:", [
         "1. إضافة موظف جديد", 
         "2. سجل الموظفين والأرصدة", 
         "3. تعديل أو حذف موظف"
-    ], key="emp_menu_select", on_change=handle_menu_change, args=("emp_menu_select",))
-
-with nav_col6:
-    st.selectbox("⚙️ الأدوات والنظام", [
-        "اختر القائمة...", 
+    ])
+    choice = sub_choice.split(". ", 1)[1]
+elif main_menu == "⚙️ الأدوات والنظام":
+    sub_choice = st.selectbox("أدوات النظام والإعدادات:", [
         "1. إدارة المستخدمين والصلاحيات", 
         "2. كشف الرواتب والمستحقات", 
         "3. طباعة التقارير", 
@@ -501,32 +522,14 @@ with nav_col6:
         "5. تصدير وتحميل Excel", 
         "6. نسخة احتياطية واستعادة", 
         "7. مسح البيانات"
-    ], key="sys_menu_select", on_change=handle_menu_change, args=("sys_menu_select",))
-
-col_info_bar, col_logout_bar = st.columns([5, 1])
-with col_info_bar:
-    st.markdown(f"""
-        <div style="background: #eef2f7; padding: 6px 12px; border-radius: 4px; font-size: 11px; margin-bottom: 8px; color: #1f4068; font-weight: bold; display: flex; gap: 15px; direction: rtl; text-align: right;">
-            <div>🏢 الشركة: {company_display_name}</div>
-            <div>🔑 رخصة التشغيل: {company_license}</div>
-            <div>👤 المستخدم: {st.session_state.current_logged_user}</div>
-            <div>🛡️ الصلاحية: {st.session_state.current_user_role}</div>
-            <div>📌 الصفحة الحالية: <b>{st.session_state.active_tab}</b></div>
-        </div>
-    """, unsafe_allow_html=True)
-with col_logout_bar:
-    if st.button("🚪 خروج آمن", use_container_width=True):
-        st.session_state.is_authenticated = False
-        st.session_state.current_logged_user = ""
-        st.rerun()
-
-choice = st.session_state.active_tab
+    ])
+    choice = sub_choice.split(". ", 1)[1]
 
 # =========================================================
 # 🏠 الشاشة الرئيسية
 # =========================================================
 if choice == "الشاشة الرئيسية":
-    st.markdown(f'<div class="section-header">📈 الشاشة الرئيسية - مؤشرات الأداء لشركة: {company_display_name}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-header">📈 مؤشرات الأداء العامة - شركة: {company_display_name}</div>', unsafe_allow_html=True)
     
     branch_filter = st.session_state.current_user_branch
     dept_filter = st.session_state.current_user_dept
@@ -547,9 +550,9 @@ if choice == "الشاشة الرئيسية":
     with col1:
         st.markdown(f'<div class="dashboard-card"><div class="dashboard-card-title">👥 إجمالي موظفي الشركة</div><div class="dashboard-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown(f'<div class="dashboard-card" style="border-right-color: #f0ad4e;"><div class="dashboard-card-title">⏳ الطلبات المعلقة</div><div class="dashboard-card-value" style="color: #f0ad4e;">{pending_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="dashboard-card" style="border-right-color: #D97706;"><div class="dashboard-card-title">⏳ الطلبات المعلقة</div><div class="dashboard-card-value" style="color: #D97706;">{pending_count}</div></div>', unsafe_allow_html=True)
     with col3:
-        st.markdown(f'<div class="dashboard-card" style="border-right-color: #5cb85c;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #5cb85c;">{accepted_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="dashboard-card" style="border-right-color: #16A34A;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #16A34A;">{accepted_count}</div></div>', unsafe_allow_html=True)
 
     if not pending_requests.empty:
         st.markdown(f'<div class="section-header">⏳ اتخاذ القرار بشأن الطلبات المعلقة ({pending_count} طلب)</div>', unsafe_allow_html=True)
@@ -629,7 +632,7 @@ if choice == "الشاشة الرئيسية":
         components.html("""
             <div style="text-align: left;">
                 <button onclick="window.parent.print()" style="
-                    background-color: #1f4068;
+                    background-color: #1E3A8A;
                     color: white;
                     padding: 8px 14px;
                     border: none;
@@ -647,7 +650,7 @@ if choice == "الشاشة الرئيسية":
         """, height=45)
 
     if not filtered_chart_emps.empty:
-        st.markdown(f'<div style="text-align: right; direction: rtl; font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1f4068;">📌 {chart_subtitle}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="text-align: right; direction: rtl; font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1E3A8A;">📌 {chart_subtitle}</div>', unsafe_allow_html=True)
         
         chart_df_melted = filtered_chart_emps.melt(
             id_vars=["اسم الموظف"],
@@ -657,14 +660,14 @@ if choice == "الشاشة الرئيسية":
         )
         
         c1 = alt.Chart(chart_df_melted).mark_bar().encode(
-            x=alt.X('اسم الموظف:N', title='الموظف', axis=alt.Axis(labelAngle=0, labelColor='#333333', titleColor='#1f4068')),
-            y=alt.Y('عدد الأيام:Q', title='عدد الأيام', axis=alt.Axis(labelColor='#333333', titleColor='#1f4068')),
+            x=alt.X('اسم الموظف:N', title='الموظف', axis=alt.Axis(labelAngle=0, labelColor='#334155', titleColor='#1E3A8A')),
+            y=alt.Y('عدد الأيام:Q', title='عدد الأيام', axis=alt.Axis(labelColor='#334155', titleColor='#1E3A8A')),
             color=alt.Color('نوع الرصيد:N', legend=alt.Legend(
                 orient='bottom', 
                 direction='horizontal',
                 title='نوع الرصيد:',
-                titleColor='#1f4068',
-                labelColor='#333333',
+                titleColor='#1E3A8A',
+                labelColor='#334155',
                 titleAnchor='middle'
             )),
             tooltip=['اسم الموظف', 'نوع الرصيد', 'عدد الأيام']
@@ -1370,7 +1373,7 @@ elif choice == "إعدادات الشركة":
                 info["logo"] = encoded_logo
                 
             auto_save_data()
-            st.success("تم تحديث إعدادات وحفظ بيانات الشركة بنجاح!")
+            str_lit.success("تم تحديث إعدادات وحفظ بيانات الشركة بنجاح!")
             st.rerun()
 
 # =========================================================
