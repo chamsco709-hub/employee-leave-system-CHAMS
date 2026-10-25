@@ -8,7 +8,7 @@ import base64
 import json
 import os
 
-# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة مع إبقاء القائمة الجانبية مفتوحة افتراضياً
+# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة مع إبقاء القائمة الجانبية مفتوحة ومثبتة
 st.set_page_config(
     page_title="النظام المتكامل لإدارة الإجازات والموارد البشرية",
     page_icon="🏢",
@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم الواجهة وتثبيت القائمة الجانبية وإلغاء خلفيات حقول الاختيار الداكنة لضمان وضوح كامل
+# 🎨 تصميم الواجهة وتثبيت القائمة الجانبية وإجبار حقول الاختيار على أن تكون بخلفية بيضاء ونصوص سوداء
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -215,7 +215,7 @@ st.markdown("""
         background-color: #F8FAFC !important;
     }
     
-    /* تثبيت القائمة الجانبية (Sidebar) على اليمين ودون أي تداخل في الألوان */
+    /* تثبيت القائمة الجانبية على اليمين ودون أي إخفاء */
     [data-testid="stSidebar"] {
         transform: none !important;
         visibility: visible !important;
@@ -233,27 +233,33 @@ st.markdown("""
         direction: rtl !important;
     }
     
-    /* إصلاح لون حقول القوائم المنسدلة (Selectbox) داخل الشريط الجانبي لتكون بخلفية بيضاء ونصوص سوداء واضحة تماماً */
-    [data-testid="stSidebar"] div[data-baseweb="select"] > div {
+    /* 🎯 تخصيص حقول القوائم المنسدلة (Selectbox) داخل الشريط الجانبي لتكون بخلفية بيضاء ونصوص سوداء واضحة */
+    [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: #FFFFFF !important;
-        color: #0F172A !important;
         border-radius: 6px !important;
     }
     
-    [data-testid="stSidebar"] div[data-baseweb="select"] span, [data-testid="stSidebar"] div[data-baseweb="select"] div {
+    [data-testid="stSidebar"] div[data-baseweb="select"] > div {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        border-color: #CBD5E1 !important;
+    }
+    
+    [data-testid="stSidebar"] div[data-baseweb="select"] span, 
+    [data-testid="stSidebar"] div[data-baseweb="select"] div,
+    [data-testid="stSidebar"] div[data-baseweb="select"] input {
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
         font-weight: bold !important;
     }
     
-    /* ضمان وضوح عناوين التسميات داخل التطبيق */
+    /* ضبط لون حقول الإدخال والتسميات العامة */
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
         color: #1E293B !important;
         font-weight: bold !important;
         font-size: 13px !important;
     }
     
-    /* ضبط لون حقول الإدخال والنصوص بداخلها */
     input, textarea, select, div[data-baseweb="input"] input, div[data-baseweb="base-input"] input {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
