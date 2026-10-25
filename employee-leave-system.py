@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم الواجهة وتثبيت وإجبار ظهور القائمة الجانبية على اليمين بشكل دائم
+# 🎨 تصميم الواجهة وتثبيت القائمة الجانبية وإلغاء خلفيات حقول الاختيار الداكنة لضمان وضوح كامل
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -215,7 +215,7 @@ st.markdown("""
         background-color: #F8FAFC !important;
     }
     
-    /* فرض ظهور القائمة الجانبية (Sidebar) دائماً وتثبيتها على اليمين ومنع انغلاقها */
+    /* تثبيت القائمة الجانبية (Sidebar) على اليمين ودون أي تداخل في الألوان */
     [data-testid="stSidebar"] {
         transform: none !important;
         visibility: visible !important;
@@ -233,14 +233,27 @@ st.markdown("""
         direction: rtl !important;
     }
     
-    /* ضمان وضوح عناوين الحقول والتسميات باللون الداكن */
+    /* إصلاح لون حقول القوائم المنسدلة (Selectbox) داخل الشريط الجانبي لتكون بخلفية بيضاء ونصوص سوداء واضحة تماماً */
+    [data-testid="stSidebar"] div[data-baseweb="select"] > div {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        border-radius: 6px !important;
+    }
+    
+    [data-testid="stSidebar"] div[data-baseweb="select"] span, [data-testid="stSidebar"] div[data-baseweb="select"] div {
+        color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
+        font-weight: bold !important;
+    }
+    
+    /* ضمان وضوح عناوين التسميات داخل التطبيق */
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
         color: #1E293B !important;
         font-weight: bold !important;
         font-size: 13px !important;
     }
     
-    /* ضبط لون الحقول والنصوص بداخلها لتكون سوداء واضحة تماماً */
+    /* ضبط لون حقول الإدخال والنصوص بداخلها */
     input, textarea, select, div[data-baseweb="input"] input, div[data-baseweb="base-input"] input {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
@@ -477,7 +490,7 @@ if not st.session_state.is_authenticated:
 render_company_header()
 
 # =========================================================
-# 🗂️ القائمة الجانبية الثابتة والمجبرة على الظهور دائماً
+# 🗂️ القائمة الجانبية الثابتة والواضحة
 # =========================================================
 with st.sidebar:
     st.markdown("### 🗂️ لوحة التحكم الرئيسية")
