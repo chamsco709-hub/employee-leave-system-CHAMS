@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم الواجهة الاحترافية وإصلاح خلفيات حقول الإدخال بالكامل
+# 🎨 تصميم الواجهة الاحترافية وضبط ألوان الحقول والنصوص السوداء الواضحة تماماً
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { display: none !important; }
@@ -214,9 +214,17 @@ st.markdown("""
         background-color: #F8FAFC !important;
     }
     
-    /* تثبيت ألوان حقول الإدخال والنصوص لتكون واضحة ونقية تماماً */
-    input, textarea, select, div[data-baseweb="input"] input {
+    /* ضبط لون النص داخل حقول الإدخال والأرقام ليكون أسود واضح تماماً وقابل للقراءة */
+    input, textarea, select, div[data-baseweb="input"] input, div[data-baseweb="base-input"] input {
         background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
+        font-size: 13px !important;
+        font-weight: bold !important;
+    }
+    
+    /* منع ظهور النصوص بلون أزرق عند التحديد أو التركيز */
+    input:focus, textarea:focus {
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
     }
@@ -474,7 +482,7 @@ with st.sidebar:
         "📝 طلبات الإجازات",
         "👥 شؤون الموظفين",
         "⚙️ الأدوات والنظام"
-    ], index=0)
+    ], index=4) # الافتراضي شؤون الموظفين بناءً على الصورة
     
     st.markdown("---")
     st.markdown(f"**👤 المستخدم:** {st.session_state.current_logged_user}")
@@ -518,7 +526,7 @@ elif main_menu == "👥 شؤون الموظفين":
         "1. إضافة موظف جديد", 
         "2. سجل الموظفين والأرصدة", 
         "3. تعديل أو حذف موظف"
-    ])
+    ], index=0)
     choice = sub_choice.split(". ", 1)[1]
 elif main_menu == "⚙️ الأدوات والنظام":
     sub_choice = st.selectbox("اختر أداة النظام:", [
@@ -1424,5 +1432,5 @@ elif choice == "مسح البيانات":
         st.session_state.attendance = pd.DataFrame(columns=["التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", "الحالة", "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)", "حضور مبكر (دقيقة)", "خروج متأخر (دقيقة)", "دقائق التأخير"])
         st.session_state.financial_transactions = pd.DataFrame(columns=["التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "النوع", "المبلغ / القيمة", "البيان / السبب"])
         auto_save_data()
-        str_lit.success("تم مسح كافة البيانات بنجاح!")
-        str_lit.rerun()
+        st.success("تم مسح كافة البيانات بنجاح!")
+        st.rerun()
