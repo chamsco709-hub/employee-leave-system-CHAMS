@@ -434,7 +434,7 @@ if not st.session_state.is_authenticated:
 render_company_header()
 
 # =========================================================
-# 🗂️ القوائم المنسدلة للتنقل السريع (بدلاً من الأزرار المتعددة)
+# 🗂️ القوائم المنسدلة للتنقل السريع
 # =========================================================
 st.markdown("---")
 nav_col1, nav_col2, nav_col3, nav_col4, nav_col5, nav_col6 = st.columns(6)
@@ -754,7 +754,7 @@ elif choice == "تسجيل حضور وانصراف":
                 st.rerun()
 
 # =========================================================
-# ⏱️ 2. سجل الحضور والانصراف (مع إمكانية الطباعة والبحث)
+# ⏱️ 2. سجل الحضور والانصراف
 # =========================================================
 elif choice == "سجل الحضور والانصراف":
     col_t1, col_t2 = st.columns([3, 1])
@@ -1159,7 +1159,87 @@ elif choice == "تعديل أو حذف موظف":
                 st.rerun()
 
 # =========================================================
-# ⚙️ الأقسام الأخرى المتبقية (إدارة المستخدمين، المرتبات، التقارير، إلخ)
+# 💰 كشف الرواتب والمستحقات (تفاصيل الاستحقاقات والاستقطاعات)
+# =========================================================
+elif choice == "كشف الرواتب والمستحقات":
+    col_t1, col_t2 = st.columns([3, 1])
+    with col_t1: st.subheader("💰 كشف الرواتب وتفاصيل الاستحقاقات والاستقطاعات الشامل")
+    with col_t2: render_print_button()
+    
+    employees_df = st.session_state.employees.copy()
+    attendance_df = st.session_state.attendance.copy()
+    financial_df = st.session_state.financial_transactions.copy()
+    
+    if employees_df.empty:
+        st.warning("لا توجد بيانات موظفين مسجلة لحساب المرتبات.")
+    else:
+        payroll_data = []
+        
+        for _, emp in employees_df.iterrows():
+            emp_code = emp["كود الموظف"]
+            emp_name = emp["اسم الموظف"]
+            emp_branch = emp["الفرع"]
+            basic_salary = float(emp.get("الراتب الأساسي", 5000.0))
+            
+            # حساب التأخيرات والإضافي من سجل الحضور
+            emp_delays_mins = 0
+            emp_overtime_mins = 0
+            if not attendance_df.empty and "كود الموظف" in attendance_df.columns:
+                emp_att = attendance_df[attendance_df["كود الموظف"] == emp_code]
+                if not emp_att.empty:
+                    emp_delays_mins = emp_att["التأخير الصباحي (دقيقة)"].sum() if "التأخير الصباحي (دقيقة)" in emp_att.columns else 0
+                    emp_overtime_mins = emp_att["إضافي بعد العمل (دقيقة)"].sum() if "إضافي بعد العمل (دقيقة)" in emp_att.columns else 0
+            
+            # حساب قيم الاستقطاعات والإضافات المالية (سلف، جزاءات، مكافآت)
+            total_advances = 0.0
+            total_penalties = 0.0
+            total_rewards = 0.0
+            
+            if not financial_df.empty and "كود الموظف" in financial_df.columns:
+                emp_fin = financial_df[financial_df["كود الموظف"] == emp_code]
+                if not emp_fin.empty:
+                    for _, f_row in emp_fin.iterrows():
+                        f_type = f_row["النوع"]
+                        f_amount = float(f_row["المبلغ / القيمة"])
+                        if f_type == "سلفة":
+                            total_advances += f_amount
+                        elif "جزاء" in f_type:
+                            total_penalties += f_amount
+                        elif "مكافأة" in f_type:
+                            total_rewards += f_amount
+            
+            # معدل الدقيقة والساعة بناءً على الراتب الأساسي (30 يوم × 8 ساعات)
+            minute_rate = (basic_salary / 30.0 / 8.0 / 60.0) if basic_salary > 0 else 0
+            delay_deduction_val = round(emp_delays_mins * minute_rate, 2)
+            
+            hour_rate = (basic_salary / 30.0 / 8.0) if basic_salary > 0 else 0
+            overtime_amount_val = round((emp_overtime_mins / 60.0) * hour_rate * 1.5, 2)
+            
+            # إجمالي الاستحقاقات وإجمالي الاستقطاعات
+            total_additions = round(overtime_amount_val + total_rewards, 2)
+            total_deductions = round(delay_deduction_val + total_penalties + total_advances, 2)
+            
+            net_salary = round(basic_salary + total_additions - total_deductions, 2)
+            
+            payroll_data.append({
+                "كود الموظف": emp_code,
+                "اسم الموظف": emp_name,
+                "الفرع": emp_branch,
+                "الراتب الأساسي": basic_salary,
+                "مكافآت / إضافي (جنيه)": total_additions,
+                "إجمالي الاستحقاقات": round(basic_salary + total_additions, 2),
+                "خصم تأخيرات الحضور (جنيه)": delay_deduction_val,
+                "جزاءات وخصومات (جنيه)": total_penalties,
+                "سلف مالية (جنيه)": total_advances,
+                "إجمالي الاستقطاعات": total_deductions,
+                "صافي المستحق": net_salary
+            })
+            
+        payroll_df = pd.DataFrame(payroll_data)
+        render_printable_table(payroll_df)
+
+# =========================================================
+# ⚙️ الأقسام الأخرى المتبقية
 # =========================================================
 elif choice == "إدارة المستخدمين والصلاحيات":
     st.subheader("🔒 إدارة مستخدمي النظام والصلاحيات")
@@ -1178,22 +1258,6 @@ elif choice == "إدارة المستخدمين والصلاحيات":
                 st.success("تم إضافة المستخدم بنجاح!")
                 st.rerun()
     render_printable_table(st.session_state.users.drop(columns=["الرسم السري"], errors="ignore"))
-
-elif choice == "كشف الرواتب والمستحقات":
-    col_t1, col_t2 = st.columns([3, 1])
-    with col_t1: st.subheader("💰 كشف الرواتب وصافي المستحقات")
-    with col_t2: render_print_button()
-    
-    payroll_data = []
-    for _, emp in st.session_state.employees.iterrows():
-        payroll_data.append({
-            "كود الموظف": emp["كود الموظف"],
-            "اسم الموظف": emp["اسم الموظف"],
-            "الفرع": emp["الفرع"],
-            "الراتب الأساسي": emp.get("الراتب الأساسي", 5000),
-            "صافي المستحق": emp.get("الراتب الأساسي", 5000)
-        })
-    render_printable_table(pd.DataFrame(payroll_data))
 
 elif choice == "طباعة التقارير":
     col_t1, col_t2 = st.columns([3, 1])
