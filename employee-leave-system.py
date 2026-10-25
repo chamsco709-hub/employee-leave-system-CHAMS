@@ -196,12 +196,12 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم الواجهة والأنماط الاحترافية الحديثة (Modern CSS Styling)
+# 🎨 تصميم الواجهة الاحترافية وإصلاح خلفيات حقول الإدخال بالكامل
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { display: none !important; }
     
-    html, body, [class*="css"], .stMarkdown, .stSelectbox, .stTextInput, .stNumberInput, .stRadio, .stDateInput, div, span, p, h1, h2, h3, h4, h5, h6 {
+    html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6 {
         font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
         direction: rtl !important;
         text-align: right !important;
@@ -211,7 +211,14 @@ st.markdown("""
         padding-top: 1rem !important;
         padding-bottom: 2rem !important;
         max-width: 100% !important;
-        background-color: #F8FAFC;
+        background-color: #F8FAFC !important;
+    }
+    
+    /* تثبيت ألوان حقول الإدخال والنصوص لتكون واضحة ونقية تماماً */
+    input, textarea, select, div[data-baseweb="input"] input {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
     }
     
     /* تخصيص الشريط الجانبي الاحترافي */
@@ -232,7 +239,7 @@ st.markdown("""
         border-radius: 10px;
         margin-bottom: 15px !important;
         width: 100%;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         box-sizing: border-box;
     }
     .header-top-system {
@@ -454,13 +461,13 @@ if not st.session_state.is_authenticated:
 render_company_header()
 
 # =========================================================
-# 🗂️ القائمة الجانبية الاحترافية للتنقل (Sidebar Navigation)
+# 🗂️ القائمة الجانبية الاحترافية للتنقل المباشر
 # =========================================================
 with st.sidebar:
     st.markdown("### 🗂️ لوحة التحكم الرئيسية")
     st.markdown("---")
     
-    main_menu = st.radio("اختر القسم:", [
+    main_menu = st.radio("اختر القسم الرئيسي:", [
         "🏠 الشاشة الرئيسية",
         "⏱️ الحضور والانصراف",
         "💰 المعاملات المالية",
@@ -480,25 +487,25 @@ with st.sidebar:
         st.session_state.current_logged_user = ""
         st.rerun()
 
-# تفرع الأقسام الفرعية بناءً على اختيار الشريط الجانبي الرئيسي
+# اختيار القسم الفرعي تلقائياً بناءً على القائمة الجانبية بدون أي تكرار
 if main_menu == "🏠 الشاشة الرئيسية":
     choice = "الشاشة الرئيسية"
 elif main_menu == "⏱️ الحضور والانصراف":
-    sub_choice = st.selectbox("إدارة الحضور والانصراف:", [
+    sub_choice = st.selectbox("اختر إجراء الحضور والانصراف:", [
         "1. تسجيل حضور وانصراف", 
         "2. سجل الحضور والانصراف", 
         "3. تعديل أو حذف حركة حضور"
     ])
     choice = sub_choice.split(". ", 1)[1]
 elif main_menu == "💰 المعاملات المالية":
-    sub_choice = st.selectbox("إدارة المعاملات المالية:", [
+    sub_choice = st.selectbox("اختر إجراء المعاملات المالية:", [
         "1. تسجيل معاملة مالية", 
         "2. سجل المعاملات المالية", 
         "3. تعديل أو حذف معاملة مالية"
     ])
     choice = sub_choice.split(". ", 1)[1]
 elif main_menu == "📝 طلبات الإجازات":
-    sub_choice = st.selectbox("إدارة طلبات الإجازات:", [
+    sub_choice = st.selectbox("اختر إجراء طلبات الإجازات:", [
         "1. تسجيل طلب إجازة جديد", 
         "2. سجل طلبات قيد الانتظار", 
         "3. سجل الطلبات المقبولة", 
@@ -507,14 +514,14 @@ elif main_menu == "📝 طلبات الإجازات":
     ])
     choice = sub_choice.split(". ", 1)[1]
 elif main_menu == "👥 شؤون الموظفين":
-    sub_choice = st.selectbox("إدارة شؤون الموظفين:", [
+    sub_choice = st.selectbox("اختر إجراء شؤون الموظفين:", [
         "1. إضافة موظف جديد", 
         "2. سجل الموظفين والأرصدة", 
         "3. تعديل أو حذف موظف"
     ])
     choice = sub_choice.split(". ", 1)[1]
 elif main_menu == "⚙️ الأدوات والنظام":
-    sub_choice = st.selectbox("أدوات النظام والإعدادات:", [
+    sub_choice = st.selectbox("اختر أداة النظام:", [
         "1. إدارة المستخدمين والصلاحيات", 
         "2. كشف الرواتب والمستحقات", 
         "3. طباعة التقارير", 
@@ -1373,7 +1380,7 @@ elif choice == "إعدادات الشركة":
                 info["logo"] = encoded_logo
                 
             auto_save_data()
-            str_lit.success("تم تحديث إعدادات وحفظ بيانات الشركة بنجاح!")
+            st.success("تم تحديث إعدادات وحفظ بيانات الشركة بنجاح!")
             st.rerun()
 
 # =========================================================
@@ -1417,5 +1424,5 @@ elif choice == "مسح البيانات":
         st.session_state.attendance = pd.DataFrame(columns=["التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", "الحالة", "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)", "حضور مبكر (دقيقة)", "خروج متأخر (دقيقة)", "دقائق التأخير"])
         st.session_state.financial_transactions = pd.DataFrame(columns=["التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "النوع", "المبلغ / القيمة", "البيان / السبب"])
         auto_save_data()
-        st.success("تم مسح كافة البيانات بنجاح!")
-        st.rerun()
+        str_lit.success("تم مسح كافة البيانات بنجاح!")
+        str_lit.rerun()
