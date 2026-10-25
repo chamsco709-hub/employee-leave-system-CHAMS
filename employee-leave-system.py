@@ -1309,7 +1309,7 @@ elif choice == "طباعة التقارير":
     render_printable_table(st.session_state.employees)
 
 # =========================================================
-# ⚙️ # 7. إعدادات الشركة
+# ⚙️ 4. إعدادات الشركة
 elif choice == "⚙️ إعدادات وبيانات الشركة":
     st.subheader("⚙️ إعدادات وتعديل بيانات الشركة والشعار")
     with st.form("company_settings_form"):
