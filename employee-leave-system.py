@@ -8,7 +8,7 @@ import base64
 import json
 import os
 
-# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة
+# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة وإبقاء الشريط الجانبي ظاهراً دائماً
 st.set_page_config(
     page_title="النظام المتكامل لإدارة الإجازات والموارد البشرية",
     page_icon="🏢",
@@ -196,10 +196,11 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم الواجهة وتثبيت القائمة الجانبية بالكامل على اليمين للغة العربية
+# 🎨 تصميم الواجهة وتثبيت القائمة الجانبية على اليمين بشكل قياسي وآمن تماماً
 st.markdown("""
     <style>
-    header[data-testid="stHeader"] { display: none !important; }
+    /* إخفاء شريط أدوات Streamlit العلوي المزعج فقط وليس القائمة الجانبية */
+    header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
     
     html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6, label {
         font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
@@ -215,25 +216,18 @@ st.markdown("""
         background-color: #F8FAFC !important;
     }
     
-    /* نقل وتثبيت القائمة الجانبية (Sidebar) على اليمين تماماً */
+    /* تثبيت القائمة الجانبية (Sidebar) على اليمين بشكل سليم ودون أي اختفاء */
     [data-testid="stSidebar"] {
-        right: 0 !important;
-        left: auto !important;
         background-color: #0F172A !important;
         color: #F8FAFC !important;
         padding-top: 1rem;
-        box-shadow: -4px 0 15px rgba(0,0,0,0.1);
-        z-index: 99999 !important;
+        border-left: 1px solid #334155;
     }
     
-    /* ضبط انعكاس حاوية الشريط الجانبي لتتوافق مع اليمين */
-    section[data-testid="stSidebar"] > div {
-        direction: rtl !important;
+    [data-testid="stSidebar"] div, [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] h3 {
+        color: #F8FAFC !important;
         text-align: right !important;
-    }
-    
-    [data-testid="stSidebar"] .stMarkdown h1, [data-testid="stSidebar"] .stMarkdown h2, [data-testid="stSidebar"] .stMarkdown h3, [data-testid="stSidebar"] label {
-        color: #E2E8F0 !important;
+        direction: rtl !important;
     }
     
     /* ضمان وضوح عناوين الحقول والتسميات باللون الداكن */
@@ -480,7 +474,7 @@ if not st.session_state.is_authenticated:
 render_company_header()
 
 # =========================================================
-# 🗂️ القائمة الجانبية للنظام المنقولة والثابتة على اليمين
+# 🗂️ القائمة الجانبية للنظام الآمنة والمستقرة
 # =========================================================
 with st.sidebar:
     st.markdown("### 🗂️ لوحة التحكم الرئيسية")
