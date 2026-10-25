@@ -213,6 +213,14 @@ st.markdown("""
         max-width: 100% !important;
     }
     
+    /* إصلاح عرض النص داخل القوائم المنسدلة لعدم قص الكلمات */
+    div[data-baseweb="select"] span {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        font-size: 11px !important;
+    }
+    
     .company-header-container {
         background: linear-gradient(135deg, #1f4068 0%, #162447 100%);
         color: white;
@@ -378,12 +386,12 @@ def render_company_header():
         f"""
         <div class="company-header-container">
             <div class="header-top-system">
-                <h2>🏢 النظام المتكامل للموارد البشرية - شركة: {info.get("name", "")} (ترخيص: {info.get("license", "")})</h2>
+                <h2>🏢 النظام المتكامل للموارد البشرية - شركة: {info.get("name", "")} &nbsp;|&nbsp; ترخيص التشغيل: {info.get("license", "")}</h2>
             </div>
             <div class="header-bottom-content">
                 <div class="header-right-info">
                     <div class="comp-name-txt">{info.get("name", "")}</div>
-                    <div class="comp-info-txt">📍 {info.get("address", "")} &nbsp;|&nbsp; 📋 سجل: {info.get("cr", "")} &nbsp;|&nbsp; 🧾 ضريبي: {info.get("tax", "")} &nbsp;|&nbsp; 🔑 ترخيص: {info.get("license", "")}</div>
+                    <div class="comp-info-txt">📍 {info.get("address", "")} &nbsp;|&nbsp; 📋 سجل تجاري: {info.get("cr", "")} &nbsp;|&nbsp; 🧾 رقم ضريبي: {info.get("tax", "")} &nbsp;|&nbsp; 🔑 رخصة: {info.get("license", "")}</div>
                     <div class="comp-info-txt">📞 {info.get("contact", "")}</div>
                 </div>
                 <div class="header-left-logo">
