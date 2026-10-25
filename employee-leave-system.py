@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم الواجهة وتثبيت القائمة الجانبية وإلغاء الخلفيات الداكنة للقوائم المنسدلة بالكامل
+# 🎨 تصميم الواجهة وتثبيت القائمة الجانبية وإجبار حقول التواريخ والاختيارات على أن تكون بخلفية بيضاء ونصوص سوداء واضحة
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -233,7 +233,7 @@ st.markdown("""
         direction: rtl !important;
     }
     
-    /* 🎯 تخصيص حقول القوائم المنسدلة (Selectbox) وقائمة منسدلة الخيارات داخل الشريط الجانبي باللون الأسود والخلفية البيضاء */
+    /* 🎯 تخصيص حقول القوائم المنسدلة داخل الشريط الجانبي */
     [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: #FFFFFF !important;
         border-radius: 6px !important;
@@ -253,22 +253,19 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* إصلاح لون القائمة المنسدلة المنبثقة (Dropdown Menu Options) لتكون بخلفية بيضاء ونصوص سوداء واضحة */
-    div[data-baseweb="popover"], div[role="listbox"], ul[role="listbox"], div[data-baseweb="menu"] {
+    /* 🎯 تصحيح شامل لحقول التواريخ (Date Input) لتكون بخلفية بيضاء ونصوص سوداء واضحة */
+    div[data-baseweb="input"], div[data-baseweb="base-input"], div[data-baseweb="calendar"] {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
     }
     
-    div[data-baseweb="popover"] div, div[role="listbox"] div, ul[role="listbox"] li, div[data-baseweb="menu"] div {
+    div[data-testid="stDateInput"] input, input[type="text"], input[type="date"] {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
         font-weight: bold !important;
-    }
-    
-    div[role="listbox"] li:hover, div[data-baseweb="menu"] div:hover {
-        background-color: #E2E8F0 !important;
-        color: #1E3A8A !important;
+        border: 1px solid #CBD5E1 !important;
+        border-radius: 6px !important;
     }
     
     /* ضبط لون حقول الإدخال والتسميات العامة */
@@ -278,7 +275,7 @@ st.markdown("""
         font-size: 13px !important;
     }
     
-    input, textarea, select, div[data-baseweb="input"] input, div[data-baseweb="base-input"] input {
+    input, textarea, select {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
