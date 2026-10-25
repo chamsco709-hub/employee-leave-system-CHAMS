@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم الواجهة وتثبيت القائمة الجانبية وإجبار حقول الاختيار على أن تكون بخلفية بيضاء ونصوص سوداء
+# 🎨 تصميم الواجهة وتثبيت القائمة الجانبية وإلغاء الخلفيات الداكنة للقوائم المنسدلة بالكامل
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -233,7 +233,7 @@ st.markdown("""
         direction: rtl !important;
     }
     
-    /* 🎯 تخصيص حقول القوائم المنسدلة (Selectbox) داخل الشريط الجانبي لتكون بخلفية بيضاء ونصوص سوداء واضحة */
+    /* 🎯 تخصيص حقول القوائم المنسدلة (Selectbox) وقائمة منسدلة الخيارات داخل الشريط الجانبي باللون الأسود والخلفية البيضاء */
     [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: #FFFFFF !important;
         border-radius: 6px !important;
@@ -251,6 +251,24 @@ st.markdown("""
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
         font-weight: bold !important;
+    }
+    
+    /* إصلاح لون القائمة المنسدلة المنبثقة (Dropdown Menu Options) لتكون بخلفية بيضاء ونصوص سوداء واضحة */
+    div[data-baseweb="popover"], div[role="listbox"], ul[role="listbox"], div[data-baseweb="menu"] {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+    }
+    
+    div[data-baseweb="popover"] div, div[role="listbox"] div, ul[role="listbox"] li, div[data-baseweb="menu"] div {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
+        font-weight: bold !important;
+    }
+    
+    div[role="listbox"] li:hover, div[data-baseweb="menu"] div:hover {
+        background-color: #E2E8F0 !important;
+        color: #1E3A8A !important;
     }
     
     /* ضبط لون حقول الإدخال والتسميات العامة */
