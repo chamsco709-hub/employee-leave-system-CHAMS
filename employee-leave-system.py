@@ -196,15 +196,16 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم الواجهة الاحترافية وضبط ألوان الحقول والنصوص السوداء الواضحة تماماً
+# 🎨 تصميم الواجهة الاحترافية وضبط ألوان الحقول والنصوص لتكون واضحة ونقية تماماً
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { display: none !important; }
     
-    html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6 {
+    html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6, label {
         font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
         direction: rtl !important;
         text-align: right !important;
+        color: #0F172A !important;
     }
     
     .block-container {
@@ -214,19 +215,20 @@ st.markdown("""
         background-color: #F8FAFC !important;
     }
     
-    /* ضبط لون النص داخل حقول الإدخال والأرقام ليكون أسود واضح تماماً وقابل للقراءة */
+    /* ضمان وضوح عناوين الحقول والتسميات باللون الداكن */
+    label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
+        color: #1E293B !important;
+        font-weight: bold !important;
+        font-size: 13px !important;
+    }
+    
+    /* ضبط لون الحقول والنصوص بداخلها لتكون سوداء واضحة تماماً */
     input, textarea, select, div[data-baseweb="input"] input, div[data-baseweb="base-input"] input {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
         font-size: 13px !important;
         font-weight: bold !important;
-    }
-    
-    /* منع ظهور النصوص بلون أزرق عند التحديد أو التركيز */
-    input:focus, textarea:focus {
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
     }
     
     /* تخصيص الشريط الجانبي الاحترافي */
@@ -482,7 +484,7 @@ with st.sidebar:
         "📝 طلبات الإجازات",
         "👥 شؤون الموظفين",
         "⚙️ الأدوات والنظام"
-    ], index=4) # الافتراضي شؤون الموظفين بناءً على الصورة
+    ], index=0)
     
     st.markdown("---")
     st.markdown(f"**👤 المستخدم:** {st.session_state.current_logged_user}")
@@ -526,7 +528,7 @@ elif main_menu == "👥 شؤون الموظفين":
         "1. إضافة موظف جديد", 
         "2. سجل الموظفين والأرصدة", 
         "3. تعديل أو حذف موظف"
-    ], index=0)
+    ])
     choice = sub_choice.split(". ", 1)[1]
 elif main_menu == "⚙️ الأدوات والنظام":
     sub_choice = st.selectbox("اختر أداة النظام:", [
