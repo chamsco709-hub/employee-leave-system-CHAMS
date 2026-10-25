@@ -8,7 +8,7 @@ import base64
 import json
 import os
 
-# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة
+# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة وبقاء القائمة الجانبية مفتوحة دائماً
 st.set_page_config(
     page_title="النظام المتكامل لإدارة الإجازات والموارد البشرية",
     page_icon="🏢",
@@ -231,11 +231,12 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* تخصيص الشريط الجانبي الاحترافي */
+    /* تخصيص الشريط الجانبي الاحترافي الثابت والظاهر تماماً */
     [data-testid="stSidebar"] {
         background-color: #0F172A !important;
-        color: #F8FAFC !important;
+        color: #F8FAFC !important.
         padding-top: 1rem;
+        min-width: 280px !important;
     }
     [data-testid="stSidebar"] .stMarkdown h1, [data-testid="stSidebar"] .stMarkdown h2, [data-testid="stSidebar"] .stMarkdown h3, [data-testid="stSidebar"] label {
         color: #E2E8F0 !important;
@@ -469,7 +470,7 @@ if not st.session_state.is_authenticated:
 render_company_header()
 
 # =========================================================
-# 🗂️ القائمة الجانبية للنظام مع زر الإظهار والإخفاء والتحكم
+# 🗂️ القائمة الجانبية للنظام مع القوائم التابعة الذكية الثابتة
 # =========================================================
 with st.sidebar:
     st.markdown("### 🗂️ لوحة التحكم الرئيسية")
@@ -541,23 +542,6 @@ with st.sidebar:
         st.session_state.is_authenticated = False
         st.session_state.current_logged_user = ""
         st.rerun()
-
-# زر مخصص في الواجهة الرئيسية لإظهار أو إخفاء لوحة التحكم (الشريط الجانبي) بضغطة زر
-c_btn_toggle, _ = st.columns([2, 8])
-with c_btn_toggle:
-    if st.button("🎛️ إظهار/إخفاء لوحة التحكم", use_container_width=True):
-        # استخدام مكون جافاسكريبت لتبديل حالة الشريط الجانبي في Streamlit
-        components.html("""
-            <script>
-                const sidebarToggle = window.parent.document.querySelector('button[kind="header"]');
-                if (sidebarToggle) {
-                    sidebarToggle.click();
-                } else {
-                    const altToggle = window.parent.document.querySelector('[data-testid="collapsedControl"]');
-                    if (altToggle) altToggle.click();
-                }
-            </script>
-        """, height=0)
 
 # =========================================================
 # 🏠 الشاشة الرئيسية / لوحة المؤشرات
