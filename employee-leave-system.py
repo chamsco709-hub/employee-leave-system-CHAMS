@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم CSS الشامل والنهائي لإصلاح خلفيات التقويم المنبثق وقوائم الاختيار باللون الأبيض والنصوص السوداء الواضحة تماماً
+# 🎨 تصميم CSS الشامل النهائي لإجبار التقويم والقوائم المنبثقة على الخلفية البيضاء والنصوص السوداء البارزة
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -215,7 +215,7 @@ st.markdown("""
         background-color: #F8FAFC !important;
     }
     
-    /* تثبيت القائمة الجانبية على اليمين ودون أي إخفاء */
+    /* تثبيت القائمة الجانبية على اليمين */
     [data-testid="stSidebar"] {
         transform: none !important;
         visibility: visible !important;
@@ -233,7 +233,7 @@ st.markdown("""
         direction: rtl !important;
     }
     
-    /* 🎯 تخصيص حقول القوائم المنسدلة داخل الشريط الجانبي لتكون بخلفية بيضاء ونصوص سوداء واضحة */
+    /* 🎯 تخصيص حقول القوائم المنسدلة داخل الشريط الجانبي */
     [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: #FFFFFF !important;
         border-radius: 6px !important;
@@ -253,42 +253,38 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* 🎯 تصحيح شامل لقائمة خيارات المنسدلة المنبثقة والقوائم الفرعية في الشريط الجانبي وعموم التطبيق */
-    div[data-baseweb="popover"], div[data-baseweb="menu"], ul[data-baseweb="menu"], div[role="listbox"] {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
-    }
-    
-    div[data-baseweb="popover"] div, div[data-baseweb="menu"] div, ul[data-baseweb="menu"] li, div[role="option"] {
+    /* 🎯 الإصلاح الجذري لحقول التواريخ والتقويم المنبثق (Calendar Popover & Dropdowns) */
+    div[data-baseweb="popover"], 
+    div[data-baseweb="popover"] *, 
+    div[data-baseweb="calendar"], 
+    div[data-baseweb="calendar"] * {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
+    }
+    
+    /* تخصيص أيام التقويم عند الإشارة والتحويم واليوم المحدد */
+    div[data-baseweb="calendar"] button {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
         font-weight: bold !important;
-    }
-    
-    div[data-baseweb="popover"] div:hover, ul[data-baseweb="menu"] li:hover, div[role="option"]:hover {
-        background-color: #E2E8F0 !important;
-        color: #1E3A8A !important;
-    }
-    
-    /* 🎯 تصحيح شامل لصندوق اختيار التاريخ (Date Input & Calendar Popup) ليكون بخلفية بيضاء ونصوص سوداء واضحة */
-    div[data-baseweb="calendar"], div[data-baseweb="calendar"] div, div[data-baseweb="calendar"] span, div[data-baseweb="calendar"] button {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
+        border-radius: 4px !important;
     }
     
     div[data-baseweb="calendar"] button:hover {
         background-color: #E2E8F0 !important;
-        color: #0F172A !important;
+        color: #1E3A8A !important;
     }
-    
-    div[data-baseweb="input"], div[data-baseweb="base-input"] {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
+
+    div[data-baseweb="calendar"] [aria-selected="true"] {
+        background-color: #1E3A8A !important;
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
     }
-    
-    div[data-testid="stDateInput"] input, input[type="text"], input[type="date"] {
+
+    /* حقل إدخال التاريخ الرئيسي */
+    div[data-testid="stDateInput"] > div,
+    div[data-testid="stDateInput"] input {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
