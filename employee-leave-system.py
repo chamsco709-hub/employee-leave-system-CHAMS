@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 سكريبت وتصميم CSS الفعّال لإجبار التقويم على اللون الأبيض الصافي وإزالة الوضع الداكن تماماً
+# 🎨 تصميم CSS الشامل مع القواعد المطلقة لإجبار التقويم وكل عناصره على اللون الأبيض والنصوص السوداء
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -233,7 +233,6 @@ st.markdown("""
         direction: rtl !important;
     }
     
-    /* تخصيص القوائم المنسدلة في الشريط الجانبي */
     [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: #FFFFFF !important;
         border-radius: 6px !important;
@@ -253,7 +252,45 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* حقل إدخال التاريخ الرئيسي */
+    /* 🎯 استهداف شامل وجذري لكل نافذة منبثقة أو تقويم في عموم الصفحة */
+    div[data-baseweb="popover"], 
+    div[data-baseweb="popover"] div, 
+    div[data-baseweb="popover"] span,
+    div[data-baseweb="calendar"], 
+    div[data-baseweb="calendar"] div, 
+    div[data-baseweb="calendar"] span,
+    div[data-baseweb="calendar"] section,
+    div[data-baseweb="calendar"] header,
+    div[role="dialog"],
+    div[role="dialog"] * {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
+    }
+    
+    div[data-baseweb="calendar"] button,
+    div[data-baseweb="popover"] button {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
+        font-weight: bold !important;
+        border: none !important;
+    }
+    
+    div[data-baseweb="calendar"] button:hover,
+    div[data-baseweb="popover"] button:hover {
+        background-color: #E2E8F0 !important;
+        color: #1E3A8A !important;
+        -webkit-text-fill-color: #1E3A8A !important;
+    }
+
+    /* اليوم المحدد في التقويم بلون مميز وواضح */
+    div[data-baseweb="calendar"] [aria-selected="true"] {
+        background-color: #1E3A8A !important;
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
+    }
+
     div[data-testid="stDateInput"] > div,
     div[data-testid="stDateInput"] input {
         background-color: #FFFFFF !important;
@@ -270,13 +307,13 @@ st.markdown("""
         -webkit-text-fill-color: #0F172A !important;
     }
     div[role="option"]:hover {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
+        background-color: #E2E8F0 !important;
+        color: #1E3A8A !important;
         -webkit-text-fill-color: #1E3A8A !important;
     }
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
-        color: #0F172A !important;
+        color: #1E293B !important;
         font-weight: bold !important;
         font-size: 13px !important;
     }
@@ -431,32 +468,36 @@ st.markdown("""
     }
     </style>
     
-    <!-- كود JavaScript متطور لإزالة الوضع الداكن وإجبار خلفية ونصوص التقويم على اللون الفاتح الواضح -->
+    <!-- كود JavaScript متطور للغاية لمراقبة ظهور التقويم وإجبار عناصره الداخلية والخارجية على الأبيض والأسود لحظياً -->
     <script>
-    const fixCalendarTheme = () => {
-        document.querySelectorAll('div[data-baseweb="popover"], div[data-baseweb="calendar"]').forEach(el => {
-            el.removeAttribute('data-theme');
-            el.style.setProperty('background-color', '#FFFFFF', 'important');
-            el.style.setProperty('color', '#0F172A', 'important');
+    const forceWhiteCalendar = () => {
+        // البحث عن أي نافذة منبثقة أو تقويم عائم
+        const popovers = document.querySelectorAll('div[data-baseweb="popover"], div[data-baseweb="calendar"], div[role="dialog"]');
+        popovers.forEach(pop => {
+            pop.removeAttribute('data-theme');
+            pop.style.setProperty('background-color', '#FFFFFF', 'important');
+            pop.style.setProperty('color', '#0F172A', 'important');
             
-            el.querySelectorAll('*').forEach(child => {
-                child.style.setProperty('background-color', '#FFFFFF', 'important');
-                child.style.setProperty('color', '#0F172A', 'important');
-                child.style.setProperty('-webkit-text-fill-color', '#0F172A', 'important');
-            });
-            
-            // تخصيص اليوم المحدد بلون مميز
-            el.querySelectorAll('[aria-selected="true"]').forEach(selected => {
-                selected.style.setProperty('background-color', '#0F172A', 'important');
-                selected.style.setProperty('color', '#FFFFFF', 'important');
-                selected.style.setProperty('-webkit-text-fill-color', '#FFFFFF', 'important');
+            // تطبيق اللون الأبيض للخلفية والأسود للنصوص على كافة العناصر الفرعية
+            const allElements = pop.querySelectorAll('*');
+            allElements.forEach(el => {
+                if (el.getAttribute('aria-selected') !== 'true') {
+                    el.style.setProperty('background-color', '#FFFFFF', 'important');
+                    el.style.setProperty('color', '#0F172A', 'important');
+                    el.style.setProperty('-webkit-text-fill-color', '#0F172A', 'important');
+                }
             });
         });
     };
 
-    const observer = new MutationObserver(fixCalendarTheme);
+    // مراقبة التغييرات في الصفحة لتنفيذ الدالة فور فتح التقويم
+    const observer = new MutationObserver(forceWhiteCalendar);
     observer.observe(document.body, { childList: true, subtree: true });
-    document.addEventListener('click', () => setTimeout(fixCalendarTheme, 50));
+    
+    // تنفيذ إضافي عند النقر في أي مكان بالصفحة
+    document.addEventListener('click', () => {
+        setTimeout(forceWhiteCalendar, 30);
+    });
     </script>
 """, unsafe_allow_html=True)
 
@@ -507,7 +548,7 @@ if not st.session_state.is_authenticated:
     st.markdown(
         f"""
         <div style="max-width: 450px; margin: 60px auto; background: #FFFFFF; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; direction: rtl;">
-            <h2 style="color: #0F172A; margin-bottom: 12px; font-size: 20px;">🔐 تسجيل الدخول للنظام</h2>
+            <h2 style="color: #1E3A8A; margin-bottom: 12px; font-size: 20px;">🔐 تسجيل الدخول للنظام</h2>
             <p style="color: #64748B; font-size: 13px; margin-bottom: 20px;">{company_display_name} | رخصة التشغيل: {company_license}</p>
         </div>
         """,
