@@ -447,7 +447,7 @@ st.markdown("""
             
             // تخصيص اليوم المحدد بلون مميز
             el.querySelectorAll('[aria-selected="true"]').forEach(selected => {
-                selected.style.setProperty('background-color', '#1E3A8A', 'important');
+                selected.style.setProperty('background-color', '#0F172A', 'important');
                 selected.style.setProperty('color', '#FFFFFF', 'important');
                 selected.style.setProperty('-webkit-text-fill-color', '#FFFFFF', 'important');
             });
@@ -507,7 +507,7 @@ if not st.session_state.is_authenticated:
     st.markdown(
         f"""
         <div style="max-width: 450px; margin: 60px auto; background: #FFFFFF; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; direction: rtl;">
-            <h2 style="color: #1E3A8A; margin-bottom: 12px; font-size: 20px;">🔐 تسجيل الدخول للنظام</h2>
+            <h2 style="color: #0F172A; margin-bottom: 12px; font-size: 20px;">🔐 تسجيل الدخول للنظام</h2>
             <p style="color: #64748B; font-size: 13px; margin-bottom: 20px;">{company_display_name} | رخصة التشغيل: {company_license}</p>
         </div>
         """,
