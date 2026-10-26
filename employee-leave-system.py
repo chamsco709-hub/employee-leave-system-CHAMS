@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم CSS الشامل (مع استهداف قاطع ونهائي لقائمة التقويم المنبثقة وجعلها بيضاء بالكامل)
+# 🎨 تصميم CSS الشامل مع إجبار نافذة اختيار التاريخ على اللون الأبيض النقي والنصوص السوداء الواضحة
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -264,7 +264,7 @@ st.markdown("""
         border-color: #CBD5E1 !important;
     }
 
-    /* 🎯 استهداف قاطع لجميع عناصر قائمة التقويم المنبثقة (Dropdown/Popover/Calendar) لإجبارها على اللون الأبيض والأسود الواضح */
+    /* 🎯 إجبار نافذة التقويم المنبثقة بالكامل على اللون الأبيض والأسود الواضح لمنع أي خلفية داكنة */
     div[data-baseweb="popover"],
     div[data-baseweb="calendar"],
     div[role="dialog"],
@@ -292,7 +292,7 @@ st.markdown("""
         -webkit-text-fill-color: #1E3A8A !important;
     }
 
-    /* اليوم المحدد في التقويم بلون أزرق مميز مع خط أبيض */
+    /* اليوم المحدد في التقويم بلون مميز بخط أبيض */
     div[data-baseweb="calendar"] [aria-selected="true"] {
         background-color: #1E3A8A !important;
         color: #FFFFFF !important;
@@ -470,7 +470,7 @@ st.markdown("""
     }
     </style>
     
-    <!-- سكريبت ذكي لتنظيف وإجبار خلفية القائمة المنبثقة للتاريخ على الأبيض النقي فوراً عند الضغط -->
+    <!-- سكريبت جافاسكريبت فوري لإزالة السمات المظلمة وفرض اللون الأبيض على التقويم المنبثق -->
     <script>
     const forceWhiteCalendar = () => {
         const popovers = document.querySelectorAll('div[data-baseweb="popover"], div[data-baseweb="calendar"], div[role="dialog"]');
@@ -494,7 +494,8 @@ st.markdown("""
     observer.observe(document.body, { childList: true, subtree: true });
     
     document.addEventListener('click', () => {
-        setTimeout(forceWhiteCalendar, 10);
+        setTimeout(forceWhiteCalendar, 5);
+        setTimeout(forceWhiteCalendar, 50);
     });
     </script>
 """, unsafe_allow_html=True)
