@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم CSS الشامل (مع استهداف دقيق ومطلق لقائمة التقويم المنبثقة لجعلها بيضاء بالكامل)
+# 🎨 تصميم CSS الشامل (مع استهداف دقيق وقاطع لقائمة التقويم المنبثقة)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -252,7 +252,7 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* حقل إدخال التاريخ الرئيسي */
+    /* حقل إدخال التاريخ الرئيسي وصندوقه */
     div[data-testid="stDateInput"],
     div[data-testid="stDateInput"] > div,
     div[data-testid="stDateInput"] input,
@@ -264,7 +264,7 @@ st.markdown("""
         border-color: #CBD5E1 !important;
     }
 
-    /* 🎯 استهداف شامل وقاطع لقائمة التقويم المنبثقة (Dropdown/Popover/Calendar) لإجبار خلفيتها على الأبيض ونصوصها للسواد */
+    /* 🎯 إجبار نافذة التقويم المنبثقة (Dropdown / Calendar / Popover) بالكامل على اللون الأبيض والأسود */
     div[data-baseweb="popover"],
     div[data-baseweb="calendar"],
     div[role="dialog"],
@@ -324,7 +324,7 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* 🏢 الهيدر العلوي للشركة */
+    /* 🏢 الهيدر العلوي للشركة بنصوص بيضاء بالكامل */
     .company-header-container {
         background: linear-gradient(135deg, #1E3A8A 15%, #0F172A 100%);
         color: #FFFFFF !important;
@@ -470,10 +470,9 @@ st.markdown("""
     }
     </style>
     
-    <!-- سكريبت ذكي لتنظيف وإجبار خلفية القائمة المنبثقة للتاريخ على الأبيض النقي ونصوصها للسواد الداكن -->
+    <!-- سكريبت ذكي لتنظيف وإجبار خلفية القائمة المنبثقة للتاريخ على الأبيض النقي فوراً عند الضغط -->
     <script>
     const forceWhiteCalendar = () => {
-        // إزالة أي سمة داكنة قد تحقنها مكتبة BaseWeb وإجبار الخلفية على الأبيض
         const popovers = document.querySelectorAll('div[data-baseweb="popover"], div[data-baseweb="calendar"], div[role="dialog"]');
         popovers.forEach(pop => {
             pop.removeAttribute('data-theme');
@@ -495,7 +494,7 @@ st.markdown("""
     observer.observe(document.body, { childList: true, subtree: true });
     
     document.addEventListener('click', () => {
-        setTimeout(forceWhiteCalendar, 20);
+        setTimeout(forceWhiteCalendar, 10);
     });
     </script>
 """, unsafe_allow_html=True)
