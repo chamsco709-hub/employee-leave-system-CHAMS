@@ -264,7 +264,7 @@ st.markdown("""
         border-color: #CBD5E1 !important;
     }
 
-    /* 🎯 إجبار نافذة التقويم المنبثقة بالكامل على اللون الأبيض والأسود الواضح لمنع أي خلفية داكنة */
+    /* 🎯 إجبار نافذة التقويم المنبثقة بالكامل على اللون الأبيض والأسود الواضح */
     div[data-baseweb="popover"],
     div[data-baseweb="calendar"],
     div[role="dialog"],
@@ -292,7 +292,6 @@ st.markdown("""
         -webkit-text-fill-color: #1E3A8A !important;
     }
 
-    /* اليوم المحدد في التقويم بلون مميز بخط أبيض */
     div[data-baseweb="calendar"] [aria-selected="true"] {
         background-color: #1E3A8A !important;
         color: #FFFFFF !important;
@@ -600,7 +599,7 @@ with st.sidebar:
     st.markdown("### 📋 القائمة التابعة للقسم:")
     
     if main_menu == "🏠 الشاشة الرئيسية":
-        sub_options = ["لوحة المؤشرات والتحكم"]
+        sub_options = ["لوحة المؤشرات والتحكم", "🔍 صندوق البحث المتطور والشامل"]
     elif main_menu == "⏱️ الحضور والانصراف":
         sub_options = [
             "تسجيل حضور وانصراف", 
@@ -652,9 +651,73 @@ with st.sidebar:
         st.rerun()
 
 # =========================================================
+# 🔍 صندوق البحث المتطور والشامل (جديد)
+# =========================================================
+if choice == "🔍 صندوق البحث المتطور والشامل":
+    st.markdown(f'<div class="section-header">🔍 صندوق البحث المتطور والشامل في قواعد بيانات الشركة</div>', unsafe_allow_html=True)
+    
+    with st.form("advanced_search_form"):
+        col_s1, col_s2, col_s3 = st.columns(3)
+        with col_s1:
+            search_keyword = st.text_input("بحث نصي (الاسم، كود الموظف، الوظيفة، أو البيان):")
+        with col_s2:
+            branches_avail = ["الكل"] + sorted(st.session_state.employees["الفرع"].dropna().unique().tolist()) if not st.session_state.employees.empty else ["الكل"]
+            selected_search_branch = st.selectbox("تصفية حسب الفرع:", branches_avail)
+        with col_s3:
+            search_target_section = st.selectbox("نطاق البحث في النظام:", ["جميع السجلات (شامل)", "سجل الموظفين والأرصدة", "سجل الحضور والانصراف", "سجل طلبات الإجازات", "سجل المعاملات المالية"])
+            
+        submit_adv_search = st.form_submit_button("🔍 تنفيذ البحث المتطور", use_container_width=True)
+        
+    if submit_adv_search or True:
+        keyword = search_keyword.strip().lower()
+        
+        if search_target_section in ["جميع السجلات (شامل)", "سجل الموظفين والأرصدة"]:
+            st.markdown("##### 👥 نتائج البحث في (سجل الموظفين):")
+            emp_df = st.session_state.employees.copy()
+            if selected_search_branch != "الكل":
+                emp_df = emp_df[emp_df["الفرع"] == selected_search_branch]
+            if keyword:
+                mask = emp_df.astype(str).apply(lambda x: x.str.lower().str.contains(keyword)).any(axis=1)
+                emp_df = emp_df[mask]
+            render_printable_table(emp_df)
+            
+        if search_target_section in ["جميع السجلات (شامل)", "سجل الحضور والانصراف"]:
+            st.markdown("##### ⏱️ نتائج البحث في (سجل الحضور والانصراف):")
+            att_df = st.session_state.attendance.copy()
+            if not att_df.empty:
+                if selected_search_branch != "الكل":
+                    att_df = att_df[att_df["الفرع"] == selected_search_branch]
+                if keyword:
+                    mask = att_df.astype(str).apply(lambda x: x.str.lower().str.contains(keyword)).any(axis=1)
+                    att_df = att_df[mask]
+            render_printable_table(att_df)
+
+        if search_target_section in ["جميع السجلات (شامل)", "سجل طلبات الإجازات"]:
+            st.markdown("##### 📝 نتائج البحث في (سجل طلبات الإجازات):")
+            req_df = st.session_state.requests.copy()
+            if not req_df.empty:
+                if selected_search_branch != "الكل":
+                    req_df = req_df[req_df["الفرع"] == selected_search_branch]
+                if keyword:
+                    mask = req_df.astype(str).apply(lambda x: x.str.lower().str.contains(keyword)).any(axis=1)
+                    req_df = req_df[mask]
+            render_printable_table(req_df)
+
+        if search_target_section in ["جميع السجلات (شامل)", "سجل المعاملات المالية"]:
+            st.markdown("##### 💰 نتائج البحث في (سجل المعاملات المالية والسلف):")
+            fin_df = st.session_state.financial_transactions.copy()
+            if not fin_df.empty:
+                if selected_search_branch != "الكل":
+                    fin_df = fin_df[fin_df["الفرع"] == selected_search_branch]
+                if keyword:
+                    mask = fin_df.astype(str).apply(lambda x: x.str.lower().str.contains(keyword)).any(axis=1)
+                    fin_df = fin_df[mask]
+            render_printable_table(fin_df)
+
+# =========================================================
 # 🏠 الشاشة الرئيسية / لوحة المؤشرات
 # =========================================================
-if choice == "لوحة المؤشرات والتحكم" or choice == "الشاشة الرئيسية":
+elif choice == "لوحة المؤشرات والتحكم" or choice == "الشاشة الرئيسية":
     st.markdown(f'<div class="section-header">📈 مؤشرات الأداء العامة - شركة: {company_display_name}</div>', unsafe_allow_html=True)
     
     branch_filter = st.session_state.current_user_branch
