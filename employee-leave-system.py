@@ -599,7 +599,7 @@ with st.sidebar:
     st.markdown("### 📋 القائمة التابعة للقسم:")
     
     if main_menu == "🏠 الشاشة الرئيسية":
-        sub_options = ["لوحة المؤشرات والتحكم"]
+        sub_options = ["لوحة المؤشرات والتحكم", "🔍 صندوق البحث المتطور والشامل"]
     elif main_menu == "⏱️ الحضور والانصراف":
         sub_options = [
             "تسجيل حضور وانصراف", 
@@ -651,36 +651,11 @@ with st.sidebar:
         st.rerun()
 
 # =========================================================
-# 🏠 الشاشة الرئيسية / لوحة المؤشرات المتكاملة مع صندوق البحث
+# 🔍 صندوق البحث المتطور والشامل (قسم مستقل)
 # =========================================================
-if choice == "لوحة المؤشرات والتحكم" or choice == "الشاشة الرئيسية":
-    st.markdown(f'<div class="section-header">📈 مؤشرات الأداء العامة - شركة: {company_display_name}</div>', unsafe_allow_html=True)
-    
-    branch_filter = st.session_state.current_user_branch
-    dept_filter = st.session_state.current_user_dept
-    
-    if "Admin" in st.session_state.current_user_role or "الإدارة العليا" in dept_filter:
-        view_employees = st.session_state.employees
-        view_requests = st.session_state.requests
-    else:
-        view_employees = st.session_state.employees[st.session_state.employees["الفرع"] == branch_filter]
-        view_requests = st.session_state.requests[st.session_state.requests["الفرع"] == branch_filter]
-    
-    total_emps = len(view_employees)
-    pending_requests = view_requests[view_requests['الحالة'] == 'قيد الانتظار'] if not view_requests.empty else pd.DataFrame()
-    pending_count = len(pending_requests)
-    accepted_count = len(view_requests[view_requests['الحالة'] == 'مقبول']) if not view_requests.empty else 0
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown(f'<div class="dashboard-card"><div class="dashboard-card-title">👥 إجمالي موظفي الشركة</div><div class="dashboard-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
-    with col2:
-        st.markdown(f'<div class="dashboard-card" style="border-right-color: #D97706;"><div class="dashboard-card-title">⏳ الطلبات المعلقة</div><div class="dashboard-card-value" style="color: #D97706;">{pending_count}</div></div>', unsafe_allow_html=True)
-    with col3:
-        st.markdown(f'<div class="dashboard-card" style="border-right-color: #16A34A;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #16A34A;">{accepted_count}</div></div>', unsafe_allow_html=True)
-
-    # 🔍 صندوق البحث المتطور والشامل المدمج مباشرة داخل لوحة التحكم
+if choice == "🔍 صندوق البحث المتطور والشامل":
     st.markdown(f'<div class="section-header">🔍 صندوق البحث المتطور والشامل في قواعد بيانات الشركة</div>', unsafe_allow_html=True)
+    
     with st.form("advanced_search_form"):
         col_s1, col_s2, col_s3 = st.columns(3)
         with col_s1:
@@ -738,6 +713,35 @@ if choice == "لوحة المؤشرات والتحكم" or choice == "الشاش
                     mask = fin_df.astype(str).apply(lambda x: x.str.lower().str.contains(keyword)).any(axis=1)
                     fin_df = fin_df[mask]
             render_printable_table(fin_df)
+
+# =========================================================
+# 🏠 الشاشة الرئيسية / لوحة المؤشرات
+# =========================================================
+elif choice == "لوحة المؤشرات والتحكم" or choice == "الشاشة الرئيسية":
+    st.markdown(f'<div class="section-header">📈 مؤشرات الأداء العامة - شركة: {company_display_name}</div>', unsafe_allow_html=True)
+    
+    branch_filter = st.session_state.current_user_branch
+    dept_filter = st.session_state.current_user_dept
+    
+    if "Admin" in st.session_state.current_user_role or "الإدارة العليا" in dept_filter:
+        view_employees = st.session_state.employees
+        view_requests = st.session_state.requests
+    else:
+        view_employees = st.session_state.employees[st.session_state.employees["الفرع"] == branch_filter]
+        view_requests = st.session_state.requests[st.session_state.requests["الفرع"] == branch_filter]
+    
+    total_emps = len(view_employees)
+    pending_requests = view_requests[view_requests['الحالة'] == 'قيد الانتظار'] if not view_requests.empty else pd.DataFrame()
+    pending_count = len(pending_requests)
+    accepted_count = len(view_requests[view_requests['الحالة'] == 'مقبول']) if not view_requests.empty else 0
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f'<div class="dashboard-card"><div class="dashboard-card-title">👥 إجمالي موظفي الشركة</div><div class="dashboard-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
+    with col2:
+        st.markdown(f'<div class="dashboard-card" style="border-right-color: #D97706;"><div class="dashboard-card-title">⏳ الطلبات المعلقة</div><div class="dashboard-card-value" style="color: #D97706;">{pending_count}</div></div>', unsafe_allow_html=True)
+    with col3:
+        st.markdown(f'<div class="dashboard-card" style="border-right-color: #16A34A;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #16A34A;">{accepted_count}</div></div>', unsafe_allow_html=True)
 
     if not pending_requests.empty:
         st.markdown(f'<div class="section-header">⏳ اتخاذ القرار بشأن الطلبات المعلقة ({pending_count} طلب)</div>', unsafe_allow_html=True)
