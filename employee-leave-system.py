@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم CSS الشامل النهائي لإجبار التقويم والقوائم المنبثقة على الخلفية البيضاء والنصوص السوداء البارزة
+# 🎨 تصميم CSS الشامل والنهائي مع إصلاح تباين وألوان نافذة التاريخ والتقويم بشكل مطلق
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -233,7 +233,7 @@ st.markdown("""
         direction: rtl !important;
     }
     
-    /* 🎯 تخصيص حقول القوائم المنسدلة داخل الشريط الجانبي */
+    /* تخصيص القوائم المنسدلة في الشريط الجانبي */
     [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: #FFFFFF !important;
         border-radius: 6px !important;
@@ -253,36 +253,43 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* 🎯 الإصلاح الجذري لحقول التواريخ والتقويم المنبثق (Calendar Popover & Dropdowns) */
+    /* 🎯 الإصلاح الجذري والقاطع لألوان وتنسيق نافذة التقويم المنبثق (Datepicker & Calendar) */
     div[data-baseweb="popover"], 
     div[data-baseweb="popover"] *, 
     div[data-baseweb="calendar"], 
-    div[data-baseweb="calendar"] * {
+    div[data-baseweb="calendar"] *,
+    div[data-baseweb="calendar"] div,
+    div[data-baseweb="calendar"] span,
+    div[data-baseweb="calendar"] button {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
     }
     
-    /* تخصيص أيام التقويم عند الإشارة والتحويم واليوم المحدد */
+    /* أزرار وعناصر أيام التقويم والشهر والسنة */
     div[data-baseweb="calendar"] button {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
         font-weight: bold !important;
         border-radius: 4px !important;
+        border: none !important;
     }
     
     div[data-baseweb="calendar"] button:hover {
         background-color: #E2E8F0 !important;
         color: #1E3A8A !important;
+        -webkit-text-fill-color: #1E3A8A !important;
     }
 
+    /* اليوم المحدد في التقويم */
     div[data-baseweb="calendar"] [aria-selected="true"] {
         background-color: #1E3A8A !important;
         color: #FFFFFF !important;
         -webkit-text-fill-color: #FFFFFF !important;
     }
 
-    /* حقل إدخال التاريخ الرئيسي */
+    /* حقل إدخال التاريخ الرئيسي والنص الظاهر فيه */
     div[data-testid="stDateInput"] > div,
     div[data-testid="stDateInput"] input {
         background-color: #FFFFFF !important;
@@ -291,6 +298,23 @@ st.markdown("""
         font-weight: bold !important;
         border: 1px solid #CBD5E1 !important;
         border-radius: 6px !important;
+    }
+    
+    div[data-testid="stDateInput"] input {
+        color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
+    }
+
+    /* قوائم الاختيار المنبثقة والقوائم التابعة العامة */
+    div[data-baseweb="menu"], ul[data-baseweb="menu"], div[role="listbox"], div[role="option"] {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
+    }
+    div[role="option"]:hover {
+        background-color: #E2E8F0 !important;
+        color: #1E3A8A !important;
+        -webkit-text-fill-color: #1E3A8A !important;
     }
     
     /* ضبط لون حقول الإدخال والتسميات العامة */
