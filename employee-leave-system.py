@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم CSS الشامل والنهائي مع إصلاح تباين وألوان نافذة التاريخ والتقويم بشكل مطلق
+# 🎨 تصميم CSS المحدث بدقة تامة لإجبار خلفية التقويم على أن تكون بيضاء نقية ونصوص الأيام والأرقام سوداء واضحة
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -255,18 +255,19 @@ st.markdown("""
     
     /* 🎯 الإصلاح الجذري والقاطع لألوان وتنسيق نافذة التقويم المنبثق (Datepicker & Calendar) */
     div[data-baseweb="popover"], 
-    div[data-baseweb="popover"] *, 
+    div[data-baseweb="popover"] div,
+    div[data-baseweb="popover"] span,
     div[data-baseweb="calendar"], 
-    div[data-baseweb="calendar"] *,
     div[data-baseweb="calendar"] div,
     div[data-baseweb="calendar"] span,
-    div[data-baseweb="calendar"] button {
+    div[data-baseweb="calendar"] section,
+    div[data-baseweb="calendar"] header {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
     }
     
-    /* أزرار وعناصر أيام التقويم والشهر والسنة */
+    /* أزرار وعناصر أيام التقويم والشهر والسنة بدقة تامة */
     div[data-baseweb="calendar"] button {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
@@ -298,11 +299,6 @@ st.markdown("""
         font-weight: bold !important;
         border: 1px solid #CBD5E1 !important;
         border-radius: 6px !important;
-    }
-    
-    div[data-testid="stDateInput"] input {
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
     }
 
     /* قوائم الاختيار المنبثقة والقوائم التابعة العامة */
