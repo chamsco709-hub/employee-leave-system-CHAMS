@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم CSS الشامل (مع استهداف دقيق وقاطع لقائمة التقويم المنبثقة)
+# 🎨 تصميم CSS الشامل (مع استهداف قاطع ونهائي لقائمة التقويم المنبثقة وجعلها بيضاء بالكامل)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -252,7 +252,7 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* حقل إدخال التاريخ الرئيسي وصندوقه */
+    /* حقل إدخال التاريخ الرئيسي */
     div[data-testid="stDateInput"],
     div[data-testid="stDateInput"] > div,
     div[data-testid="stDateInput"] input,
@@ -264,7 +264,7 @@ st.markdown("""
         border-color: #CBD5E1 !important;
     }
 
-    /* 🎯 إجبار نافذة التقويم المنبثقة (Dropdown / Calendar / Popover) بالكامل على اللون الأبيض والأسود */
+    /* 🎯 استهداف قاطع لجميع عناصر قائمة التقويم المنبثقة (Dropdown/Popover/Calendar) لإجبارها على اللون الأبيض والأسود الواضح */
     div[data-baseweb="popover"],
     div[data-baseweb="calendar"],
     div[role="dialog"],
@@ -292,7 +292,7 @@ st.markdown("""
         -webkit-text-fill-color: #1E3A8A !important;
     }
 
-    /* اليوم المحدد في التقويم بلون مميز */
+    /* اليوم المحدد في التقويم بلون أزرق مميز مع خط أبيض */
     div[data-baseweb="calendar"] [aria-selected="true"] {
         background-color: #1E3A8A !important;
         color: #FFFFFF !important;
