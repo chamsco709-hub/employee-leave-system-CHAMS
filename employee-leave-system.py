@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم CSS الشامل مع القواعد المطلقة لإجبار التقويم وكل عناصره على اللون الأبيض والنصوص السوداء
+# 🎨 تصميم CSS الشامل (مع ضبط لون الهيدر العلوي والتقويم باللون الأبيض والأسود)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -252,7 +252,7 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* 🎯 استهداف شامل وجذري لكل نافذة منبثقة أو تقويم في عموم الصفحة */
+    /* 🎯 تنسيق نافذة التقويم المنبثقة باللون الأبيض والنصوص السوداء الواضحة */
     div[data-baseweb="popover"], 
     div[data-baseweb="popover"] div, 
     div[data-baseweb="popover"] span,
@@ -284,7 +284,7 @@ st.markdown("""
         -webkit-text-fill-color: #1E3A8A !important;
     }
 
-    /* اليوم المحدد في التقويم بلون مميز وواضح */
+    /* اليوم المحدد في التقويم */
     div[data-baseweb="calendar"] [aria-selected="true"] {
         background-color: #1E3A8A !important;
         color: #FFFFFF !important;
@@ -326,9 +326,10 @@ st.markdown("""
         font-weight: bold !important;
     }
     
+    /* 🏢 الهيدر العلوي للشركة مع نصوص بيضاء بالكامل */
     .company-header-container {
         background: linear-gradient(135deg, #1E3A8A 15%, #0F172A 100%);
-        color: white;
+        color: #FFFFFF !important;
         padding: 16px 20px;
         border-radius: 10px;
         margin-bottom: 15px !important;
@@ -347,6 +348,7 @@ st.markdown("""
         font-size: 16px !important;
         font-weight: bold !important;
         color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
         margin: 0 !important;
         padding: 0 !important;
         text-align: center !important;
@@ -370,12 +372,14 @@ st.markdown("""
         font-size: 15px !important;
         font-weight: bold !important;
         margin-bottom: 4px !important;
-        color: #F8FAFC !important;
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
     }
     .comp-info-txt {
         font-size: 11px !important;
         margin: 2px 0 !important;
-        color: #CBD5E1 !important;
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
         line-height: 1.4;
     }
     
@@ -468,17 +472,15 @@ st.markdown("""
     }
     </style>
     
-    <!-- كود JavaScript متطور للغاية لمراقبة ظهور التقويم وإجبار عناصره الداخلية والخارجية على الأبيض والأسود لحظياً -->
+    <!-- سكريبت ذكي لتنظيف وإجبار خلفية التقويم على الأبيض وصيغة النصوص للسواد -->
     <script>
     const forceWhiteCalendar = () => {
-        // البحث عن أي نافذة منبثقة أو تقويم عائم
         const popovers = document.querySelectorAll('div[data-baseweb="popover"], div[data-baseweb="calendar"], div[role="dialog"]');
         popovers.forEach(pop => {
             pop.removeAttribute('data-theme');
             pop.style.setProperty('background-color', '#FFFFFF', 'important');
             pop.style.setProperty('color', '#0F172A', 'important');
             
-            // تطبيق اللون الأبيض للخلفية والأسود للنصوص على كافة العناصر الفرعية
             const allElements = pop.querySelectorAll('*');
             allElements.forEach(el => {
                 if (el.getAttribute('aria-selected') !== 'true') {
@@ -490,11 +492,9 @@ st.markdown("""
         });
     };
 
-    // مراقبة التغييرات في الصفحة لتنفيذ الدالة فور فتح التقويم
     const observer = new MutationObserver(forceWhiteCalendar);
     observer.observe(document.body, { childList: true, subtree: true });
     
-    // تنفيذ إضافي عند النقر في أي مكان بالصفحة
     document.addEventListener('click', () => {
         setTimeout(forceWhiteCalendar, 30);
     });
