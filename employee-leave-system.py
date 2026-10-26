@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم الواجهة وتثبيت القائمة الجانبية وإجبار حقول التواريخ والاختيارات على أن تكون بخلفية بيضاء ونصوص سوداء واضحة
+# 🎨 تصميم CSS الشامل والنهائي لإصلاح خلفيات التواريخ وقوائم الاختيار الجانبية والمنسدلة باللون الأبيض والنصوص السوداء الواضحة تماماً
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -233,7 +233,7 @@ st.markdown("""
         direction: rtl !important;
     }
     
-    /* 🎯 تخصيص حقول القوائم المنسدلة داخل الشريط الجانبي */
+    /* 🎯 تخصيص حقول القوائم المنسدلة داخل الشريط الجانبي (قائمة حدد الإجراء المطلوب والقوائم الأخرى) لتكون بخلفية بيضاء ونصوص سوداء واضحة تماماً حتى عند النقر عليها */
     [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: #FFFFFF !important;
         border-radius: 6px !important;
@@ -253,8 +253,21 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* 🎯 تصحيح شامل لحقول التواريخ (Date Input) لتكون بخلفية بيضاء ونصوص سوداء واضحة */
-    div[data-baseweb="input"], div[data-baseweb="base-input"], div[data-baseweb="calendar"] {
+    /* 🎯 تصحيح شامل لقائمة خيارات المنسدلة المنبثقة (Dropdown Menu Popups) في عموم التطبيق لتكون بنصوص سوداء واضحة */
+    div[data-baseweb="popover"] div, div[data-baseweb="menu"] div, ul[data-baseweb="menu"] li {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
+        font-weight: bold !important;
+    }
+    
+    div[data-baseweb="popover"] div:hover, ul[data-baseweb="menu"] li:hover {
+        background-color: #E2E8F0 !important;
+        color: #1E3A8A !important;
+    }
+    
+    /* 🎯 تصحيح شامل لحقول اختيار التاريخ (Date Input) لتكون بخلفية بيضاء نقية ونصوص سوداء بارزة */
+    div[data-baseweb="input"], div[data-baseweb="base-input"] {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
     }
