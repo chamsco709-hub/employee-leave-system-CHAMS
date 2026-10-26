@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم CSS الشامل (مع إجبار حقول التاريخ والتقويم على اللون الأبيض والأسود الواضح)
+# 🎨 تصميم CSS الشامل (مع استهداف دقيق ومطلق لقائمة التقويم المنبثقة لجعلها بيضاء بالكامل)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -252,7 +252,7 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* 🎯 إجبار صندوق إدخال التاريخ الرئيسي على اللون الأبيض بخط أسود واضح */
+    /* حقل إدخال التاريخ الرئيسي */
     div[data-testid="stDateInput"],
     div[data-testid="stDateInput"] > div,
     div[data-testid="stDateInput"] input,
@@ -264,16 +264,12 @@ st.markdown("""
         border-color: #CBD5E1 !important;
     }
 
-    /* 🎯 استهداف نافذة التقويم المنبثقة والـ Popover بالكامل لجعلها بيضاء بالكامل والنصوص سوداء */
-    div[data-baseweb="popover"], 
-    div[data-baseweb="popover"] div, 
-    div[data-baseweb="popover"] span,
-    div[data-baseweb="calendar"], 
-    div[data-baseweb="calendar"] div, 
-    div[data-baseweb="calendar"] span,
-    div[data-baseweb="calendar"] section,
-    div[data-baseweb="calendar"] header,
+    /* 🎯 استهداف شامل وقاطع لقائمة التقويم المنبثقة (Dropdown/Popover/Calendar) لإجبار خلفيتها على الأبيض ونصوصها للسواد */
+    div[data-baseweb="popover"],
+    div[data-baseweb="calendar"],
     div[role="dialog"],
+    div[data-baseweb="popover"] *,
+    div[data-baseweb="calendar"] *,
     div[role="dialog"] * {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
@@ -296,7 +292,7 @@ st.markdown("""
         -webkit-text-fill-color: #1E3A8A !important;
     }
 
-    /* اليوم المحدد في التقويم */
+    /* اليوم المحدد في التقويم بلون مميز */
     div[data-baseweb="calendar"] [aria-selected="true"] {
         background-color: #1E3A8A !important;
         color: #FFFFFF !important;
@@ -328,7 +324,7 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* 🏢 الهيدر العلوي للشركة بنصوص بيضاء بالكامل */
+    /* 🏢 الهيدر العلوي للشركة */
     .company-header-container {
         background: linear-gradient(135deg, #1E3A8A 15%, #0F172A 100%);
         color: #FFFFFF !important;
@@ -474,17 +470,10 @@ st.markdown("""
     }
     </style>
     
-    <!-- سكريبت ذكي لتنظيف وإجبار خلفية حقول التاريخ والتقويم على الأبيض وصيغة النصوص للسواد الداكن -->
+    <!-- سكريبت ذكي لتنظيف وإجبار خلفية القائمة المنبثقة للتاريخ على الأبيض النقي ونصوصها للسواد الداكن -->
     <script>
     const forceWhiteCalendar = () => {
-        // تلوين صناديق حقول التاريخ الرئيسية
-        document.querySelectorAll('div[data-testid="stDateInput"], div[data-testid="stDateInput"] > div, div[data-testid="stDateInput"] input').forEach(el => {
-            el.style.setProperty('background-color', '#FFFFFF', 'important');
-            el.style.setProperty('color', '#0F172A', 'important');
-            el.style.setProperty('-webkit-text-fill-color', '#0F172A', 'important');
-        });
-
-        // تلوين النوافذ المنبثقة والتقويم
+        // إزالة أي سمة داكنة قد تحقنها مكتبة BaseWeb وإجبار الخلفية على الأبيض
         const popovers = document.querySelectorAll('div[data-baseweb="popover"], div[data-baseweb="calendar"], div[role="dialog"]');
         popovers.forEach(pop => {
             pop.removeAttribute('data-theme');
@@ -506,7 +495,7 @@ st.markdown("""
     observer.observe(document.body, { childList: true, subtree: true });
     
     document.addEventListener('click', () => {
-        setTimeout(forceWhiteCalendar, 30);
+        setTimeout(forceWhiteCalendar, 20);
     });
     </script>
 """, unsafe_allow_html=True)
