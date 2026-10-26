@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 تصميم CSS المحدث بدقة تامة لإجبار خلفية التقويم على أن تكون بيضاء نقية ونصوص الأيام والأرقام سوداء واضحة
+# 🎨 سكريبت وتصميم CSS لفرض الألوان البيضاء والسوداء الصحيحة على التقويم عبر المتصفح مباشرة
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -253,21 +253,16 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* 🎯 الإصلاح الجذري والقاطع لألوان وتنسيق نافذة التقويم المنبثق (Datepicker & Calendar) */
+    /* 🎯 استهداف شامل وقاطع لعناصر التقويم المنبثق والخلفيات */
     div[data-baseweb="popover"], 
-    div[data-baseweb="popover"] div,
-    div[data-baseweb="popover"] span,
+    div[data-baseweb="popover"] *, 
     div[data-baseweb="calendar"], 
-    div[data-baseweb="calendar"] div,
-    div[data-baseweb="calendar"] span,
-    div[data-baseweb="calendar"] section,
-    div[data-baseweb="calendar"] header {
+    div[data-baseweb="calendar"] * {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
     }
     
-    /* أزرار وعناصر أيام التقويم والشهر والسنة بدقة تامة */
     div[data-baseweb="calendar"] button {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
@@ -283,14 +278,12 @@ st.markdown("""
         -webkit-text-fill-color: #1E3A8A !important;
     }
 
-    /* اليوم المحدد في التقويم */
     div[data-baseweb="calendar"] [aria-selected="true"] {
         background-color: #1E3A8A !important;
         color: #FFFFFF !important;
         -webkit-text-fill-color: #FFFFFF !important;
     }
 
-    /* حقل إدخال التاريخ الرئيسي والنص الظاهر فيه */
     div[data-testid="stDateInput"] > div,
     div[data-testid="stDateInput"] input {
         background-color: #FFFFFF !important;
@@ -301,7 +294,6 @@ st.markdown("""
         border-radius: 6px !important;
     }
 
-    /* قوائم الاختيار المنبثقة والقوائم التابعة العامة */
     div[data-baseweb="menu"], ul[data-baseweb="menu"], div[role="listbox"], div[role="option"] {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
@@ -313,7 +305,6 @@ st.markdown("""
         -webkit-text-fill-color: #1E3A8A !important;
     }
     
-    /* ضبط لون حقول الإدخال والتسميات العامة */
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
         color: #1E293B !important;
         font-weight: bold !important;
@@ -328,7 +319,6 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* الهيدر العلوي للشركة */
     .company-header-container {
         background: linear-gradient(135deg, #1E3A8A 15%, #0F172A 100%);
         color: white;
@@ -382,7 +372,6 @@ st.markdown("""
         line-height: 1.4;
     }
     
-    /* بطاقات المؤشرات الإحصائية الاحترافية */
     .dashboard-card {
         background: #FFFFFF;
         border-right: 5px solid #1E3A8A;
@@ -404,7 +393,6 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* عناوين الأقسام */
     .section-header {
         font-size: 15px !important;
         font-weight: bold !important;
@@ -417,7 +405,6 @@ st.markdown("""
         direction: rtl !important;
     }
     
-    /* الجداول الاحترافية */
     table.custom-table {
         width: 100%;
         border-collapse: collapse;
@@ -473,6 +460,23 @@ st.markdown("""
         }
     }
     </style>
+    
+    <!-- كود JavaScript ذكي لتصحيح خلفية ونصوص التقويم تلقائياً عند فتحه -->
+    <script>
+    const observer = new MutationObserver((mutations) => {
+        document.querySelectorAll('div[data-baseweb="popover"], div[data-baseweb="calendar"]').forEach(el => {
+            el.style.backgroundColor = '#FFFFFF';
+            el.style.color = '#0F172A';
+            el.querySelectorAll('*').forEach(child => {
+                if (child.getAttribute('aria-selected') !== 'true') {
+                    child.style.backgroundColor = '#FFFFFF';
+                    child.style.color = '#0F172A';
+                }
+            });
+        });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    </script>
 """, unsafe_allow_html=True)
 
 if 'is_authenticated' not in st.session_state: st.session_state.is_authenticated = False
