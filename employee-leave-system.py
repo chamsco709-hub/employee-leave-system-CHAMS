@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=45)
 
-# 🎨 سكريبت وتصميم CSS لفرض الألوان البيضاء والسوداء الصحيحة على التقويم عبر المتصفح مباشرة
+# 🎨 سكريبت وتصميم CSS الفعّال لإجبار التقويم على اللون الأبيض الصافي وإزالة الوضع الداكن تماماً
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -253,37 +253,7 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* 🎯 استهداف شامل وقاطع لعناصر التقويم المنبثق والخلفيات */
-    div[data-baseweb="popover"], 
-    div[data-baseweb="popover"] *, 
-    div[data-baseweb="calendar"], 
-    div[data-baseweb="calendar"] * {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
-    }
-    
-    div[data-baseweb="calendar"] button {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
-        font-weight: bold !important;
-        border-radius: 4px !important;
-        border: none !important;
-    }
-    
-    div[data-baseweb="calendar"] button:hover {
-        background-color: #E2E8F0 !important;
-        color: #1E3A8A !important;
-        -webkit-text-fill-color: #1E3A8A !important;
-    }
-
-    div[data-baseweb="calendar"] [aria-selected="true"] {
-        background-color: #1E3A8A !important;
-        color: #FFFFFF !important;
-        -webkit-text-fill-color: #FFFFFF !important;
-    }
-
+    /* حقل إدخال التاريخ الرئيسي */
     div[data-testid="stDateInput"] > div,
     div[data-testid="stDateInput"] input {
         background-color: #FFFFFF !important;
@@ -461,21 +431,32 @@ st.markdown("""
     }
     </style>
     
-    <!-- كود JavaScript ذكي لتصحيح خلفية ونصوص التقويم تلقائياً عند فتحه -->
+    <!-- كود JavaScript متطور لإزالة الوضع الداكن وإجبار خلفية ونصوص التقويم على اللون الفاتح الواضح -->
     <script>
-    const observer = new MutationObserver((mutations) => {
+    const fixCalendarTheme = () => {
         document.querySelectorAll('div[data-baseweb="popover"], div[data-baseweb="calendar"]').forEach(el => {
-            el.style.backgroundColor = '#FFFFFF';
-            el.style.color = '#0F172A';
+            el.removeAttribute('data-theme');
+            el.style.setProperty('background-color', '#FFFFFF', 'important');
+            el.style.setProperty('color', '#0F172A', 'important');
+            
             el.querySelectorAll('*').forEach(child => {
-                if (child.getAttribute('aria-selected') !== 'true') {
-                    child.style.backgroundColor = '#FFFFFF';
-                    child.style.color = '#0F172A';
-                }
+                child.style.setProperty('background-color', '#FFFFFF', 'important');
+                child.style.setProperty('color', '#0F172A', 'important');
+                child.style.setProperty('-webkit-text-fill-color', '#0F172A', 'important');
+            });
+            
+            // تخصيص اليوم المحدد بلون مميز
+            el.querySelectorAll('[aria-selected="true"]').forEach(selected => {
+                selected.style.setProperty('background-color', '#1E3A8A', 'important');
+                selected.style.setProperty('color', '#FFFFFF', 'important');
+                selected.style.setProperty('-webkit-text-fill-color', '#FFFFFF', 'important');
             });
         });
-    });
+    };
+
+    const observer = new MutationObserver(fixCalendarTheme);
     observer.observe(document.body, { childList: true, subtree: true });
+    document.addEventListener('click', () => setTimeout(fixCalendarTheme, 50));
     </script>
 """, unsafe_allow_html=True)
 
