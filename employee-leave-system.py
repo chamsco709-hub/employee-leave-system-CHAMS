@@ -280,7 +280,7 @@ st.markdown("""
     
     div[data-baseweb="calendar"] button:hover {
         background-color: #E2E8F0 !important;
-        color: #1E3A8A !important;
+        color: #0F172A !important;
     }
     
     div[data-baseweb="input"], div[data-baseweb="base-input"] {
