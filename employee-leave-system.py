@@ -270,13 +270,13 @@ st.markdown("""
         -webkit-text-fill-color: #0F172A !important;
     }
     div[role="option"]:hover {
-        background-color: #E2E8F0 !important;
-        color: #1E3A8A !important;
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
         -webkit-text-fill-color: #1E3A8A !important;
     }
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
-        color: #1E293B !important;
+        color: #0F172A !important;
         font-weight: bold !important;
         font-size: 13px !important;
     }
