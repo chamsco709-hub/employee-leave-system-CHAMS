@@ -199,7 +199,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS الزجاجي وتفعيل خاصية التثبيت (Sticky Menu) لهيدر الشركة وقائمة التنقل
+# 🎨 تصميم CSS الزجاجي وتثبيت الهيدر مع دعم القوائم المنسدلة
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: visible !important; background-color: transparent !important; }
@@ -221,7 +221,6 @@ st.markdown("""
         min-height: 100vh;
     }
     
-    /* 📌 إبقاء هيدر الشركة في أعلى الشاشة أثناء التمرير (Sticky Header) */
     .sticky-header-container {
         position: sticky;
         top: 0rem;
@@ -234,7 +233,6 @@ st.markdown("""
         margin-bottom: 15px;
     }
 
-    /* 📱 تنسيق القائمة الجانبية (الهامبرغر ☰) الزجاجية */
     [data-testid="stSidebar"] {
         background: rgba(255, 255, 255, 0.9) !important;
         backdrop-filter: blur(20px) !important;
@@ -269,7 +267,6 @@ st.markdown("""
         padding: 10px !important;
     }
     
-    /* 🏢 هيدر الشركة الزجاجي */
     .glass-header {
         background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(20px);
@@ -322,7 +319,6 @@ st.markdown("""
         line-height: 1.4;
     }
     
-    /* 📊 بطاقات مؤشرات الأداء الزجاجية */
     .glass-card {
         background: rgba(255, 255, 255, 0.75);
         backdrop-filter: blur(15px);
@@ -352,7 +348,6 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* 📌 رؤوس الأقسام */
     .section-header {
         font-size: 17px !important;
         font-weight: bold !important;
@@ -365,7 +360,6 @@ st.markdown("""
         direction: rtl !important;
     }
     
-    /* 📋 الجداول الزجاجية */
     table.custom-table {
         width: 100%;
         border-collapse: separate;
@@ -398,7 +392,6 @@ st.markdown("""
         border-bottom: 2.5px solid #C4B5FD;
     }
     
-    /* 📝 مناطق النماذج العريضة */
     .entry-form-area {
         background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(15px);
@@ -521,7 +514,7 @@ with st.sidebar:
         st.rerun()
 
 # ---------------------------------------------------------
-# 🎯 1. وضع هيدر الشركة والمكونات داخل الحاوية المثبتة (Sticky Header Container)
+# 🎯 1. وضع هيدر الشركة داخل الحاوية المثبتة (Sticky Header)
 # ---------------------------------------------------------
 st.markdown('<div class="sticky-header-container">', unsafe_allow_html=True)
 render_company_header()
@@ -557,11 +550,11 @@ with col4:
     st.markdown(f'<div class="glass-card" style="border-right-color: #2563EB;"><div class="glass-card-title">💰 إجمالي الرواتب الأساسية</div><div class="glass-card-value" style="font-size: 22px; color: #2563EB;">{total_payroll_est:,.0f} ج.م</div></div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# 🎯 3. قائمة التنقل الضخمة (Mega Menu الفاخرة)
+# 🎯 3. القوائم المنسدلة الفرعية (Dropdowns Menu System)
 # ---------------------------------------------------------
 st.markdown("<br>", unsafe_allow_html=True)
 
-mega_menu_categories = {
+dropdown_menu_categories = {
     "🏠 الشاشة الرئيسية": ["لوحة المؤشرات والتحكم"],
     "🔍 صندوق البحث": ["محرك البحث المتطور والفلترة"],
     "⏱️ الحضور والانصراف": ["تسجيل حضور وانصراف", "سجل الحضور والانصراف", "تعديل أو حذف حركة حضور"],
@@ -571,19 +564,13 @@ mega_menu_categories = {
     "⚙️ الأدوات والنظام": ["إدارة المستخدمين والصلاحيات", "كشف الرواتب والمستحقات", "طباعة التقارير", "إعدادات الشركة", "تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"]
 }
 
-selected_main_cat = st.radio(
-    "🧭 القائمة الرئيسية:", 
-    list(mega_menu_categories.keys()), 
-    horizontal=True,
-    label_visibility="collapsed"
-)
+col_nav1, col_nav2 = st.columns([1.5, 2.5])
+with col_nav1:
+    selected_main_cat = st.selectbox("📂 القائمة الرئيسية (اختر القسم):", list(dropdown_menu_categories.keys()))
 
-sub_options_list = mega_menu_categories[selected_main_cat]
-if len(sub_options_list) > 1:
-    st.markdown(f"<div style='background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); padding: 12px 18px; border-radius: 12px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.8);'><b>📂 العمليات المتاحة في ({selected_main_cat}):</b></div>", unsafe_allow_html=True)
-    choice = st.radio("اختر الإجراء المطلوب:", sub_options_list, horizontal=True, label_visibility="collapsed")
-else:
-    choice = sub_options_list[0]
+with col_nav2:
+    sub_options_list = dropdown_menu_categories[selected_main_cat]
+    choice = st.selectbox(f"📑 العمليات الفرعية المتاحة في ({selected_main_cat}):", sub_options_list)
 
 st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.4); margin: 15px 0 25px 0;'>", unsafe_allow_html=True)
 
