@@ -179,7 +179,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS السينمائي الداكن مع إعدادات الطباعة الدقيقة
+# 🎨 تصميم CSS السينمائي الداكن وتثبيت القائمة العلوية تماماً (Sticky / Fixed Menu)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -202,6 +202,7 @@ st.markdown("""
         min-height: 100vh;
     }
     
+    /* 📌 القائمة المثبتة علوياً (Sticky Menu) وتتحرك وتلتصق مع التمرير */
     .sticky-top-wrapper {
         position: sticky;
         top: 0rem;
@@ -236,39 +237,38 @@ st.markdown("""
         background: rgba(30, 30, 30, 0.85);
         border: 1px solid rgba(255, 255, 255, 0.08);
         color: #FFFFFF !important;
-        padding: 14px 20px;
+        padding: 12px 18px;
         border-radius: 14px;
         width: 100%;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
     .header-top-system h2 {
-        font-size: 15px !important;
+        font-size: 14px !important;
         font-weight: bold !important;
         color: #F87171 !important;
         margin: 0 !important;
         text-align: center;
     }
     .comp-name-txt {
-        font-size: 16px !important;
+        font-size: 15px !important;
         font-weight: bold !important;
-        margin-bottom: 2px !important;
         color: #FFFFFF !important;
     }
     .comp-info-txt {
-        font-size: 11.5px !important;
+        font-size: 11px !important;
         color: #94A3B8 !important;
     }
     
     .user-badge-box {
         background: rgba(229, 9, 20, 0.15);
         border: 1px solid rgba(229, 9, 20, 0.4);
-        padding: 6px 12px;
-        border-radius: 10px;
-        font-size: 12px;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 11.5px;
         color: #FCA5A5;
         font-weight: bold;
         text-align: center;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
     
     .glass-card {
@@ -450,7 +450,7 @@ if not st.session_state.is_authenticated:
     st.stop()
 
 # ---------------------------------------------------------
-# 📌 الحاوية العلوية الموحدة والثابتة (هيدر + مستخدم + خانات الأقسام المنسدلة)
+# 📌 الحاوية المثبتة العلوية الموحدة (Sticky Top Menu / Wrapper)
 # ---------------------------------------------------------
 st.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
 
@@ -472,7 +472,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 3. خانات الأقسام والقوائم المنسدلة المتجاورة (تختفي تلقائياً عند الطباعة)
+# 3. خريطة الأقسام والخانات المنسدلة المتجاورة (تختفي تلقائياً عند الطباعة)
 st.markdown('<div class="cinema-top-bar" style="margin: 0; box-shadow: none;">', unsafe_allow_html=True)
 col_nav1, col_nav2, col_nav3 = st.columns([1.5, 2.5, 1])
 
@@ -514,7 +514,7 @@ with col_nav3:
         st.rerun()
 
 st.markdown('</div>', unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)  # إغلاق الحاوية العلوية الثابتة
+st.markdown('</div>', unsafe_allow_html=True)  # إغلاق الحاوية المثبتة
 
 # ---------------------------------------------------------
 # 🎯 بطاقات المؤشرات الأربعة المتجاورة
