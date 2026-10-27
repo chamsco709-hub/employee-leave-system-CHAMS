@@ -589,11 +589,11 @@ if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم �
     render_printable_table(view_employees)
 
 elif choice == "تسجيل حضور وانصراف":
-    st.subheader("⏱️ تسجيل حركة حضور / انصراف (بأزرار زمنية واحتساب آلي)")
+    st.subheader("⏱️ تسجيل حركة حضور / انصراف (أزرار الساعات والدقائق الصباحية والمسائية)")
     emp_names = st.session_state.employees["اسم الموظف"].tolist()
     if emp_names:
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with st.form("att_form_buttons"):
+        with st.form("att_form_custom_time"):
             selected_emp = st.selectbox("اختر الموظف", emp_names)
             att_date = st.date_input("تاريخ الحركة", value=date.today())
             
@@ -603,46 +603,74 @@ elif choice == "تسجيل حضور وانصراف":
             
             st.info(f"📍 الفرع: {c_branch} &nbsp;|&nbsp; 💼 الوظيفة: {c_job}")
             
-            # أزرار اختيار الأوقات الرسمية والفعلية بضغطة زر
-            st.markdown("🕒 **أزرار الأوقات الرسمية:**")
-            col_b1, col_b2 = st.columns(2)
-            with col_b1:
-                start_work = st.selectbox("بداية العمل الرسمية", ["08:00 AM", "09:00 AM", "10:00 AM"])
-            with col_b2:
-                end_work = st.selectbox("نهاية العمل الرسمية", ["04:00 PM", "05:00 PM", "06:00 PM"])
-                
-            st.markdown("🕒 **أزرار الأوقات الفعلية:**")
-            time_options = ["07:30 AM", "08:00 AM", "08:15 AM", "08:30 AM", "09:00 AM", "03:00 PM", "04:00 PM", "04:30 PM", "05:00 PM", "06:00 PM"]
-            col_b3, col_b4 = st.columns(2)
-            with col_b3:
-                actual_in = st.selectbox("وقت الحضور الفعلي", time_options, index=1)
-            with col_b4:
-                actual_out = st.selectbox("وقت الانصراف الفعلي", time_options, index=7)
-                
+            st.markdown("---")
+            st.markdown("🕒 **المواعيد الرسمية للشركة:**")
+            col_r1, col_r2, col_r3, col_r4 = st.columns(4)
+            with col_r1: start_h = st.selectbox("ساعة البداية", list(range(1, 13)), index=7) # الافتراضي 8
+            with col_r2: start_m = st.selectbox("دقيقة البداية", [0, 15, 30, 45], index=0)
+            with col_r3: start_ampm = st.selectbox("فترة البداية", ["AM", "PM"], index=0)
+            
+            with col_r4:
+                # نهاية العمل الرسمية الافتراضية (مثلاً 4 مساءً)
+                end_h_def = 4
+                end_m_def = 0
+                end_ampm_def = "PM"
+            
+            col_e1, col_e2, col_e3 = st.columns(3)
+            with col_e1: end_h = st.selectbox("ساعة النهاية", list(range(1, 13)), index=3) # 4
+            with col_e2: end_m = st.selectbox("دقيقة النهاية", [0, 15, 30, 45], index=0)
+            with col_e3: end_ampm = st.selectbox("فترة النهاية", ["AM", "PM"], index=1)
+
+            st.markdown("---")
+            st.markdown("⏰ **الأوقات الفعلية (حضور وانصراف الموظف):**")
+            
+            st.markdown("📍 **وقت الحضور الفعلي:**")
+            col_in1, col_in2, col_in3 = st.columns(3)
+            with col_in1: act_in_h = st.selectbox("ساعة الحضور", list(range(1, 13)), index=7, key="ain_h")
+            with col_in2: act_in_m = st.selectbox("دقيقة الحضور", [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55], index=0, key="ain_m")
+            with col_in3: act_in_ampm = st.selectbox("صباحاً / مساءً (حضور)", ["AM", "PM"], index=0, key="ain_ap")
+
+            st.markdown("📍 **وقت الانصراف الفعلي:**")
+            col_out1, col_out2, col_out3 = st.columns(3)
+            with col_out1: act_out_h = st.selectbox("ساعة الانصراف", list(range(1, 13)), index=3, key="aout_h")
+            with col_out2: act_out_m = st.selectbox("دقيقة الانصراف", [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55], index=0, key="aout_m")
+            with col_out3: act_out_ampm = st.selectbox("صباحاً / مساءً (انصراف)", ["AM", "PM"], index=1, key="aout_ap")
+
             att_status = st.selectbox("حالة الحضور", ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"])
             
             if st.form_submit_button("💾 حساب تلقائي وحفظ الحركة", use_container_width=True):
-                # حساب التأخير الصباحي والانصراف المبكر والإضافي آلياً
-                fmt = "%I:%M %p"
-                t_start_work = datetime.strptime(start_work, fmt)
-                t_end_work = datetime.strptime(end_work, fmt)
-                t_actual_in = datetime.strptime(actual_in, fmt)
-                t_actual_out = datetime.strptime(actual_out, fmt)
-                
-                tardy_min = max(0, int((t_actual_in - t_start_work).total_seconds() / 60))
-                early_min = max(0, int((t_end_work - t_actual_out).total_seconds() / 60))
-                overtime_min = max(0, int((t_actual_out - t_end_work).total_seconds() / 60))
-                
+                # تنسيق النصوص للأوقات
+                start_work_str = f"{start_h:02d}:{start_m:02d} {start_ampm}"
+                end_work_str = f"{end_h:02d}:{end_m:02d} {end_ampm}"
+                actual_in_str = f"{act_in_h:02d}:{act_in_m:02d} {act_in_ampm}"
+                actual_out_str = f"{act_out_h:02d}:{act_out_m:02d} {act_out_ampm}"
+
+                # حساب التأخير والإضافي بدقة باستخدام الدقائق المطلقة (من 24 ساعة)
+                def to_minutes(h, m, ampm):
+                    hour_24 = h % 12
+                    if ampm == "PM":
+                        hour_24 += 12
+                    return hour_24 * 60 + m
+
+                start_total_min = to_minutes(start_h, start_m, start_ampm)
+                end_total_min = to_minutes(end_h, end_m, end_ampm)
+                act_in_total_min = to_minutes(act_in_h, act_in_m, act_in_ampm)
+                act_out_total_min = to_minutes(act_out_h, act_out_m, act_out_ampm)
+
+                tardy_min = max(0, act_in_total_min - start_total_min)
+                early_min = max(0, end_total_min - act_out_total_min)
+                overtime_min = max(0, act_out_total_min - end_total_min)
+
                 new_att = {
                     "التاريخ": str(att_date),
                     "كود الموظف": emp_info["كود الموظف"],
                     "اسم الموظف": selected_emp,
                     "الوظيفة": c_job,
                     "الفرع": c_branch,
-                    "بداية العمل الرسمية": start_work,
-                    "نهاية العمل الرسمية": end_work,
-                    "وقت الحضور الفعلي": actual_in,
-                    "وقت الانصراف الفعلي": actual_out,
+                    "بداية العمل الرسمية": start_work_str,
+                    "نهاية العمل الرسمية": end_work_str,
+                    "وقت الحضور الفعلي": actual_in_str,
+                    "وقت الانصراف الفعلي": actual_out_str,
                     "الحالة": att_status,
                     "التأخير الصباحي (دقيقة)": tardy_min,
                     "انصراف مبكر (دقيقة)": early_min,
@@ -851,7 +879,6 @@ elif choice == "كشف الرواتب والمستحقات الشامل":
     
     payroll_df = st.session_state.employees[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "الراتب الأساسي"]].copy()
     
-    # دمج المعاملات المالية
     if not st.session_state.financial_transactions.empty:
         trans_sum = st.session_state.financial_transactions.groupby("كود الموظف")["المبلغ / القيمة"].sum().reset_index()
         payroll_df = payroll_df.merge(trans_sum, on="كود الموظف", how="left").fillna(0)
@@ -859,7 +886,6 @@ elif choice == "كشف الرواتب والمستحقات الشامل":
     else:
         payroll_df["إجمالي المعاملات المالية"] = 0.0
 
-    # دمج وحساب إجماليات التأخير والإضافي من سجل الحضور والانصراف تلقائياً
     if not st.session_state.attendance.empty:
         att_agg = st.session_state.attendance.groupby("كود الموظف")[["التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"]].sum().reset_index()
         payroll_df = payroll_df.merge(att_agg, on="كود الموظف", how="left").fillna(0)
@@ -868,8 +894,6 @@ elif choice == "كشف الرواتب والمستحقات الشامل":
         payroll_df["انصراف مبكر (دقيقة)"] = 0
         payroll_df["إضافي بعد العمل (دقيقة)"] = 0
 
-    # حساب قيمة الإضافي والخصومات (افتراضياً: سعر دقيقة الإضافي = أساسي / 10000، وسعر دقيقة التأخير = خصم)
-    # يمكن تعديلها حسب رغبة الشركة
     payroll_df["قيمة الإضافي"] = payroll_df["إضافي بعد العمل (دقيقة)"] * (payroll_df["الراتب الأساسي"] / 10000)
     payroll_df["قيمة الخصومات (تأخير)"] = (payroll_df["التأخير الصباحي (دقيقة)"] + payroll_df["انصراف مبكر (دقيقة)"]) * (payroll_df["الراتب الأساسي"] / 10000)
     
