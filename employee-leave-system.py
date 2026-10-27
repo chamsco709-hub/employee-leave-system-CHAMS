@@ -73,7 +73,17 @@ def load_company_data():
                     ])
 
                 if "attendance" in data and len(data["attendance"]) > 0:
-                    st.session_state.attendance = pd.DataFrame(data["attendance"])
+                    df_att = pd.DataFrame(data["attendance"])
+                    # تنظيف وتوحيد أعمدة الحضور لمنع أي تداخل أو ظهور NaN
+                    expected_att_cols = [
+                        "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", 
+                        "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", 
+                        "الحالة", "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"
+                    ]
+                    for col in expected_att_cols:
+                        if col not in df_att.columns:
+                            df_att[col] = 0 if "(دقيقة)" in col else ""
+                    st.session_state.attendance = df_att[expected_att_cols]
                 else:
                     st.session_state.attendance = pd.DataFrame(columns=[
                         "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", 
@@ -606,12 +616,12 @@ elif choice == "تسجيل حضور وانصراف":
             st.markdown("---")
             st.markdown("🕒 **المواعيد الرسمية للشركة:**")
             col_r1, col_r2, col_r3 = st.columns(3)
-            with col_r1: start_h = st.selectbox("ساعة البداية", list(range(1, 13)), index=7) # الافتراضي 8
+            with col_r1: start_h = st.selectbox("ساعة البداية", list(range(1, 13)), index=7)
             with col_r2: start_m = st.selectbox("دقيقة البداية (00-59)", list(range(0, 60)), index=0)
             with col_r3: start_ampm = st.selectbox("فترة البداية", ["AM", "PM"], index=0)
             
             col_e1, col_e2, col_e3 = st.columns(3)
-            with col_e1: end_h = st.selectbox("ساعة النهاية", list(range(1, 13)), index=3) # 4
+            with col_e1: end_h = st.selectbox("ساعة النهاية", list(range(1, 13)), index=3)
             with col_e2: end_m = st.selectbox("دقيقة النهاية (00-59)", list(range(0, 60)), index=0)
             with col_e3: end_ampm = st.selectbox("فترة النهاية", ["AM", "PM"], index=1)
 
@@ -633,13 +643,11 @@ elif choice == "تسجيل حضور وانصراف":
             att_status = st.selectbox("حالة الحضور", ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"])
             
             if st.form_submit_button("💾 حساب تلقائي وحفظ الحركة", use_container_width=True):
-                # تنسيق النصوص للأوقات
                 start_work_str = f"{start_h:02d}:{start_m:02d} {start_ampm}"
                 end_work_str = f"{end_h:02d}:{end_m:02d} {end_ampm}"
                 actual_in_str = f"{act_in_h:02d}:{act_in_m:02d} {act_in_ampm}"
                 actual_out_str = f"{act_out_h:02d}:{act_out_m:02d} {act_out_ampm}"
 
-                # حساب التأخير والإضافي بدقة باستخدام الدقائق المطلقة (من 24 ساعة)
                 def to_minutes(h, m, ampm):
                     hour_24 = h % 12
                     if ampm == "PM":
@@ -670,6 +678,13 @@ elif choice == "تسجيل حضور وانصراف":
                     "انصراف مبكر (دقيقة)": early_min,
                     "إضافي بعد العمل (دقيقة)": overtime_min
                 }
+                
+                # إزالة أي سجلات قديمة لنفس الموظف في نفس التاريخ لمنع التكرار والتداخل
+                st.session_state.attendance = st.session_state.attendance[
+                    ~((st.session_state.attendance["كود الموظف"] == emp_info["كود الموظف"]) & 
+                      (st.session_state.attendance["التاريخ"] == str(att_date)))
+                ]
+                
                 st.session_state.attendance = pd.concat([st.session_state.attendance, pd.DataFrame([new_att])], ignore_index=True)
                 auto_save_data()
                 st.success(f"تم الحساب والحفظ بنجاح! (تأخير: {tardy_min} دقيقة | إضافي: {overtime_min} دقيقة)")
@@ -680,7 +695,21 @@ elif choice == "سجل الحضور والانصراف":
     col_t1, col_t2 = st.columns([3, 1])
     with col_t1: st.subheader("⏱️ سجل الحضور والانصراف الشامل")
     with col_t2: render_print_button()
-    render_printable_table(st.session_state.attendance)
+    
+    # تنظيف العرض النهائي للتأكد من عدم وجود أي أعمدة مكررة أو فارغة
+    clean_att_df = st.session_state.attendance.copy()
+    expected_cols = [
+        "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", 
+        "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", 
+        "الحالة", "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"
+    ]
+    # الاحتفاظ فقط بالأعمدة المطلوبة وتعبئة أي قيم فارغة بصفر أو نص فارغ
+    for col in expected_cols:
+        if col not in clean_att_df.columns:
+            clean_att_df[col] = 0 if "(دقيقة)" in col else ""
+    clean_att_df = clean_att_df[expected_cols].fillna(0)
+    
+    render_printable_table(clean_att_df)
 
 elif choice == "تعديل أو حذف حركة حضور":
     st.subheader("✏️ تعديل أو حذف حركة حضور والانصراف")
