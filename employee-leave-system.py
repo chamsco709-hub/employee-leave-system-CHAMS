@@ -213,4 +213,3 @@ st.markdown("""
     .block-container {
         padding-top: 1.5rem !important;
         padding-bottom: 4rem !important;
-        padding-left: 2rem !important;
