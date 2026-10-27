@@ -90,7 +90,7 @@ if section_menu == "لوحة التحكم الرئيسية":
     # جدول استعراضي سريع للبيانات الأخيرة
     st.markdown("<h5 style='font-weight:600; color:#1F2937; margin-top:15px; margin-bottom:10px;'>📋 أحدث طلبات الإجازات الواردة</h5>", unsafe_allow_html=True)
     sample_df = pd.DataFrame({
-        "رقم الطلب":
+        "رقم الطلب":int(st.session_state.requests["رقم الطلب"].max() + 1) if not st.session_state.requests.empty else 101,
         "كود الموظف": ["EMP01", "EMP05", "EMP08"],
         "اسم الموظف": ["أحمد محمود", "سارة محمد", "كريم عبد العزيز"],
         "نوع الإجازة": ["إجازة سنوية", "إجازة مرضية", "إجازة عارضة"],
