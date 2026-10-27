@@ -1,10 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
-import altair as alt
-from datetime import datetime, date, time, timedelta
-import io
-import base64
+from datetime import datetime, date
 import json
 import os
 
