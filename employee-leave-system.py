@@ -202,7 +202,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS الزجاجي العصري المطابق تماماً للصورة (Glassmorphic Dashboard UI)
+# 🎨 تصميم CSS الزجاجي العصري المتطابق تماماً لتخطيط الصورة (Glassmorphic Dashboard UI)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -511,8 +511,6 @@ if not st.session_state.is_authenticated:
                     st.error("❌ الرسم السري غير صحيح!")
     st.stop()
 
-render_company_header()
-
 # =========================================================
 # 🗂️ القائمة الجانبية الثابتة والمنسقة
 # =========================================================
@@ -564,6 +562,38 @@ with st.sidebar:
         st.session_state.is_authenticated = False
         st.session_state.current_logged_user = ""
         st.rerun()
+
+# 1. عرض الهيدر أولاً
+render_company_header()
+
+# 2. نقل بطاقات مؤشرات الأداء فوراً تحت الهيدر لتطابق تصميم الصورة
+branch_filter = st.session_state.current_user_branch
+dept_filter = st.session_state.current_user_dept
+
+if "Admin" in st.session_state.current_user_role or "الإدارة العليا" in dept_filter:
+    view_employees = st.session_state.employees
+    view_requests = st.session_state.requests
+else:
+    view_employees = st.session_state.employees[st.session_state.employees["الفرع"] == branch_filter]
+    view_requests = st.session_state.requests[st.session_state.requests["الفرع"] == branch_filter]
+
+total_emps = len(view_employees)
+pending_requests = view_requests[view_requests['الحالة'] == 'قيد الانتظار'] if not view_requests.empty else pd.DataFrame()
+pending_count = len(pending_requests)
+accepted_count = len(view_requests[view_requests['الحالة'] == 'مقبول']) if not view_requests.empty else 0
+
+col1, col2, col3, col4 = st.columns(4)
+with col1:
+    st.markdown(f'<div class="glass-card"><div class="glass-card-title">👥 إجمالي موظفي الشركة</div><div class="glass-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
+with col2:
+    st.markdown(f'<div class="glass-card" style="border-right-color: #D97706;"><div class="glass-card-title">⏳ الطلبات المعلقة</div><div class="glass-card-value" style="color: #D97706;">{pending_count}</div></div>', unsafe_allow_html=True)
+with col3:
+    st.markdown(f'<div class="glass-card" style="border-right-color: #059669;"><div class="glass-card-title">✅ الطلبات المقبولة</div><div class="glass-card-value" style="color: #059669;">{accepted_count}</div></div>', unsafe_allow_html=True)
+with col4:
+    total_payroll_est = float(view_employees["الراتب الأساسي"].sum()) if not view_employees.empty and "الراتب الأساسي" in view_employees.columns else 0.0
+    st.markdown(f'<div class="glass-card" style="border-right-color: #2563EB;"><div class="glass-card-title">💰 إجمالي الرواتب الأساسية</div><div class="glass-card-value" style="font-size: 22px; color: #2563EB;">{total_payroll_est:,.0f} ج.م</div></div>', unsafe_allow_html=True)
+
+st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.4); margin: 20px 0;'>", unsafe_allow_html=True)
 
 # =========================================================
 # 🔍 صندوق البحث المتطور والشامل
@@ -632,34 +662,9 @@ if main_menu == "🔍 صندوق البحث الشامل" or choice == "محرك
             render_printable_table(fin_df)
 
 # =========================================================
-# 🏠 الشاشة الرئيسية / لوحة المؤشرات الزجاجية المطابقة للصورة
+# 🏠 الشاشة الرئيسية / لوحة التحكم
 # =========================================================
 elif choice == "لوحة المؤشرات والتحكم" or choice == "الشاشة الرئيسية":
-    st.markdown(f'<div class="section-header">📈 مؤشرات الأداء العامة - شركة: {company_display_name}</div>', unsafe_allow_html=True)
-    
-    branch_filter = st.session_state.current_user_branch
-    dept_filter = st.session_state.current_user_dept
-    
-    if "Admin" in st.session_state.current_user_role or "الإدارة العليا" in dept_filter:
-        view_employees = st.session_state.employees
-        view_requests = st.session_state.requests
-    else:
-        view_employees = st.session_state.employees[st.session_state.employees["الفرع"] == branch_filter]
-        view_requests = st.session_state.requests[st.session_state.requests["الفرع"] == branch_filter]
-    
-    total_emps = len(view_employees)
-    pending_requests = view_requests[view_requests['الحالة'] == 'قيد الانتظار'] if not view_requests.empty else pd.DataFrame()
-    pending_count = len(pending_requests)
-    accepted_count = len(view_requests[view_requests['الحالة'] == 'مقبول']) if not view_requests.empty else 0
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown(f'<div class="glass-card"><div class="glass-card-title">👥 إجمالي موظفي الشركة</div><div class="glass-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
-    with col2:
-        st.markdown(f'<div class="glass-card" style="border-right-color: #D97706;"><div class="glass-card-title">⏳ الطلبات المعلقة</div><div class="glass-card-value" style="color: #D97706;">{pending_count}</div></div>', unsafe_allow_html=True)
-    with col3:
-        st.markdown(f'<div class="glass-card" style="border-right-color: #059669;"><div class="glass-card-title">✅ الطلبات المقبولة</div><div class="glass-card-value" style="color: #059669;">{accepted_count}</div></div>', unsafe_allow_html=True)
-
     if not pending_requests.empty:
         st.markdown(f'<div class="section-header">⏳ اتخاذ القرار بشأن الطلبات المعلقة ({pending_count} طلب)</div>', unsafe_allow_html=True)
         render_printable_table(pending_requests)
