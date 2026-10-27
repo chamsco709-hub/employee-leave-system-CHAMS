@@ -27,7 +27,7 @@ style_css = (
     ".kpi-box { background: #FFFFFF; border-radius: 10px; padding: 20px; border: 1px solid #E2E8F0; border-right: 5px solid #4F46E5; box-shadow: 0 2px 4px rgba(0,0,0,0.01); text-align: right; margin-bottom: 15px; }"
     ".kpi-title { font-size: 13px; color: #64748B; font-weight: 600; margin-bottom: 6px; }"
     ".kpi-value { font-size: 24px; color: #0F172A; font-weight: 700; }"
-    "/* تنسيق الجداول والـ Streamlit Widgets */"
+    "/* تنسيق الحقول والـ Streamlit Widgets */"
     "div[data-testid='stDateInput'] input, input, textarea, select { background-color: #FFFFFF !important; color: #0F172A !important; font-weight: 500 !important; border-radius: 8px !important; border: 1px solid #CBD5E1 !important; padding: 10px 14px !important; }"
     ".stButton button { background-color: #4F46E5 !important; color: white !important; border-radius: 8px !important; padding: 8px 16px !important; font-weight: 600 !important; border: none !important; width: 100%; }"
     ".stButton button:hover { background-color: #4338CA !important; }"
@@ -74,7 +74,6 @@ with col_nav4:
 st.markdown("<hr style='border: 0.5px solid #E2E8F0; margin: 10px 0 24px 0;'>", unsafe_allow_html=True)
 
 # 5. تحديد شاشة العرض بناءً على خيارات القوائم المنسدلة العلوية
-# نستخدم حيلة ذكية لمعرفة التبويب النشط الذي قام المستخدم بتغييره
 if section_menu == "لوحة التحكم الرئيسية":
     st.markdown("<h4 style='font-weight:700; color:#0F172A; margin-bottom:15px;'>📊 ملخص مؤشرات الأداء الحالية للمنشأة</h4>", unsafe_allow_html=True)
     
