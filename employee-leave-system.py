@@ -264,7 +264,7 @@ st.markdown("""
         -webkit-text-fill-color: #0F172A !important;
         font-weight: bold !important;
         border-radius: 8px !important;
-        border-color: #E2E8F0 !important;
+        border-color: #0F172A !important;
     }
 
     div[data-baseweb="popover"],
@@ -290,13 +290,13 @@ st.markdown("""
     
     div[data-baseweb="calendar"] button:hover,
     div[data-baseweb="popover"] button:hover {
-        background-color: #EFF6FF !important;
-        color: #1E3A8A !important;
-        -webkit-text-fill-color: #1E3A8A !important;
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
     }
 
     div[data-baseweb="calendar"] [aria-selected="true"] {
-        background-color: #2563EB !important;
+        background-color: #0F172A !important;
         color: #FFFFFF !important;
         -webkit-text-fill-color: #FFFFFF !important;
     }
@@ -332,7 +332,7 @@ st.markdown("""
     .company-header-container {
         background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%);
         color: #FFFFFF !important;
-        padding: 20px 24px;
+        padding: 22px 26px;
         border-radius: 14px;
         margin-bottom: 20px !important;
         width: 100%;
@@ -364,7 +364,7 @@ st.markdown("""
     }
     .header-right-info { text-align: right !important; flex: 3; }
     .header-left-logo {
-        flex: 1;
+        flex: 1.2;
         text-align: left !important;
         display: flex;
         justify-content: flex-end;
@@ -547,10 +547,11 @@ def render_printable_table(df):
 
 def render_company_header():
     info = st.session_state.company_info
-    logo_html = '<div style="padding: 6px 12px; border: 1px dashed rgba(255,255,255,0.4); border-radius: 8px; font-size: 10px; color: white; background: rgba(255,255,255,0.05);">🏢 الشعار</div>'
+    logo_html = '<div style="padding: 10px 16px; border: 1px dashed rgba(255,255,255,0.4); border-radius: 10px; font-size: 12px; color: white; background: rgba(255,255,255,0.06); font-weight: bold;">🏢 شعار الشركة</div>'
     if info.get("logo") is not None:
         try:
-            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 50px; max-width: 100px; object-fit: contain; background: white; border-radius: 6px; padding: 3px;" />'
+            # تم تكبير أبعاد الشعار هنا لتشغل مساحة أكبر وأوضح
+            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 85px; max-width: 170px; object-fit: contain; background: white; border-radius: 8px; padding: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />'
         except Exception:
             pass
             
