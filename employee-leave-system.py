@@ -8,12 +8,12 @@ import base64
 import json
 import os
 
-# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة
+# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة مع السماح بفتح القائمة الجانبية (الهامبرغر)
 st.set_page_config(
     page_title="النظام المتكامل لإدارة الموارد البشرية",
     page_icon="🏢",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="auto"
 )
 
 # 🔑 ملف الترخيص الخاص بهذه النسخة
@@ -199,11 +199,10 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS الزجاجي وتنسيق Mega Menu الشبكي
+# 🎨 تصميم CSS الزجاجي وتخصيص قائمة الهامبرغر الجانبية
 st.markdown("""
     <style>
-    header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
-    [data-testid="stSidebar"] { display: none !important; width: 0px !important; }
+    header[data-testid="stHeader"] { visibility: visible !important; background-color: transparent !important; }
     
     html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6, label {
         font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
@@ -220,6 +219,14 @@ st.markdown("""
         max-width: 100% !important;
         background: linear-gradient(135deg, #DFDBE5 0%, #E8E4EC 50%, #CAB6C2 100%) !important;
         min-height: 100vh;
+    }
+    
+    /* 📱 تنسيق القائمة الجانبية (الهامبرغر ☰) الزجاجية الفاخرة */
+    [data-testid="stSidebar"] {
+        background: rgba(255, 255, 255, 0.9) !important;
+        backdrop-filter: blur(20px) !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: -10px 0 30px rgba(0,0,0,0.08);
     }
     
     div[data-testid="stDateInput"],
@@ -487,6 +494,20 @@ if not st.session_state.is_authenticated:
                     st.error("❌ الرسم السري غير صحيح!")
     st.stop()
 
+# =========================================================
+# ☰ قائمة الهامبرغر الجانبية (Hamburger Menu / Sidebar)
+# =========================================================
+with st.sidebar:
+    st.markdown("### ☰ القائمة الجانبية السريعة")
+    st.markdown(f"**👤 المستخدم:** {st.session_state.current_logged_user}")
+    st.session_state.enable_advanced_tools = st.toggle("⚙️ تفعيل الأدوات المتقدمة للإدارة", value=True)
+    
+    st.markdown("---")
+    if st.button("🚪 تسجيل خروج آمن", use_container_width=True):
+        st.session_state.is_authenticated = False
+        st.session_state.current_logged_user = ""
+        st.rerun()
+
 # ---------------------------------------------------------
 # 🎯 1. عرض هيدر الشركة أولاً
 # ---------------------------------------------------------
@@ -526,7 +547,6 @@ with col4:
 # ---------------------------------------------------------
 st.markdown("<br>", unsafe_allow_html=True)
 
-# تعريف الأقسام الرئيسية للـ Mega Menu
 mega_menu_categories = {
     "🏠 الشاشة الرئيسية": ["لوحة المؤشرات والتحكم"],
     "🔍 صندوق البحث": ["محرك البحث المتطور والفلترة"],
@@ -537,7 +557,6 @@ mega_menu_categories = {
     "⚙️ الأدوات والنظام": ["إدارة المستخدمين والصلاحيات", "كشف الرواتب والمستحقات", "طباعة التقارير", "إعدادات الشركة", "تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"]
 }
 
-# اختيار القسم الرئيسي عبر أزرار أفقية متجاوبة
 selected_main_cat = st.radio(
     "🧭 القائمة الرئيسية:", 
     list(mega_menu_categories.keys()), 
@@ -545,7 +564,6 @@ selected_main_cat = st.radio(
     label_visibility="collapsed"
 )
 
-# عرض الخيارات الفرعية للقسم المختار بشكل شبكي (Mega Menu Grid)
 sub_options_list = mega_menu_categories[selected_main_cat]
 if len(sub_options_list) > 1:
     st.markdown(f"<div style='background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); padding: 12px 18px; border-radius: 12px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.8);'><b>📂 العمليات المتاحة في ({selected_main_cat}):</b></div>", unsafe_allow_html=True)
