@@ -8,12 +8,12 @@ import base64
 import json
 import os
 
-# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة
+# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة مع إخفاء القائمة الجانبية تماماً
 st.set_page_config(
     page_title="النظام المتكامل لإدارة الموارد البشرية",
     page_icon="🏢",
     layout="wide",
-    initial_sidebar_state="auto"
+    initial_sidebar_state="collapsed"
 )
 
 # 🔑 ملف الترخيص الخاص بهذه النسخة
@@ -199,10 +199,11 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS الزجاجي وتثبيت الهيدر مع دعم القوائم المنسدلة
+# 🎨 تصميم CSS الزجاجي وإلغاء القائمة الجانبية تماماً مع تثبيت الهيدر وقوائم التنقل
 st.markdown("""
     <style>
-    header[data-testid="stHeader"] { visibility: visible !important; background-color: transparent !important; }
+    header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
+    [data-testid="stSidebar"] { display: none !important; width: 0px !important; }
     
     html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6, label {
         font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
@@ -212,7 +213,7 @@ st.markdown("""
     }
     
     .block-container {
-        padding-top: 1.5rem !important;
+        padding-top: 1rem !important;
         padding-bottom: 4rem !important;
         padding-left: 2.5rem !important;
         padding-right: 2.5rem !important;
@@ -221,23 +222,18 @@ st.markdown("""
         min-height: 100vh;
     }
     
+    /* 📌 تثبيت الهيدر وأدوات التنقل في أعلى الشاشة أثناء التمرير (Sticky Fixed Menu) */
     .sticky-header-container {
         position: sticky;
         top: 0rem;
-        z-index: 999;
-        background: rgba(235, 230, 240, 0.95);
+        z-index: 9999;
+        background: rgba(235, 230, 240, 0.96);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        padding-top: 10px;
-        padding-bottom: 10px;
+        padding-top: 8px;
+        padding-bottom: 12px;
         margin-bottom: 15px;
-    }
-
-    [data-testid="stSidebar"] {
-        background: rgba(255, 255, 255, 0.9) !important;
-        backdrop-filter: blur(20px) !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: -10px 0 30px rgba(0,0,0,0.08);
+        border-bottom: 1px solid rgba(124, 58, 237, 0.15);
     }
     
     div[data-testid="stDateInput"],
@@ -268,13 +264,13 @@ st.markdown("""
     }
     
     .glass-header {
-        background: rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.88);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.95);
         color: #2D3748 !important;
-        padding: 18px 24px;
-        border-radius: 20px;
+        padding: 16px 22px;
+        border-radius: 18px;
         width: 100%;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         box-sizing: border-box;
@@ -282,12 +278,12 @@ st.markdown("""
     .header-top-system {
         text-align: center !important;
         width: 100%;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-        padding-bottom: 8px;
+        padding-bottom: 6px;
     }
     .header-top-system h2 {
-        font-size: 16px !important;
+        font-size: 15px !important;
         font-weight: bold !important;
         color: #4C1D95 !important;
         margin: 0 !important;
@@ -307,13 +303,13 @@ st.markdown("""
         align-items: center;
     }
     .comp-name-txt {
-        font-size: 17px !important;
+        font-size: 16px !important;
         font-weight: bold !important;
-        margin-bottom: 4px !important;
+        margin-bottom: 3px !important;
         color: #1A202C !important;
     }
     .comp-info-txt {
-        font-size: 12.5px !important;
+        font-size: 12px !important;
         margin: 2px 0 !important;
         color: #718096 !important;
         line-height: 1.4;
@@ -325,7 +321,7 @@ st.markdown("""
         -webkit-backdrop-filter: blur(15px);
         border: 1px solid rgba(255, 255, 255, 0.8);
         border-right: 6px solid #7C3AED;
-        padding: 20px 22px;
+        padding: 18px 20px;
         border-radius: 16px;
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
         text-align: right !important;
@@ -337,13 +333,13 @@ st.markdown("""
         box-shadow: 0 12px 30px rgba(124, 58, 237, 0.1);
     }
     .glass-card-title {
-        font-size: 13px;
+        font-size: 12.5px;
         color: #718096;
         font-weight: bold;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
     .glass-card-value {
-        font-size: 26px;
+        font-size: 24px;
         color: #4C1D95;
         font-weight: bold;
     }
@@ -436,10 +432,10 @@ def render_printable_table(df):
 
 def render_company_header():
     info = st.session_state.company_info
-    logo_html = '<div style="padding: 10px 15px; border: 1.5px dashed rgba(76,29,149,0.3); border-radius: 12px; font-size: 12px; color: #4C1D95; background: rgba(255,255,255,0.6); font-weight: bold;">🏢 شعار الشركة</div>'
+    logo_html = '<div style="padding: 8px 12px; border: 1.5px dashed rgba(76,29,149,0.3); border-radius: 10px; font-size: 11px; color: #4C1D95; background: rgba(255,255,255,0.6); font-weight: bold;">🏢 شعار الشركة</div>'
     if info.get("logo") is not None:
         try:
-            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 75px; max-width: 150px; object-fit: contain; background: white; border-radius: 10px; padding: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />'
+            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 65px; max-width: 140px; object-fit: contain; background: white; border-radius: 8px; padding: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />'
         except Exception:
             pass
             
@@ -499,25 +495,35 @@ if not st.session_state.is_authenticated:
                     st.error("❌ الرسم السري غير صحيح!")
     st.stop()
 
-# =========================================================
-# ☰ قائمة الهامبرغر الجانبية (Hamburger Menu / Sidebar)
-# =========================================================
-with st.sidebar:
-    st.markdown("### ☰ القائمة الجانبية السريعة")
-    st.markdown(f"**👤 المستخدم:** {st.session_state.current_logged_user}")
-    st.session_state.enable_advanced_tools = st.toggle("⚙️ تفعيل الأدوات المتقدمة للإدارة", value=True)
-    
-    st.markdown("---")
-    if st.button("🚪 تسجيل خروج آمن", use_container_width=True):
+# ---------------------------------------------------------
+# 🎯 1. الحاوية المثبتة العلوية (Sticky Header + Navigation Dropdowns)
+# ---------------------------------------------------------
+st.markdown('<div class="sticky-header-container">', unsafe_allow_html=True)
+render_company_header()
+
+# القوائم المنسدلة الفرعية داخل الهيدر المثبت للتنقل السريع
+dropdown_menu_categories = {
+    "🏠 الشاشة الرئيسية": ["لوحة المؤشرات والتحكم"],
+    "🔍 صندوق البحث": ["محرك البحث المتطور والفلترة"],
+    "⏱️ الحضور والانصراف": ["تسجيل حضور وانصراف", "سجل الحضور والانصراف", "تعديل أو حذف حركة حضور"],
+    "💰 المعاملات المالية": ["تسجيل معاملة مالية", "سجل المعاملات المالية", "تعديل أو حذف معاملة مالية"],
+    "📝 طلبات الإجازات": ["تسجيل طلب إجازة جديد", "سجل طلبات قيد الانتظار", "سجل الطلبات المقبولة", "سجل الطلبات المرفوضة", "تعديل أو حذف طلب إجازة"],
+    "👥 شؤون الموظفين": ["إضافة موظف جديد", "سجل الموظفين والأرصدة", "تعديل أو حذف موظف"],
+    "⚙️ الأدوات والنظام": ["إدارة المستخدمين والصلاحيات", "كشف الرواتب والمستحقات", "طباعة التقارير", "إعدادات الشركة", "تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"]
+}
+
+col_nav1, col_nav2, col_nav3 = st.columns([1.5, 2.5, 1])
+with col_nav1:
+    selected_main_cat = st.selectbox("📂 القائمة الرئيسية:", list(dropdown_menu_categories.keys()), label_visibility="collapsed")
+with col_nav2:
+    sub_options_list = dropdown_menu_categories[selected_main_cat]
+    choice = st.selectbox(f"📑 العمليات الفرعية:", sub_options_list, label_visibility="collapsed")
+with col_nav3:
+    if st.button("🚪 تسجيل خروج", use_container_width=True):
         st.session_state.is_authenticated = False
         st.session_state.current_logged_user = ""
         st.rerun()
 
-# ---------------------------------------------------------
-# 🎯 1. وضع هيدر الشركة داخل الحاوية المثبتة (Sticky Header)
-# ---------------------------------------------------------
-st.markdown('<div class="sticky-header-container">', unsafe_allow_html=True)
-render_company_header()
 st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
@@ -548,29 +554,6 @@ with col3:
 with col4:
     total_payroll_est = float(view_employees["الراتب الأساسي"].sum()) if not view_employees.empty and "الراتب الأساسي" in view_employees.columns else 0.0
     st.markdown(f'<div class="glass-card" style="border-right-color: #2563EB;"><div class="glass-card-title">💰 إجمالي الرواتب الأساسية</div><div class="glass-card-value" style="font-size: 22px; color: #2563EB;">{total_payroll_est:,.0f} ج.م</div></div>', unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# 🎯 3. القوائم المنسدلة الفرعية (Dropdowns Menu System)
-# ---------------------------------------------------------
-st.markdown("<br>", unsafe_allow_html=True)
-
-dropdown_menu_categories = {
-    "🏠 الشاشة الرئيسية": ["لوحة المؤشرات والتحكم"],
-    "🔍 صندوق البحث": ["محرك البحث المتطور والفلترة"],
-    "⏱️ الحضور والانصراف": ["تسجيل حضور وانصراف", "سجل الحضور والانصراف", "تعديل أو حذف حركة حضور"],
-    "💰 المعاملات المالية": ["تسجيل معاملة مالية", "سجل المعاملات المالية", "تعديل أو حذف معاملة مالية"],
-    "📝 طلبات الإجازات": ["تسجيل طلب إجازة جديد", "سجل طلبات قيد الانتظار", "سجل الطلبات المقبولة", "سجل الطلبات المرفوضة", "تعديل أو حذف طلب إجازة"],
-    "👥 شؤون الموظفين": ["إضافة موظف جديد", "سجل الموظفين والأرصدة", "تعديل أو حذف موظف"],
-    "⚙️ الأدوات والنظام": ["إدارة المستخدمين والصلاحيات", "كشف الرواتب والمستحقات", "طباعة التقارير", "إعدادات الشركة", "تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"]
-}
-
-col_nav1, col_nav2 = st.columns([1.5, 2.5])
-with col_nav1:
-    selected_main_cat = st.selectbox("📂 القائمة الرئيسية (اختر القسم):", list(dropdown_menu_categories.keys()))
-
-with col_nav2:
-    sub_options_list = dropdown_menu_categories[selected_main_cat]
-    choice = st.selectbox(f"📑 العمليات الفرعية المتاحة في ({selected_main_cat}):", sub_options_list)
 
 st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.4); margin: 15px 0 25px 0;'>", unsafe_allow_html=True)
 
