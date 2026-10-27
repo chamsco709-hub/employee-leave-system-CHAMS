@@ -969,7 +969,7 @@ elif choice == "إعدادات الشركة وبياناتها الشاملة":
         c_addr_set = st.text_input("العنوان", value=info.get("address", ""))
         c_contact_set = st.text_input("أرقام التواصل", value=info.get("contact", ""))
         c_email_set = st.text_input("البريد الإلكتروني", value=info.get("email", ""))
-        c_logo_set = st.text_input("رابط أو مسار الشعار (Logo)", value=str(info.get("logo", "")))
+        uploaded_logo = st.file_uploader("رفع شعار الشركة (Logo)", type=["png", "jpg", "jpeg"])
         
         if st.form_submit_button("💾 حفظ إعدادات الشركة", use_container_width=True):
             info["name"] = c_name_set
