@@ -74,7 +74,6 @@ def load_company_data():
 
                 if "attendance" in data and len(data["attendance"]) > 0:
                     df_att = pd.DataFrame(data["attendance"])
-                    # تنظيف وتوحيد أعمدة الحضور لمنع أي تداخل أو ظهور NaN
                     expected_att_cols = [
                         "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", 
                         "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", 
@@ -679,7 +678,6 @@ elif choice == "تسجيل حضور وانصراف":
                     "إضافي بعد العمل (دقيقة)": overtime_min
                 }
                 
-                # إزالة أي سجلات قديمة لنفس الموظف في نفس التاريخ لمنع التكرار والتداخل
                 st.session_state.attendance = st.session_state.attendance[
                     ~((st.session_state.attendance["كود الموظف"] == emp_info["كود الموظف"]) & 
                       (st.session_state.attendance["التاريخ"] == str(att_date)))
@@ -696,19 +694,16 @@ elif choice == "سجل الحضور والانصراف":
     with col_t1: st.subheader("⏱️ سجل الحضور والانصراف الشامل")
     with col_t2: render_print_button()
     
-    # تنظيف العرض النهائي للتأكد من عدم وجود أي أعمدة مكررة أو فارغة
     clean_att_df = st.session_state.attendance.copy()
     expected_cols = [
         "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", 
         "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", 
         "الحالة", "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"
     ]
-    # الاحتفاظ فقط بالأعمدة المطلوبة وتعبئة أي قيم فارغة بصفر أو نص فارغ
     for col in expected_cols:
         if col not in clean_att_df.columns:
             clean_att_df[col] = 0 if "(دقيقة)" in col else ""
     clean_att_df = clean_att_df[expected_cols].fillna(0)
-    
     render_printable_table(clean_att_df)
 
 elif choice == "تعديل أو حذف حركة حضور":
@@ -897,32 +892,56 @@ elif choice == "تعديل أو حذف معاملة مالية":
 
 elif choice == "كشف الرواتب والمستحقات الشامل":
     col_t1, col_t2 = st.columns([3, 1])
-    with col_t1: st.subheader("💰 كشف الرواتب والمستحقات والاحتساب الآلي")
+    with col_t1: st.subheader("💰 كشف الرواتب والتفصيل الشامل (المستحقات والاستقطاعات)")
     with col_t2: render_print_button()
     
+    # الجدول الأساسي للموظفين
     payroll_df = st.session_state.employees[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "الراتب الأساسي"]].copy()
     
+    # 1. تجميع المعاملات المالية وتصنيفها (مكافآت/بدلات vs سلف/جزاءات)
     if not st.session_state.financial_transactions.empty:
-        trans_sum = st.session_state.financial_transactions.groupby("كود الموظف")["المبلغ / القيمة"].sum().reset_index()
-        payroll_df = payroll_df.merge(trans_sum, on="كود الموظف", how="left").fillna(0)
-        payroll_df.rename(columns={"المبلغ / القيمة": "إجمالي المعاملات المالية"}, inplace=True)
+        fin_df = st.session_state.financial_transactions.copy()
+        # فصل المعاملات الإيجابية (مكافأة، بدلات) عن السلبية (سلفة، جزاء)
+        fin_df["مستحقات مالية إضافية"] = fin_df.apply(lambda r: r["المبلغ / القيمة"] if r["النوع"] in ["مكافأة (إضافي)", "بدلات"] else 0, axis=1)
+        fin_df["استقطاعات مالية أخرى"] = fin_df.apply(lambda r: r["المبلغ / القيمة"] if r["النوع"] in ["سلفة", "جزاء (خصم)"] else 0, axis=1)
+        
+        fin_grouped = fin_df.groupby("كود الموظف")[["مستحقات مالية إضافية", "استقطاعات مالية أخرى"]].sum().reset_index()
+        payroll_df = payroll_df.merge(fin_grouped, on="كود الموظف", how="left")
     else:
-        payroll_df["إجمالي المعاملات المالية"] = 0.0
+        payroll_df["مستحقات مالية إضافية"] = 0.0
+        payroll_df["استقطاعات مالية أخرى"] = 0.0
 
+    # 2. تجميع إجماليات الحضور (التأخير والانصراف المبكر والإضافي)
     if not st.session_state.attendance.empty:
         att_agg = st.session_state.attendance.groupby("كود الموظف")[["التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"]].sum().reset_index()
-        payroll_df = payroll_df.merge(att_agg, on="كود الموظف", how="left").fillna(0)
+        payroll_df = payroll_df.merge(att_agg, on="كود الموظف", how="left")
     else:
         payroll_df["التأخير الصباحي (دقيقة)"] = 0
         payroll_df["انصراف مبكر (دقيقة)"] = 0
         payroll_df["إضافي بعد العمل (دقيقة)"] = 0
 
-    payroll_df["قيمة الإضافي"] = payroll_df["إضافي بعد العمل (دقيقة)"] * (payroll_df["الراتب الأساسي"] / 10000)
-    payroll_df["قيمة الخصومات (تأخير)"] = (payroll_df["التأخير الصباحي (دقيقة)"] + payroll_df["انصراف مبكر (دقيقة)"]) * (payroll_df["الراتب الأساسي"] / 10000)
+    payroll_df = payroll_df.fillna(0)
+
+    # 3. حساب القيم النقدية للاستقطاعات والمستحقات الخاصة بالحضور
+    # معدل الدقيقة = الراتب الأساسي / 10000 (أو حسب قاعدة الشركة)
+    minute_rate = payroll_df["الراتب الأساسي"] / 10000
+    payroll_df["قيمة دقائق الإضافي (مستحق)"] = payroll_df["إضافي بعد العمل (دقيقة)"] * minute_rate
+    payroll_df["قيمة التأخير والمبكر (استقطاع)"] = (payroll_df["التأخير الصباحي (دقيقة)"] + payroll_df["انصراف مبكر (دقيقة)"]) * minute_rate
+
+    # 4. تجميع إجمالي المستحقات وإجمالي الاستقطاعات وصافي الراتب النهائي
+    payroll_df["إجمالي المستحقات"] = payroll_df["الراتب الأساسي"] + payroll_df["مستحقات مالية إضافية"] + payroll_df["قيمة دقائق الإضافي (مستحق)"]
+    payroll_df["إجمالي الاستقطاعات"] = payroll_df["استقطاعات مالية أخرى"] + payroll_df["قيمة التأخير والمبكر (استقطاع)"]
+    payroll_df["صافي الراتب المستحق"] = payroll_df["إجمالي المستحقات"] - payroll_df["إجمالي الاستقطاعات"]
+
+    # ترتيب وعرض الأعمدة بشكل تفصيلي واحترافي
+    display_payroll_cols = [
+        "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", "الراتب الأساسي",
+        "مستحقات مالية إضافية", "إضافي بعد العمل (دقيقة)", "قيمة دقائق الإضافي (مستحق)",
+        "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "قيمة التأخير والمبكر (استقطاع)", "استقطاعات مالية أخرى",
+        "إجمالي المستحقات", "إجمالي الاستقطاعات", "صافي الراتب المستحق"
+    ]
     
-    payroll_df["صافي الراتب المستحق"] = payroll_df["الراتب الأساسي"] + payroll_df["إجمالي المعاملات المالية"] + payroll_df["قيمة الإضافي"] - payroll_df["قيمة الخصومات (تأخير)"]
-        
-    render_printable_table(payroll_df)
+    render_printable_table(payroll_df[display_payroll_cols])
 
 elif choice == "إضافة موظف جديد":
     st.subheader("👥 إضافة موظف جديد (مع كامل أرصدة الإجازات)")
