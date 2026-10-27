@@ -658,12 +658,10 @@ elif choice == "تسجيل حضور وانصراف":
                 act_in_total_min = to_minutes(act_in_h, act_in_m, act_in_ampm)
                 act_out_total_min = to_minutes(act_out_h, act_out_m, act_out_ampm)
 
-                # حساب الساعات الفعلية من وقت البداية الرسمية إلى وقت الخروج أو حسب الدوام
                 worked_minutes = act_out_total_min - act_in_total_min
                 if worked_minutes < 0:
                     worked_minutes += 24 * 60
 
-                # حساب الساعات المستهدفة الرسمية
                 standard_minutes = end_total_min - start_total_min
                 if standard_minutes < 0:
                     standard_minutes += 24 * 60
@@ -671,12 +669,10 @@ elif choice == "تسجيل حضور وانصراف":
                 overtime_min = 0
                 tardy_min = 0
 
-                # فحص التأخير الصباحي مقارنة بوقت البداية مع فترة السماح
                 in_diff = act_in_total_min - start_total_min
                 if in_diff > grace_period_min:
                     tardy_min += (in_diff - grace_period_min)
 
-                # فحص إجمالي ساعات العمل (مقارنة بالمدة المستهدفة)
                 diff_total = worked_minutes - standard_minutes
                 if diff_total > 0:
                     overtime_min = int(diff_total)
@@ -730,25 +726,60 @@ elif choice == "سجل الحضور والانصراف":
     render_printable_table(clean_att_df)
 
 elif choice == "تعديل أو حذف حركة حضور":
-    st.subheader("✏️ تعديل أو حذف حركة حضور والانصراف (مع إدراج كامل المدخلات)")
+    st.subheader("✏️ تعديل أو حذف حركة حضور والانصراف (إدراج وتعديل كافة الحقول)")
     if not st.session_state.attendance.empty:
         att_indices = st.session_state.attendance.index.tolist()
         selected_att_idx = st.selectbox("اختر رقم السجل للتعديل أو الحذف", att_indices)
         record = st.session_state.attendance.loc[selected_att_idx]
+        
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with st.form("edit_att_form_full"):
-            edit_status = st.selectbox("حالة الحضور", ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"], index=["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"].index(record["الحالة"]) if record["الحالة"] in ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"] else 0)
+        with st.form("edit_att_form_comprehensive"):
+            emp_names = st.session_state.employees["اسم الموظف"].tolist()
+            current_emp_idx = emp_names.index(record["اسم الموظف"]) if record["اسم الموظف"] in emp_names else 0
+            edit_emp = st.selectbox("اسم الموظف", emp_names, index=current_emp_idx)
+            
+            try:
+                default_date = datetime.strptime(str(record["التاريخ"]), "%Y-%m-%d").date()
+            except:
+                default_date = date.today()
+            edit_date = st.date_input("تاريخ الحركة", value=default_date)
+            
+            st.markdown("---")
+            edit_start_work = st.text_input("بداية العمل الرسمية", value=str(record["بداية العمل الرسمية"]))
+            edit_end_work = st.text_input("نهاية العمل الرسمية", value=str(record["نهاية العمل الرسمية"]))
+            edit_grace = st.number_input("فترة السماح (دقيقة)", value=int(record.get("فترة السماح (دقيقة)", 15)))
+
+            st.markdown("---")
+            edit_act_in = st.text_input("وقت الحضور الفعلي", value=str(record["وقت الحضور الفعلي"]))
+            edit_act_out = st.text_input("وقت الانصراف الفعلي", value=str(record["وقت الانصراف الفعلي"]))
+            
+            status_list = ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"]
+            current_stat_idx = status_list.index(record["الحالة"]) if record["الحالة"] in status_list else 0
+            edit_status = st.selectbox("حالة الحضور", status_list, index=current_stat_idx)
+            
             edit_tardy = st.number_input("التأخير (دقيقة)", value=int(record["التأخير (دقيقة)"]))
             edit_over = st.number_input("إضافي (دقيقة)", value=int(record["إضافي (دقيقة)"]))
             
             col_eb1, col_eb2 = st.columns(2)
             with col_eb1:
-                if st.form_submit_button("💾 حفظ التعديلات", use_container_width=True):
+                if st.form_submit_button("💾 حفظ كافة التعديلات", use_container_width=True):
+                    emp_row = st.session_state.employees[st.session_state.employees["اسم الموظف"] == edit_emp].iloc[0]
+                    st.session_state.attendance.at[selected_att_idx, "اسم الموظف"] = edit_emp
+                    st.session_state.attendance.at[selected_att_idx, "كود الموظف"] = emp_row["كود الموظف"]
+                    st.session_state.attendance.at[selected_att_idx, "الوظيفة"] = emp_row["الوظيفة"]
+                    st.session_state.attendance.at[selected_att_idx, "الفرع"] = emp_row["الفرع"]
+                    st.session_state.attendance.at[selected_att_idx, "التاريخ"] = str(edit_date)
+                    st.session_state.attendance.at[selected_att_idx, "بداية العمل الرسمية"] = edit_start_work
+                    st.session_state.attendance.at[selected_att_idx, "نهاية العمل الرسمية"] = edit_end_work
+                    st.session_state.attendance.at[selected_att_idx, "فترة السماح (دقيقة)"] = edit_grace
+                    st.session_state.attendance.at[selected_att_idx, "وقت الحضور الفعلي"] = edit_act_in
+                    st.session_state.attendance.at[selected_att_idx, "وقت الانصراف الفعلي"] = edit_act_out
                     st.session_state.attendance.at[selected_att_idx, "الحالة"] = edit_status
                     st.session_state.attendance.at[selected_att_idx, "التأخير (دقيقة)"] = edit_tardy
                     st.session_state.attendance.at[selected_att_idx, "إضافي (دقيقة)"] = edit_over
+                    
                     auto_save_data()
-                    st.success("تم تحديث السجل بكامل مدخلاته بنجاح!")
+                    st.success("تم تحديث كافة حقول سجل الحضور والانصراف بنجاح!")
                     st.rerun()
             with col_eb2:
                 if st.form_submit_button("🗑️ حذف السجل", use_container_width=True):
@@ -839,23 +870,61 @@ elif choice == "سجل الطلبات المرفوضة":
     render_printable_table(st.session_state.requests[st.session_state.requests["الحالة"] == "مرفوض"] if not st.session_state.requests.empty else pd.DataFrame())
 
 elif choice == "تعديل أو حذف طلب إجازة":
-    st.subheader("✏️ تعديل أو حذف طلب إجازة (مع إدراج كامل المدخلات)")
+    st.subheader("✏️ تعديل أو حذف طلب إجازة (إدراج وتعديل كافة حقول الطلب)")
     if not st.session_state.requests.empty:
         req_ids = st.session_state.requests["رقم الطلب"].tolist()
         sel_req_id = st.selectbox("اختر رقم الطلب", req_ids)
         r_rec = st.session_state.requests[st.session_state.requests["رقم الطلب"] == sel_req_id].iloc[0]
         r_idx = st.session_state.requests[st.session_state.requests["رقم الطلب"] == sel_req_id].index[0]
+        
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with st.form("edit_req_form_full"):
-            new_stat = st.selectbox("حالة الطلب", ["قيد الانتظار", "مقبول", "مرفوض"], index=["قيد الانتظار", "مقبول", "مرفوض"].index(r_rec["الحالة"]) if r_rec["الحالة"] in ["قيد الانتظار", "مقبول", "مرفوض"] else 0)
-            new_reas = st.text_input("السبب / ملاحظات", value=str(r_rec["السبب"]))
+        with st.form("edit_req_form_comprehensive"):
+            emp_names = st.session_state.employees["اسم الموظف"].tolist()
+            cur_emp_r = emp_names.index(r_rec["اسم الموظف"]) if r_rec["اسم الموظف"] in emp_names else 0
+            edit_req_emp = st.selectbox("الموظف الطالب", emp_names, index=cur_emp_r)
+            
+            types_list = ["إجازة سنوية", "إجازة أسبوعية / عارضة", "إجازة مرضية", "إجازة بدون أجر"]
+            cur_type_idx = types_list.index(r_rec["نوع الإجازة"]) if r_rec["نوع الإجازة"] in types_list else 0
+            edit_req_type = st.selectbox("نوع الإجازة المطلوبة", types_list, index=cur_type_idx)
+            
+            try:
+                d_from_def = datetime.strptime(str(r_rec["من تاريخ"]), "%Y-%m-%d").date()
+            except:
+                d_from_def = date.today()
+            try:
+                d_to_def = datetime.strptime(str(r_rec["إلى تاريخ"]), "%Y-%m-%d").date()
+            except:
+                d_to_def = date.today()
+                
+            col_ed1, col_ed2 = st.columns(2)
+            with col_ed1: edit_d_from = st.date_input("من تاريخ", value=d_from_def)
+            with col_ed2: edit_d_to = st.date_input("إلى تاريخ", value=d_to_def)
+            
+            edit_reason = st.text_area("السبب / ملاحظات الإجازة", value=str(r_rec["السبب"]))
+            
+            stat_list_req = ["قيد الانتظار", "مقبول", "مرفوض"]
+            cur_stat_r = stat_list_req.index(r_rec["الحالة"]) if r_rec["الحالة"] in stat_list_req else 0
+            edit_req_stat = st.selectbox("حالة الطلب", stat_list_req, index=cur_stat_r)
+            
             col_er1, col_er2 = st.columns(2)
             with col_er1:
-                if st.form_submit_button("💾 حفظ التعديل", use_container_width=True):
-                    st.session_state.requests.at[r_idx, "الحالة"] = new_stat
-                    st.session_state.requests.at[r_idx, "السبب"] = new_reas
+                if st.form_submit_button("💾 حفظ كافة تعديلات الطلب", use_container_width=True):
+                    days_calc = (edit_d_to - edit_d_from).days + 1
+                    emp_row_r = st.session_state.employees[st.session_state.employees["اسم الموظف"] == edit_req_emp].iloc[0]
+                    
+                    st.session_state.requests.at[r_idx, "اسم الموظف"] = edit_req_emp
+                    st.session_state.requests.at[r_idx, "كود الموظف"] = emp_row_r["كود الموظف"]
+                    st.session_state.requests.at[r_idx, "الوظيفة"] = emp_row_r["الوظيفة"]
+                    st.session_state.requests.at[r_idx, "الفرع"] = emp_row_r["الفرع"]
+                    st.session_state.requests.at[r_idx, "نوع الإجازة"] = edit_req_type
+                    st.session_state.requests.at[r_idx, "من تاريخ"] = str(edit_d_from)
+                    st.session_state.requests.at[r_idx, "إلى تاريخ"] = str(edit_d_to)
+                    st.session_state.requests.at[r_idx, "عدد الأيام"] = days_calc
+                    st.session_state.requests.at[r_idx, "السبب"] = edit_reason
+                    st.session_state.requests.at[r_idx, "الحالة"] = edit_req_stat
+                    
                     auto_save_data()
-                    st.success("تم تحديث الطلب بكامل مدخلاته بنجاح!")
+                    st.success("تم تحديث طلب الإجازة بكامل مدخلاته بنجاح!")
                     st.rerun()
             with col_er2:
                 if st.form_submit_button("🗑️ حذف الطلب", use_container_width=True):
@@ -868,21 +937,31 @@ elif choice == "تعديل أو حذف طلب إجازة":
         st.info("لا توجد طلبات إجازة مسجلة.")
 
 elif choice == "تسجيل معاملة مالية":
-    st.subheader("💰 تسجيل معاملة مالية جديدة")
+    st.subheader("💰 تسجيل معاملة مالية جديدة (مع إمكانية تحديد التاريخ)")
     emp_names = st.session_state.employees["اسم الموظف"].tolist()
     if emp_names:
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with st.form("fin_form"):
+        with st.form("fin_form_with_date"):
             emp_f = st.selectbox("الموظف", emp_names)
+            trans_date = st.date_input("تاريخ المعاملة المالية", value=date.today())
             t_type = st.selectbox("نوع المعاملة", ["سلفة", "جزاء (خصم)", "غياب (خصم أيام)", "مكافأة (إضافي)", "بدلات"])
             t_amt = st.number_input("المبلغ / القيمة", min_value=0.0, value=100.0)
             t_reas = st.text_input("البيان / السبب")
+            
             if st.form_submit_button("حفظ المعاملة المالية", use_container_width=True):
                 emp_data = st.session_state.employees[st.session_state.employees["اسم الموظف"] == emp_f].iloc[0]
-                new_f = {"التاريخ": str(date.today()), "كود الموظف": emp_data["كود الموظف"], "اسم الموظف": emp_f, "الفرع": emp_data["الفرع"], "النوع": t_type, "المبلغ / القيمة": t_amt, "البيان / السبب": t_reas}
+                new_f = {
+                    "التاريخ": str(trans_date), 
+                    "كود الموظف": emp_data["كود الموظف"], 
+                    "اسم الموظف": emp_f, 
+                    "الفرع": emp_data["الفرع"], 
+                    "النوع": t_type, 
+                    "المبلغ / القيمة": t_amt, 
+                    "البيان / السبب": t_reas
+                }
                 st.session_state.financial_transactions = pd.concat([st.session_state.financial_transactions, pd.DataFrame([new_f])], ignore_index=True)
                 auto_save_data()
-                st.success("تم الحفظ بنجاح!")
+                st.success("تم حفظ المعاملة المالية وتاريخها بنجاح!")
                 st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -893,25 +972,46 @@ elif choice == "سجل المعاملات المالية":
     render_printable_table(st.session_state.financial_transactions)
 
 elif choice == "تعديل أو حذف معاملة مالية":
-    st.subheader("✏️ تعديل أو حذف معاملة مالية (مع إدراج كامل المدخلات)")
+    st.subheader("✏️ تعديل أو حذف معاملة مالية (مع إدراج وتعديل التاريخ وكل الحقول)")
     if not st.session_state.financial_transactions.empty:
         fin_indices = st.session_state.financial_transactions.index.tolist()
         sel_fin_idx = st.selectbox("اختر المعاملة المالية", fin_indices)
         f_rec = st.session_state.financial_transactions.loc[sel_fin_idx]
+        
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with st.form("edit_fin_form_full"):
-            new_type = st.selectbox("نوع المعاملة", ["سلفة", "جزاء (خصم)", "غياب (خصم أيام)", "مكافأة (إضافي)", "بدلات"], index=["سلفة", "جزاء (خصم)", "غياب (خصم أيام)", "مكافأة (إضافي)", "بدلات"].index(f_rec["النوع"]) if f_rec["النوع"] in ["سلفة", "جزاء (خصم)", "غياب (خصم أيام)", "مكافأة (إضافي)", "بدلات"] else 0)
+        with st.form("edit_fin_form_comprehensive"):
+            emp_names = st.session_state.employees["اسم الموظف"].tolist()
+            cur_emp_f = emp_names.index(f_rec["اسم الموظف"]) if f_rec["اسم الموظف"] in emp_names else 0
+            edit_fin_emp = st.selectbox("الموظف", emp_names, index=cur_emp_f)
+            
+            try:
+                trans_date_def = datetime.strptime(str(f_rec["التاريخ"]), "%Y-%m-%d").date()
+            except:
+                trans_date_def = date.today()
+            edit_fin_date = st.date_input("تاريخ المعاملة المالية", value=trans_date_def)
+            
+            fin_types = ["سلفة", "جزاء (خصم)", "غياب (خصم أيام)", "مكافأة (إضافي)", "بدلات"]
+            cur_fin_type = fin_types.index(f_rec["النوع"]) if f_rec["النوع"] in fin_types else 0
+            new_type = st.selectbox("نوع المعاملة", fin_types, index=cur_fin_type)
+            
             new_amt = st.number_input("المبلغ / القيمة", value=float(f_rec["المبلغ / القيمة"]))
             new_reas = st.text_input("البيان / السبب", value=str(f_rec["البيان / السبب"]))
             
             col_ef1, col_ef2 = st.columns(2)
             with col_ef1:
-                if st.form_submit_button("💾 حفظ التعديل", use_container_width=True):
+                if st.form_submit_button("💾 حفظ كافة تعديلات المعاملة", use_container_width=True):
+                    emp_row_f = st.session_state.employees[st.session_state.employees["اسم الموظف"] == edit_fin_emp].iloc[0]
+                    
+                    st.session_state.financial_transactions.at[sel_fin_idx, "اسم الموظف"] = edit_fin_emp
+                    st.session_state.financial_transactions.at[sel_fin_idx, "كود الموظف"] = emp_row_f["كود الموظف"]
+                    st.session_state.financial_transactions.at[sel_fin_idx, "الفرع"] = emp_row_f["الفرع"]
+                    st.session_state.financial_transactions.at[sel_fin_idx, "التاريخ"] = str(edit_fin_date)
                     st.session_state.financial_transactions.at[sel_fin_idx, "النوع"] = new_type
                     st.session_state.financial_transactions.at[sel_fin_idx, "المبلغ / القيمة"] = new_amt
                     st.session_state.financial_transactions.at[sel_fin_idx, "البيان / السبب"] = new_reas
+                    
                     auto_save_data()
-                    st.success("تم تحديث المعاملة بكامل مدخلاتها بنجاح!")
+                    st.success("تم تحديث المعاملة المالية بكامل مدخلاتها وتاريخها بنجاح!")
                     st.rerun()
             with col_ef2:
                 if st.form_submit_button("🗑️ حذف المعاملة", use_container_width=True):
