@@ -589,11 +589,11 @@ if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم �
     render_printable_table(view_employees)
 
 elif choice == "تسجيل حضور وانصراف":
-    st.subheader("⏱️ تسجيل حركة حضور / انصراف (أزرار الساعات والدقائق الصباحية والمسائية)")
+    st.subheader("⏱️ تسجيل حركة حضور / انصراف (ساعات ودقائق من 00 إلى 59 مع AM/PM)")
     emp_names = st.session_state.employees["اسم الموظف"].tolist()
     if emp_names:
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with st.form("att_form_custom_time"):
+        with st.form("att_form_custom_time_full"):
             selected_emp = st.selectbox("اختر الموظف", emp_names)
             att_date = st.date_input("تاريخ الحركة", value=date.today())
             
@@ -605,20 +605,14 @@ elif choice == "تسجيل حضور وانصراف":
             
             st.markdown("---")
             st.markdown("🕒 **المواعيد الرسمية للشركة:**")
-            col_r1, col_r2, col_r3, col_r4 = st.columns(4)
+            col_r1, col_r2, col_r3 = st.columns(3)
             with col_r1: start_h = st.selectbox("ساعة البداية", list(range(1, 13)), index=7) # الافتراضي 8
-            with col_r2: start_m = st.selectbox("دقيقة البداية", [0, 15, 30, 45], index=0)
+            with col_r2: start_m = st.selectbox("دقيقة البداية (00-59)", list(range(0, 60)), index=0)
             with col_r3: start_ampm = st.selectbox("فترة البداية", ["AM", "PM"], index=0)
-            
-            with col_r4:
-                # نهاية العمل الرسمية الافتراضية (مثلاً 4 مساءً)
-                end_h_def = 4
-                end_m_def = 0
-                end_ampm_def = "PM"
             
             col_e1, col_e2, col_e3 = st.columns(3)
             with col_e1: end_h = st.selectbox("ساعة النهاية", list(range(1, 13)), index=3) # 4
-            with col_e2: end_m = st.selectbox("دقيقة النهاية", [0, 15, 30, 45], index=0)
+            with col_e2: end_m = st.selectbox("دقيقة النهاية (00-59)", list(range(0, 60)), index=0)
             with col_e3: end_ampm = st.selectbox("فترة النهاية", ["AM", "PM"], index=1)
 
             st.markdown("---")
@@ -627,13 +621,13 @@ elif choice == "تسجيل حضور وانصراف":
             st.markdown("📍 **وقت الحضور الفعلي:**")
             col_in1, col_in2, col_in3 = st.columns(3)
             with col_in1: act_in_h = st.selectbox("ساعة الحضور", list(range(1, 13)), index=7, key="ain_h")
-            with col_in2: act_in_m = st.selectbox("دقيقة الحضور", [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55], index=0, key="ain_m")
+            with col_in2: act_in_m = st.selectbox("دقيقة الحضور (00-59)", list(range(0, 60)), index=0, key="ain_m")
             with col_in3: act_in_ampm = st.selectbox("صباحاً / مساءً (حضور)", ["AM", "PM"], index=0, key="ain_ap")
 
             st.markdown("📍 **وقت الانصراف الفعلي:**")
             col_out1, col_out2, col_out3 = st.columns(3)
             with col_out1: act_out_h = st.selectbox("ساعة الانصراف", list(range(1, 13)), index=3, key="aout_h")
-            with col_out2: act_out_m = st.selectbox("دقيقة الانصراف", [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55], index=0, key="aout_m")
+            with col_out2: act_out_m = st.selectbox("دقيقة الانصراف (00-59)", list(range(0, 60)), index=0, key="aout_m")
             with col_out3: act_out_ampm = st.selectbox("صباحاً / مساءً (انصراف)", ["AM", "PM"], index=1, key="aout_ap")
 
             att_status = st.selectbox("حالة الحضور", ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"])
