@@ -176,7 +176,7 @@ def select_time_12h(label_prefix, key_prefix, default_hour=8, default_minute=0, 
     formatted_str = f"{hour:02d}:{minute:02d} {'AM' if period == 'صباحاً (AM)' else 'PM'}"
     return time(h_24, minute), formatted_str
 
-# 🖨️ زر طباعة ذكي مع كود جافاسكريفت يعزل القائمة الجانبية تماماً عند الطباعة
+# 🖨️ زر طباعة ذكي مع عزل القائمة الجانبية تماماً
 def render_print_button():
     components.html("""
         <div style="text-align: left; margin-bottom: 15px;" class="no-print">
@@ -186,7 +186,7 @@ def render_print_button():
                 window.parent.print();
                 setTimeout(() => { if (sidebar) sidebar.style.display = 'block'; }, 1000);
             " style="
-                background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+                background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
                 color: white;
                 padding: 10px 22px;
                 border: none;
@@ -194,7 +194,7 @@ def render_print_button():
                 font-size: 13px;
                 font-weight: bold;
                 cursor: pointer;
-                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+                box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
                 font-family: 'Tahoma', sans-serif;
                 transition: all 0.3s ease;
             ">
@@ -203,7 +203,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS المتطور والانسيابي (Modern & Fluid Full-Width UI)
+# 🎨 تصميم الواجهة الأولى (الأزرق الملكي الاحترافي العريض Full-Width)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -224,10 +224,10 @@ st.markdown("""
         background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%) !important;
     }
     
-    /* 📋 القائمة الجانبية الانسيابية العصرية */
+    /* 📋 القائمة الجانبية الانسيابية */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #090D16 0%, #1E293B 100%) !important;
-        color: #F8FAFC !important;
+        background: linear-gradient(180deg, #0F172A 0%, #1E3A8A 100%) !important;
+        color: #FFFFFF !important;
         padding-top: 1.5rem;
         border-left: 1px solid rgba(255, 255, 255, 0.08);
         min-width: 310px !important;
@@ -235,13 +235,13 @@ st.markdown("""
     }
     
     [data-testid="stSidebar"] div, [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] h3 {
-        color: #F8FAFC !important;
+        color: #FFFFFF !important;
         text-align: right !important;
         direction: rtl !important;
     }
     
     [data-testid="stSidebar"] div[data-baseweb="select"] {
-        background-color: rgba(255, 255, 255, 0.08) !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
         border-radius: 10px !important;
     }
     
@@ -299,7 +299,7 @@ st.markdown("""
         padding: 10px !important;
     }
     
-    /* 🏢 هيدر الشركة الاحترافي العريض والمتطور */
+    /* 🏢 هيدر الشركة الاحترافي الملكي */
     .company-header-container {
         background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%);
         color: #FFFFFF !important;
@@ -357,10 +357,10 @@ st.markdown("""
         line-height: 1.6;
     }
     
-    /* 📊 بطاقات مؤشرات الأداء العريضة والعصرية (Dashboard Cards) */
+    /* 📊 بطاقات مؤشرات الأداء العريضة */
     .dashboard-card {
         background: #FFFFFF;
-        border-right: 6px solid #3B82F6;
+        border-right: 6px solid #1E3A8A;
         padding: 22px 24px;
         border-radius: 14px;
         box-shadow: 0 6px 20px rgba(0,0,0,0.05);
@@ -730,7 +730,7 @@ if main_menu == "🔍 صندوق البحث الشامل" or choice == "محرك
             render_printable_table(fin_df)
 
 # =========================================================
-# 🏠 الشاشة الرئيسية / لوحة المؤشرات (العريضة والعصرية)
+# 🏠 الشاشة الرئيسية / لوحة المؤشرات العريضة
 # =========================================================
 elif choice == "لوحة المؤشرات والتحكم" or choice == "الشاشة الرئيسية":
     st.markdown(f'<div class="section-header">📈 مؤشرات الأداء العامة - شركة: {company_display_name}</div>', unsafe_allow_html=True)
