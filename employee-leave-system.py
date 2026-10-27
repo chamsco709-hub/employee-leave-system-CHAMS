@@ -5,6 +5,7 @@ from datetime import datetime, date
 import json
 import os
 import io
+import base64
 
 # ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة مع إخفاء القائمة الجانبية تماماً
 st.set_page_config(
@@ -131,7 +132,7 @@ def load_company_data():
             "contact": "01000000000",
             "email": "info@company.com",
             "license": company_license,
-            "logo": "🏢"
+            "logo": ""
         }
 
 def auto_save_data():
@@ -249,6 +250,7 @@ st.markdown("""
         border-radius: 12px;
         border: 1px solid rgba(229, 9, 20, 0.4);
         text-align: center;
+        min-width: 50px;
     }
     
     .header-top-system h2 {
@@ -415,23 +417,33 @@ def render_printable_table(df):
 
 def render_company_header():
     info = st.session_state.company_info
-    logo_val = info.get("logo", "🏢")
+    logo_val = info.get("logo", "")
     
-    # التحقق مما إذا كان الشعار رابط صورة أو رمز تعبيري/نص
-    if logo_val and (logo_val.startswith("http://") or logo_val.startswith("https://") or logo_val.endswith((".png", ".jpg", ".jpeg"))):
-        logo_html = f'<img src="{logo_val}" style="width: 45px; height: 45px; object-fit: contain; border-radius: 8px;" />'
+    # دعم عرض الشعار سواء كان صورة مرفوعة (Base64) أو رابط أو رمز افتراضي
+    if logo_val and logo_val.startswith("data:image"):
+        logo_html = f'<img src="{logo_val}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: white; padding: 2px;" />'
+    elif logo_val and (logo_val.startswith("http://") or logo_val.startswith("https://")):
+        logo_html = f'<img src="{logo_val}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px;" />'
     else:
-        logo_html = f'<div class="header-logo-box">{logo_val}</div>'
+        logo_html = '<div class="header-logo-box">🏢</div>'
+
+    contact_num = info.get("contact", "غير محدد")
+    email_addr = info.get("email", "غير محدد")
+    address_str = info.get("address", "غير محدد")
+    cr_num = info.get("cr", "غير محدد")
+    tax_num = info.get("tax", "غير محدد")
+    lic_num = info.get("license", "غير محدد")
+    comp_name = info.get("name", "")
 
     st.markdown(
         f"""
         <div class="glass-header">
-            <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
                 {logo_html}
-                <div>
+                <div style="width: 100%;">
                     <div class="header-top-system"><h2>🍿 منصة عرض شؤون الموظفين والإدارة</h2></div>
-                    <div class="comp-name-txt">{info.get("name", "")}</div>
-                    <div class="comp-info-txt">📍 {info.get("address", "")} &nbsp;|&nbsp; 📋 س.ت: {info.get("cr", "")} &nbsp;|&nbsp; 🧾 ب.ض: {info.get("tax", "")} &nbsp;|&nbsp; 📞 هاتف: {info.get("contact", "")} &nbsp;|&nbsp; ✉️ بريد: {info.get("email", "")} &nbsp;|&nbsp; 🔑 ترخيص: {info.get("license", "")}</div>
+                    <div class="comp-name-txt">{comp_name}</div>
+                    <div class="comp-info-txt">📍 العنوان: {address_str} &nbsp;|&nbsp; 📋 س.ت: {cr_num} &nbsp;|&nbsp; 🧾 ب.ض: {tax_num} &nbsp;|&nbsp; 📞 هاتف: {contact_num} &nbsp;|&nbsp; ✉️ بريد: {email_addr} &nbsp;|&nbsp; 🔑 ترخيص: {lic_num}</div>
                 </div>
             </div>
         </div>
@@ -982,7 +994,12 @@ elif choice == "طباعة التقارير العامة":
 elif choice == "إعدادات الشركة وبياناتها الشاملة":
     st.subheader("⚙️ إعدادات الشركة وبياناتها الشاملة")
     info = st.session_state.company_info
+    
     st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
+    
+    # نموذج رفع شعار الشركة كصورة
+    uploaded_logo = st.file_uploader("🖼️ اختر صورة شعار الشركة (PNG أو JPG)", type=["png", "jpg", "jpeg"])
+    
     with st.form("settings_full"):
         c_name_set = st.text_input("اسم الشركة", value=info.get("name", ""))
         c_lic_set = st.text_input("رقم الترخيص", value=info.get("license", ""))
@@ -991,7 +1008,6 @@ elif choice == "إعدادات الشركة وبياناتها الشاملة":
         c_addr_set = st.text_input("العنوان", value=info.get("address", ""))
         c_contact_set = st.text_input("أرقام التواصل", value=info.get("contact", ""))
         c_email_set = st.text_input("البريد الإلكتروني", value=info.get("email", ""))
-        c_logo_set = st.text_input("شعار الشركة (رابط صورة أو رمز تعبيري مثل 🏢 أو 🌟)", value=str(info.get("logo", "")))
         
         if st.form_submit_button("💾 حفظ إعدادات الشركة", use_container_width=True):
             info["name"] = c_name_set
@@ -1001,9 +1017,17 @@ elif choice == "إعدادات الشركة وبياناتها الشاملة":
             info["address"] = c_addr_set
             info["contact"] = c_contact_set
             info["email"] = c_email_set
-            info["logo"] = c_logo_set
+            
+            # إذا قام المستخدم برفع صورة جديدة، يتم تحويلها وتخزينها تلقائياً
+            if uploaded_logo is not None:
+                bytes_data = uploaded_logo.getvalue()
+                encoded_img = base64.b64encode(bytes_data).decode("utf-8")
+                file_ext = uploaded_logo.name.split(".")[-1].lower()
+                mime_type = f"image/{file_ext}" if file_ext in ["png", "jpg", "jpeg"] else "image/png"
+                info["logo"] = f"data:{mime_type};base64,{encoded_img}"
+                
             auto_save_data()
-            st.success("تم تحديث إعدادات الشركة وبياناتها بنجاح!")
+            st.success("تم تحديث إعدادات الشركة وشعارها بنجاح!")
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
