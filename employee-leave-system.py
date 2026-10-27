@@ -8,7 +8,7 @@ import base64
 import json
 import os
 
-# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة مع إبقاء القائمة الجانبية مفتوحة ومثبتة
+# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة
 st.set_page_config(
     page_title="النظام المتكامل لإدارة الموارد البشرية",
     page_icon="🏢",
@@ -176,13 +176,19 @@ def select_time_12h(label_prefix, key_prefix, default_hour=8, default_minute=0, 
     formatted_str = f"{hour:02d}:{minute:02d} {'AM' if period == 'صباحاً (AM)' else 'PM'}"
     return time(h_24, minute), formatted_str
 
+# 🖨️ زر طباعة ذكي مع كود جافاسكريفت يعزل القائمة الجانبية تماماً عند الطباعة
 def render_print_button():
     components.html("""
-        <div style="text-align: left; margin-bottom: 15px;">
-            <button onclick="window.parent.print()" style="
+        <div style="text-align: left; margin-bottom: 15px;" class="no-print">
+            <button onclick="
+                const sidebar = window.parent.document.querySelector('[data-testid=\\'stSidebar\\']');
+                if (sidebar) sidebar.style.display = 'none';
+                window.parent.print();
+                setTimeout(() => { if (sidebar) sidebar.style.display = 'block'; }, 1000);
+            " style="
                 background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
                 color: white;
-                padding: 9px 20px;
+                padding: 10px 22px;
                 border: none;
                 border-radius: 8px;
                 font-size: 13px;
@@ -192,12 +198,12 @@ def render_print_button():
                 font-family: 'Tahoma', sans-serif;
                 transition: all 0.3s ease;
             ">
-                🖨️ طباعة السجل الحالي
+                🖨️ طباعة السجل الحالي بشكل نظيف
             </button>
         </div>
-    """, height=45)
+    """, height=50)
 
-# 🎨 تصميم CSS المتطور والانسيابي (Modern & Fluid UI Design)
+# 🎨 تصميم CSS المتطور مع قواعد طباعة صارمة لعزل المحتوى الرئيسي وإخفاء القائمة الجانبية
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -216,11 +222,8 @@ st.markdown("""
         background-color: #F8FAFC !important;
     }
     
-    /* 📋 القائمة الجانبية الانسيابية المحدثة */
+    /* 📋 القائمة الجانبية الانسيابية */
     [data-testid="stSidebar"] {
-        transform: none !important;
-        visibility: visible !important;
-        display: block !important;
         background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%) !important;
         color: #F8FAFC !important;
         padding-top: 1.5rem;
@@ -254,7 +257,6 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* حقول الإدخال والتقويم بتصميم انسيابي ناعم */
     div[data-testid="stDateInput"],
     div[data-testid="stDateInput"] > div,
     div[data-testid="stDateInput"] input,
@@ -264,7 +266,7 @@ st.markdown("""
         -webkit-text-fill-color: #0F172A !important;
         font-weight: bold !important;
         border-radius: 8px !important;
-        border-color: #0F172A !important;
+        border-color: #E2E8F0 !important;
     }
 
     div[data-baseweb="popover"],
@@ -276,40 +278,6 @@ st.markdown("""
         background-color: #FFFFFF !important;
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
-    }
-    
-    div[data-baseweb="calendar"] button,
-    div[data-baseweb="popover"] button {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
-        font-weight: bold !important;
-        border: none !important;
-        border-radius: 6px !important;
-    }
-    
-    div[data-baseweb="calendar"] button:hover,
-    div[data-baseweb="popover"] button:hover {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
-    }
-
-    div[data-baseweb="calendar"] [aria-selected="true"] {
-        background-color: #0F172A !important;
-        color: #FFFFFF !important;
-        -webkit-text-fill-color: #FFFFFF !important;
-    }
-
-    div[data-baseweb="menu"], ul[data-baseweb="menu"], div[role="listbox"], div[role="option"] {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
-    }
-    div[role="option"]:hover {
-        background-color: #F1F5F9 !important;
-        color: #2563EB !important;
-        -webkit-text-fill-color: #2563EB !important;
     }
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
@@ -328,7 +296,7 @@ st.markdown("""
         border: 1px solid #CBD5E1 !important;
     }
     
-    /* 🏢 هيدر الشركة الاحترافي المتطور */
+    /* 🏢 هيدر الشركة الاحترافي */
     .company-header-container {
         background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%);
         color: #FFFFFF !important;
@@ -354,7 +322,6 @@ st.markdown("""
         margin: 0 !important;
         padding: 0 !important;
         text-align: center !important;
-        letter-spacing: 0.3px;
     }
     .header-bottom-content {
         display: flex;
@@ -386,7 +353,7 @@ st.markdown("""
         line-height: 1.5;
     }
     
-    /* 📊 بطاقات مؤشرات الأداء العصرية */
+    /* 📊 بطاقات المؤشرات */
     .dashboard-card {
         background: #FFFFFF;
         border-right: 5px solid #2563EB;
@@ -395,11 +362,6 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(0,0,0,0.04);
         text-align: right !important;
         margin-bottom: 12px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .dashboard-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
     }
     .dashboard-card-title {
         font-size: 12px;
@@ -413,7 +375,7 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* 📌 رؤوس الأقسام المتميزة */
+    /* 📌 رؤوس الأقسام */
     .section-header {
         font-size: 16px !important;
         font-weight: bold !important;
@@ -426,7 +388,7 @@ st.markdown("""
         direction: rtl !important;
     }
     
-    /* 📋 الجداول الانسيابية النظيفة */
+    /* 📋 الجداول الانسيابية */
     table.custom-table {
         width: 100%;
         border-collapse: separate;
@@ -457,11 +419,7 @@ st.markdown("""
         color: #1E3A8A !important;
         border-bottom: 2px solid #CBD5E1;
     }
-    table.custom-table tr:last-child td {
-        border-bottom: none;
-    }
     
-    /* 📝 مناطق النماذج والإدخال */
     .entry-form-area {
         background: #FFFFFF;
         padding: 20px;
@@ -471,7 +429,12 @@ st.markdown("""
         margin-bottom: 15px;
     }
     
+    /* 🖨️ قواعد الطباعة الصارمة لإخفاء القائمة والأزرار نهائياً */
     @media print {
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
         body, .stApp, .block-container {
             background-color: #FFFFFF !important;
             color: #000000 !important;
@@ -479,57 +442,60 @@ st.markdown("""
             text-align: right !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
-        button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"],
-        .dashboard-card, div[data-testid="stForm"], .no-print, .entry-form-area, hr, div[data-testid="stSidebar"] {
+        /* إخفاء القائمة الجانبية تماماً عبر الـ CSS والـ DOM */
+        [data-testid="stSidebar"], 
+        section[data-testid="stSidebar"],
+        div[data-testid="stSidebar"] {
             display: none !important;
+            visibility: hidden !important;
+            width: 0px !important;
+            max-width: 0px !important;
+            flex: 0 0 0% !important;
         }
+        /* إخفاء الأزرار، الحقول، النماذج، ومكونات النظام غير المرغوبة في الطباعة */
+        button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"],
+        .dashboard-card, div[data-testid="stForm"], .no-print, .entry-form-area, hr {
+            display: none !important;
+            visibility: hidden !important;
+        }
+        /* تخصيص الهيدر والجدول للطباعة بشكل احترافي */
         .company-header-container {
             background: #FFFFFF !important;
             color: #000000 !important;
-            border: 1px solid #000;
+            border: 1.5px solid #1E3A8A;
             box-shadow: none;
+            padding: 12px !important;
+            margin-bottom: 15px !important;
+        }
+        .header-top-system {
+            border-bottom: 1px solid #1E3A8A !important;
         }
         .header-top-system h2, .comp-name-txt, .comp-info-txt {
             color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
         }
         table.custom-table {
             width: 100% !important;
-            margin-top: 15px !important;
+            margin-top: 10px !important;
             box-shadow: none !important;
-            border: 1px solid #000 !important;
+            border: 1px solid #1E3A8A !important;
+        }
+        table.custom-table th {
+            background-color: #1E3A8A !important;
+            color: #FFFFFF !important;
+            -webkit-text-fill-color: #FFFFFF !important;
+            border: 1px solid #1E3A8A !important;
+        }
+        table.custom-table td {
+            border: 1px solid #CBD5E1 !important;
+            color: #000000 !important;
         }
     }
     </style>
-    
-    <!-- سكريبت جافاسكريبت فوري لضمان ظهور عناصر التقويم والواجهة بوضوح تام -->
-    <script>
-    const forceWhiteCalendar = () => {
-        const popovers = document.querySelectorAll('div[data-baseweb="popover"], div[data-baseweb="calendar"], div[role="dialog"]');
-        popovers.forEach(pop => {
-            pop.removeAttribute('data-theme');
-            pop.style.setProperty('background-color', '#FFFFFF', 'important');
-            pop.style.setProperty('color', '#0F172A', 'important');
-            
-            const allElements = pop.querySelectorAll('*');
-            allElements.forEach(el => {
-                if (el.getAttribute('aria-selected') !== 'true') {
-                    el.style.setProperty('background-color', '#FFFFFF', 'important');
-                    el.style.setProperty('color', '#0F172A', 'important');
-                    el.style.setProperty('-webkit-text-fill-color', '#0F172A', 'important');
-                }
-            });
-        });
-    };
-
-    const observer = new MutationObserver(forceWhiteCalendar);
-    observer.observe(document.body, { childList: true, subtree: true });
-    
-    document.addEventListener('click', () => {
-        setTimeout(forceWhiteCalendar, 5);
-        setTimeout(forceWhiteCalendar, 50);
-    });
-    </script>
 """, unsafe_allow_html=True)
 
 if 'is_authenticated' not in st.session_state: st.session_state.is_authenticated = False
@@ -550,7 +516,6 @@ def render_company_header():
     logo_html = '<div style="padding: 10px 16px; border: 1px dashed rgba(255,255,255,0.4); border-radius: 10px; font-size: 12px; color: white; background: rgba(255,255,255,0.06); font-weight: bold;">🏢 شعار الشركة</div>'
     if info.get("logo") is not None:
         try:
-            # تم تكبير أبعاد الشعار هنا لتشغل مساحة أكبر وأوضح
             logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 85px; max-width: 170px; object-fit: contain; background: white; border-radius: 8px; padding: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />'
         except Exception:
             pass
@@ -614,7 +579,7 @@ if not st.session_state.is_authenticated:
 render_company_header()
 
 # =========================================================
-# 🗂️ القائمة الجانبية الثابتة والمنسقة (مع صندوق البحث كقسم رئيسي)
+# 🗂️ القائمة الجانبية الثابتة والمنسقة
 # =========================================================
 with st.sidebar:
     st.markdown("### 🗂️ لوحة التحكم الرئيسية")
@@ -692,7 +657,7 @@ with st.sidebar:
         st.rerun()
 
 # =========================================================
-# 🔍 صندوق البحث المتطور والشامل (قسم رئيسي مستقل)
+# 🔍 صندوق البحث المتطور والشامل
 # =========================================================
 if main_menu == "🔍 صندوق البحث الشامل" or choice == "محرك البحث المتطور والفلترة":
     st.markdown(f'<div class="section-header">🔍 صندوق البحث المتطور والشامل في قواعد بيانات الشركة</div>', unsafe_allow_html=True)
@@ -863,8 +828,13 @@ elif choice == "لوحة المؤشرات والتحكم" or choice == "الشا
         st.write("")
         st.write("")
         components.html("""
-            <div style="text-align: left;">
-                <button onclick="window.parent.print()" style="
+            <div style="text-align: left;" class="no-print">
+                <button onclick="
+                    const sidebar = window.parent.document.querySelector('[data-testid=\\'stSidebar\\']');
+                    if (sidebar) sidebar.style.display = 'none';
+                    window.parent.print();
+                    setTimeout(() => { if (sidebar) sidebar.style.display = 'block'; }, 1000);
+                " style="
                     background-color: #1E3A8A;
                     color: white;
                     padding: 8px 14px;
