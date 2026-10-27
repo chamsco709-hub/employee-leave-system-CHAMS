@@ -470,7 +470,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 3. الأزرار أو الخانات المنسدلة للتحكم والتنقل
+# 3. الأزرار والخانات المنسدلة للتحكم والتنقل
 st.markdown('<div class="cinema-top-bar" style="margin: 0; box-shadow: none;">', unsafe_allow_html=True)
 col_nav1, col_nav2, col_nav3 = st.columns([1.5, 2.5, 1])
 
@@ -503,7 +503,7 @@ sub_options_map = {
 
 with col_nav2:
     sub_options_list = sub_options_map.get(selected_main_cat, ["لوحة التحكم والمؤشرات"])
-    choice = st.selectbox("📑 العمليات الفرعية (زر منسدل):", sub_options_list, label_visibility="collapsed")
+    choice = st.selectbox("📑 العمليات الفرعية (بوتون منسدل):", sub_options_list, label_visibility="collapsed")
 
 with col_nav3:
     if st.button("⏹️ خروج", use_container_width=True):
