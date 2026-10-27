@@ -10,7 +10,7 @@ import os
 
 # ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة مع إبقاء القائمة الجانبية مفتوحة ومثبتة
 st.set_page_config(
-    page_title="النظام المتكامل لإدارة الإجازات والموارد البشرية",
+    page_title="النظام المتكامل لإدارة الموارد البشرية",
     page_icon="🏢",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -178,25 +178,26 @@ def select_time_12h(label_prefix, key_prefix, default_hour=8, default_minute=0, 
 
 def render_print_button():
     components.html("""
-        <div style="text-align: left; margin-bottom: 12px;">
+        <div style="text-align: left; margin-bottom: 15px;">
             <button onclick="window.parent.print()" style="
-                background-color: #1E3A8A;
+                background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
                 color: white;
-                padding: 8px 18px;
+                padding: 9px 20px;
                 border: none;
-                border-radius: 6px;
+                border-radius: 8px;
                 font-size: 13px;
                 font-weight: bold;
                 cursor: pointer;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
                 font-family: 'Tahoma', sans-serif;
+                transition: all 0.3s ease;
             ">
                 🖨️ طباعة السجل الحالي
             </button>
         </div>
     """, height=45)
 
-# 🎨 تصميم CSS الشامل مع إجبار نافذة اختيار التاريخ على اللون الأبيض النقي والنصوص السوداء الواضحة
+# 🎨 تصميم CSS المتطور والانسيابي (Modern & Fluid UI Design)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -205,54 +206,55 @@ st.markdown("""
         font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
         direction: rtl !important;
         text-align: right !important;
-        color: #0F172A !important;
+        color: #1E293B !important;
     }
     
     .block-container {
-        padding-top: 1rem !important;
-        padding-bottom: 2rem !important;
+        padding-top: 1.5rem !important;
+        padding-bottom: 3rem !important;
         max-width: 100% !important;
         background-color: #F8FAFC !important;
     }
     
-    /* تثبيت القائمة الجانبية على اليمين */
+    /* 📋 القائمة الجانبية الانسيابية المحدثة */
     [data-testid="stSidebar"] {
         transform: none !important;
         visibility: visible !important;
         display: block !important;
-        background-color: #0F172A !important;
+        background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%) !important;
         color: #F8FAFC !important;
-        padding-top: 1rem;
-        border-left: 1px solid #334155;
-        min-width: 280px !important;
+        padding-top: 1.5rem;
+        border-left: 1px solid rgba(255, 255, 255, 0.08);
+        min-width: 290px !important;
+        box-shadow: -5px 0 25px rgba(0,0,0,0.1);
     }
     
     [data-testid="stSidebar"] div, [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] h3 {
-        color: #F8FAFC !important;
+        color: #F1F5F9 !important;
         text-align: right !important;
         direction: rtl !important;
     }
     
     [data-testid="stSidebar"] div[data-baseweb="select"] {
-        background-color: #FFFFFF !important;
-        border-radius: 6px !important;
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        border-radius: 8px !important;
     }
     
     [data-testid="stSidebar"] div[data-baseweb="select"] > div {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
-        border-color: #CBD5E1 !important;
+        background-color: transparent !important;
+        color: #FFFFFF !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
     }
     
     [data-testid="stSidebar"] div[data-baseweb="select"] span, 
     [data-testid="stSidebar"] div[data-baseweb="select"] div,
     [data-testid="stSidebar"] div[data-baseweb="select"] input {
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
         font-weight: bold !important;
     }
     
-    /* حقل إدخال التاريخ الرئيسي */
+    /* حقول الإدخال والتقويم بتصميم انسيابي ناعم */
     div[data-testid="stDateInput"],
     div[data-testid="stDateInput"] > div,
     div[data-testid="stDateInput"] input,
@@ -261,10 +263,10 @@ st.markdown("""
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
         font-weight: bold !important;
-        border-color: #CBD5E1 !important;
+        border-radius: 8px !important;
+        border-color: #E2E8F0 !important;
     }
 
-    /* 🎯 إجبار نافذة التقويم المنبثقة بالكامل على اللون الأبيض والأسود الواضح */
     div[data-baseweb="popover"],
     div[data-baseweb="calendar"],
     div[role="dialog"],
@@ -283,17 +285,18 @@ st.markdown("""
         -webkit-text-fill-color: #0F172A !important;
         font-weight: bold !important;
         border: none !important;
+        border-radius: 6px !important;
     }
     
     div[data-baseweb="calendar"] button:hover,
     div[data-baseweb="popover"] button:hover {
-        background-color: #E2E8F0 !important;
+        background-color: #EFF6FF !important;
         color: #1E3A8A !important;
         -webkit-text-fill-color: #1E3A8A !important;
     }
 
     div[data-baseweb="calendar"] [aria-selected="true"] {
-        background-color: #1E3A8A !important;
+        background-color: #2563EB !important;
         color: #FFFFFF !important;
         -webkit-text-fill-color: #FFFFFF !important;
     }
@@ -304,13 +307,13 @@ st.markdown("""
         -webkit-text-fill-color: #0F172A !important;
     }
     div[role="option"]:hover {
-        background-color: #E2E8F0 !important;
-        color: #1E3A8A !important;
-        -webkit-text-fill-color: #1E3A8A !important;
+        background-color: #F1F5F9 !important;
+        color: #2563EB !important;
+        -webkit-text-fill-color: #2563EB !important;
     }
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
-        color: #1E293B !important;
+        color: #334155 !important;
         font-weight: bold !important;
         font-size: 13px !important;
     }
@@ -321,34 +324,37 @@ st.markdown("""
         -webkit-text-fill-color: #0F172A !important;
         font-size: 13px !important;
         font-weight: bold !important;
+        border-radius: 8px !important;
+        border: 1px solid #CBD5E1 !important;
     }
     
-    /* 🏢 الهيدر العلوي للشركة بنصوص بيضاء بالكامل */
+    /* 🏢 هيدر الشركة الاحترافي المتطور */
     .company-header-container {
-        background: linear-gradient(135deg, #1E3A8A 15%, #0F172A 100%);
+        background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%);
         color: #FFFFFF !important;
-        padding: 16px 20px;
-        border-radius: 10px;
-        margin-bottom: 15px !important;
+        padding: 20px 24px;
+        border-radius: 14px;
+        margin-bottom: 20px !important;
         width: 100%;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.25);
         box-sizing: border-box;
     }
     .header-top-system {
         text-align: center !important;
         width: 100%;
-        margin-bottom: 8px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-        padding-bottom: 6px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        padding-bottom: 8px;
     }
     .header-top-system h2 {
-        font-size: 16px !important;
+        font-size: 17px !important;
         font-weight: bold !important;
         color: #FFFFFF !important;
         -webkit-text-fill-color: #FFFFFF !important;
         margin: 0 !important;
         padding: 0 !important;
         text-align: center !important;
+        letter-spacing: 0.3px;
     }
     .header-bottom-content {
         display: flex;
@@ -366,78 +372,103 @@ st.markdown("""
         padding-left: 5px;
     }
     .comp-name-txt {
-        font-size: 15px !important;
+        font-size: 16px !important;
         font-weight: bold !important;
-        margin-bottom: 4px !important;
+        margin-bottom: 6px !important;
         color: #FFFFFF !important;
         -webkit-text-fill-color: #FFFFFF !important;
     }
     .comp-info-txt {
-        font-size: 11px !important;
-        margin: 2px 0 !important;
-        color: #FFFFFF !important;
-        -webkit-text-fill-color: #FFFFFF !important;
-        line-height: 1.4;
+        font-size: 12px !important;
+        margin: 3px 0 !important;
+        color: #E2E8F0 !important;
+        -webkit-text-fill-color: #E2E8F0 !important;
+        line-height: 1.5;
     }
     
+    /* 📊 بطاقات مؤشرات الأداء العصرية */
     .dashboard-card {
         background: #FFFFFF;
-        border-right: 5px solid #1E3A8A;
-        padding: 14px 18px;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        border-right: 5px solid #2563EB;
+        padding: 18px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.04);
         text-align: right !important;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
     }
     .dashboard-card-title {
         font-size: 12px;
         color: #64748B;
         font-weight: bold;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
     }
     .dashboard-card-value {
-        font-size: 22px;
+        font-size: 24px;
         color: #1E3A8A;
         font-weight: bold;
     }
     
+    /* 📌 رؤوس الأقسام المتميزة */
     .section-header {
-        font-size: 15px !important;
+        font-size: 16px !important;
         font-weight: bold !important;
         color: #1E3A8A !important;
-        border-bottom: 2px solid #1E3A8A;
-        padding-bottom: 6px;
-        margin-top: 12px !important;
-        margin-bottom: 10px !important;
+        border-bottom: 2px solid #3B82F6;
+        padding-bottom: 8px;
+        margin-top: 18px !important;
+        margin-bottom: 14px !important;
         text-align: right !important;
         direction: rtl !important;
     }
     
+    /* 📋 الجداول الانسيابية النظيفة */
     table.custom-table {
         width: 100%;
-        border-collapse: collapse;
-        margin-top: 6px !important;
-        margin-bottom: 12px !important;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 8px !important;
+        margin-bottom: 16px !important;
         background-color: #FFFFFF;
         color: #0F172A;
         direction: rtl !important;
         text-align: right !important;
-        border-radius: 6px;
+        border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        border: 1px solid #E2E8F0;
     }
     table.custom-table th, table.custom-table td {
-        border: 1px solid #E2E8F0;
-        padding: 8px 12px;
+        border-bottom: 1px solid #E2E8F0;
+        border-left: 1px solid #F1F5F9;
+        padding: 10px 14px;
         text-align: right !important;
-        font-size: 12px;
-        color: #0F172A !important;
+        font-size: 12.5px;
+        color: #1E293B !important;
         background-color: #FFFFFF !important;
     }
     table.custom-table th {
-        background-color: #F1F5F9 !important;
+        background-color: #F8FAFC !important;
         font-weight: bold;
         color: #1E3A8A !important;
+        border-bottom: 2px solid #CBD5E1;
+    }
+    table.custom-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    /* 📝 مناطق النماذج والإدخال */
+    .entry-form-area {
+        background: #FFFFFF;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        border: 1px solid #E2E8F0;
+        margin-bottom: 15px;
     }
     
     @media print {
@@ -465,11 +496,13 @@ st.markdown("""
         table.custom-table {
             width: 100% !important;
             margin-top: 15px !important;
+            box-shadow: none !important;
+            border: 1px solid #000 !important;
         }
     }
     </style>
     
-    <!-- سكريبت جافاسكريبت فوري لإزالة السمات المظلمة وفرض اللون الأبيض على التقويم المنبثق -->
+    <!-- سكريبت جافاسكريبت فوري لضمان ظهور عناصر التقويم والواجهة بوضوح تام -->
     <script>
     const forceWhiteCalendar = () => {
         const popovers = document.querySelectorAll('div[data-baseweb="popover"], div[data-baseweb="calendar"], div[role="dialog"]');
@@ -514,10 +547,10 @@ def render_printable_table(df):
 
 def render_company_header():
     info = st.session_state.company_info
-    logo_html = '<div style="padding: 4px 8px; border: 1px dashed rgba(255,255,255,0.4); border-radius: 4px; font-size: 9px; color: white;">🏢 الشعار</div>'
+    logo_html = '<div style="padding: 6px 12px; border: 1px dashed rgba(255,255,255,0.4); border-radius: 8px; font-size: 10px; color: white; background: rgba(255,255,255,0.05);">🏢 الشعار</div>'
     if info.get("logo") is not None:
         try:
-            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 45px; max-width: 90px; object-fit: contain; background: white; border-radius: 4px; padding: 2px;" />'
+            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 50px; max-width: 100px; object-fit: contain; background: white; border-radius: 6px; padding: 3px;" />'
         except Exception:
             pass
             
@@ -545,9 +578,9 @@ def render_company_header():
 if not st.session_state.is_authenticated:
     st.markdown(
         f"""
-        <div style="max-width: 450px; margin: 60px auto; background: #FFFFFF; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; direction: rtl;">
-            <h2 style="color: #1E3A8A; margin-bottom: 12px; font-size: 20px;">🔐 تسجيل الدخول للنظام</h2>
-            <p style="color: #64748B; font-size: 13px; margin-bottom: 20px;">{company_display_name} | رخصة التشغيل: {company_license}</p>
+        <div style="max-width: 440px; margin: 70px auto; background: #FFFFFF; padding: 35px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.06); text-align: center; direction: rtl; border: 1px solid #E2E8F0;">
+            <h2 style="color: #1E3A8A; margin-bottom: 12px; font-size: 21px;">🔐 تسجيل الدخول للنظام</h2>
+            <p style="color: #64748B; font-size: 13px; margin-bottom: 22px;">{company_display_name} | رخصة التشغيل: {company_license}</p>
         </div>
         """,
         unsafe_allow_html=True
@@ -580,7 +613,7 @@ if not st.session_state.is_authenticated:
 render_company_header()
 
 # =========================================================
-# 🗂️ القائمة الجانبية الثابتة والواضحة
+# 🗂️ القائمة الجانبية الثابتة والمنسقة (مع صندوق البحث كقسم رئيسي)
 # =========================================================
 with st.sidebar:
     st.markdown("### 🗂️ لوحة التحكم الرئيسية")
@@ -588,6 +621,7 @@ with st.sidebar:
     
     main_menu = st.radio("اختر القسم الرئيسي:", [
         "🏠 الشاشة الرئيسية",
+        "🔍 صندوق البحث الشامل",
         "⏱️ الحضور والانصراف",
         "💰 المعاملات المالية",
         "📝 طلبات الإجازات",
@@ -596,22 +630,27 @@ with st.sidebar:
     ], index=0)
     
     st.markdown("---")
-    st.markdown("### 📋 القائمة التابعة للقسم:")
     
     if main_menu == "🏠 الشاشة الرئيسية":
-        sub_options = ["لوحة المؤشرات والتحكم", "🔍 صندوق البحث المتطور والشامل"]
+        sub_options = ["لوحة المؤشرات والتحكم"]
+        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
+    elif main_menu == "🔍 صندوق البحث الشامل":
+        sub_options = ["محرك البحث المتطور والفلترة"]
+        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     elif main_menu == "⏱️ الحضور والانصراف":
         sub_options = [
             "تسجيل حضور وانصراف", 
             "سجل الحضور والانصراف", 
             "تعديل أو حذف حركة حضور"
         ]
+        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     elif main_menu == "💰 المعاملات المالية":
         sub_options = [
             "تسجيل معاملة مالية", 
             "سجل المعاملات المالية", 
             "تعديل أو حذف معاملة مالية"
         ]
+        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     elif main_menu == "📝 طلبات الإجازات":
         sub_options = [
             "تسجيل طلب إجازة جديد", 
@@ -620,12 +659,14 @@ with st.sidebar:
             "سجل الطلبات المرفوضة", 
             "تعديل أو حذف طلب إجازة"
         ]
+        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     elif main_menu == "👥 شؤون الموظفين":
         sub_options = [
             "إضافة موظف جديد", 
             "سجل الموظفين والأرصدة", 
             "تعديل أو حذف موظف"
         ]
+        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     elif main_menu == "⚙️ الأدوات والنظام":
         sub_options = [
             "إدارة المستخدمين والصلاحيات", 
@@ -636,8 +677,7 @@ with st.sidebar:
             "نسخة احتياطية واستعادة", 
             "مسح البيانات"
         ]
-    
-    choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
+        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     
     st.markdown("---")
     st.markdown(f"**👤 المستخدم:** {st.session_state.current_logged_user}")
@@ -651,11 +691,12 @@ with st.sidebar:
         st.rerun()
 
 # =========================================================
-# 🔍 صندوق البحث المتطور والشامل (قسم مستقل)
+# 🔍 صندوق البحث المتطور والشامل (قسم رئيسي مستقل)
 # =========================================================
-if choice == "🔍 صندوق البحث المتطور والشامل":
+if main_menu == "🔍 صندوق البحث الشامل" or choice == "محرك البحث المتطور والفلترة":
     st.markdown(f'<div class="section-header">🔍 صندوق البحث المتطور والشامل في قواعد بيانات الشركة</div>', unsafe_allow_html=True)
     
+    st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     with st.form("advanced_search_form"):
         col_s1, col_s2, col_s3 = st.columns(3)
         with col_s1:
@@ -667,6 +708,7 @@ if choice == "🔍 صندوق البحث المتطور والشامل":
             search_target_section = st.selectbox("نطاق البحث في النظام:", ["جميع السجلات (شامل)", "سجل الموظفين والأرصدة", "سجل الحضور والانصراف", "سجل طلبات الإجازات", "سجل المعاملات المالية"])
             
         submit_adv_search = st.form_submit_button("🔍 تنفيذ البحث المتطور", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
         
     if submit_adv_search or True:
         keyword = search_keyword.strip().lower()
@@ -792,6 +834,7 @@ elif choice == "لوحة المؤشرات والتحكم" or choice == "الشا
     
     st.markdown(f'<div class="section-header">📊 الرسم البياني التحليلي لإحصائيات وأرصدة الموظفين</div>', unsafe_allow_html=True)
     
+    st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     col_f_type, col_f_val, col_p_btn = st.columns([2, 2, 1])
     with col_f_type:
         chart_filter_type = st.selectbox("تصفية المخطط للطباعة حسب:", ["عرض الكل", "فرع معين", "موظف معين"])
@@ -825,7 +868,7 @@ elif choice == "لوحة المؤشرات والتحكم" or choice == "الشا
                     color: white;
                     padding: 8px 14px;
                     border: none;
-                    border-radius: 4px;
+                    border-radius: 6px;
                     font-size: 13px;
                     font-weight: bold;
                     cursor: pointer;
@@ -833,10 +876,11 @@ elif choice == "لوحة المؤشرات والتحكم" or choice == "الشا
                     font-family: 'Tahoma', sans-serif;
                     width: 100%;
                 ">
-                    🖨️ طباعة المخطط فقط
+                    🖨️ طباعة المخطط
                 </button>
             </div>
         """, height=45)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     if not filtered_chart_emps.empty:
         st.markdown(f'<div style="text-align: right; direction: rtl; font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1E3A8A;">📌 {chart_subtitle}</div>', unsafe_allow_html=True)
@@ -885,6 +929,7 @@ elif choice == "تسجيل حضور وانصراف":
     if not emp_names:
         st.warning("لا توجد موظفون متاحون.")
     else:
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with st.form("attendance_record_form"):
             col_f1, col_f2, col_f3 = st.columns([2, 2, 2])
             with col_f1:
@@ -979,6 +1024,7 @@ elif choice == "تسجيل حضور وانصراف":
                 auto_save_data()
                 st.success("تم تسجيل حركة الحضور والانصراف وحساب كافة الأوقات بالدقيقة بنجاح!")
                 st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # ⏱️ 2. سجل الحضور والانصراف
@@ -1020,6 +1066,7 @@ elif choice == "تعديل أو حذف حركة حضور":
         
         row_to_edit = st.session_state.attendance.loc[selected_att_idx]
         
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with st.form("edit_attendance_full_form"):
             st.markdown(f"**تعديل تفاصيل حركة الحضور للموظف: {row_to_edit['اسم الموظف']} (بتاريخ {row_to_edit['التاريخ']})**")
             
@@ -1067,6 +1114,7 @@ elif choice == "تعديل أو حذف حركة حضور":
                 auto_save_data()
                 st.error("تم حذف الحركة بنجاح!")
                 st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # 💰 1. تسجيل معاملة مالية
@@ -1078,6 +1126,7 @@ elif choice == "تسجيل معاملة مالية":
     if not emp_names:
         st.warning("لا توجد موظفون مسجلون.")
     else:
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with st.form("financial_transaction_form"):
             col_m1, col_m2, col_m3 = st.columns([2, 2, 2])
             with col_m1:
@@ -1120,6 +1169,7 @@ elif choice == "تسجيل معاملة مالية":
                 auto_save_data()
                 st.success("تم تسجيل المعاملة المالية بنجاح!")
                 st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # 💰 2. سجل المعاملات المالية
@@ -1146,6 +1196,7 @@ elif choice == "تعديل أو حذف معاملة مالية":
         
         fin_to_edit = st.session_state.financial_transactions.loc[selected_fin_idx]
         
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with st.form("edit_fin_form"):
             st.markdown(f"**تعديل المعاملة المالية للموظف: {fin_to_edit['اسم الموظف']}**")
             ed_f_emp = st.text_input("اسم الموظف", value=str(fin_to_edit["اسم الموظف"]))
@@ -1176,6 +1227,7 @@ elif choice == "تعديل أو حذف معاملة مالية":
                 auto_save_data()
                 st.error("تم حذف المعاملة المالية بنجاح!")
                 st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # 📝 1. تسجيل طلب إجازة جديد
@@ -1188,6 +1240,7 @@ elif choice == "تسجيل طلب إجازة جديد":
     if not emp_list:
         st.warning("لا توجد موظفون متاحون لتسجيل إجازة لهم.")
     else:
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with st.form("leave_form"):
             emp_name = st.selectbox("اسم الموظف", emp_list)
             leave_type = st.selectbox("نوع الإجازة", [
@@ -1197,7 +1250,7 @@ elif choice == "تسجيل طلب إجازة جديد":
             with col_d1: start_date = st.date_input("من تاريخ")
             with col_d2: end_date = st.date_input("إلى تاريخ")
             reason = st.text_area("سبب الإجازة / ملاحظات إضافية")
-            submit_leave = st.form_submit_button("إرسال طلب الإجازة للمراجعة")
+            submit_leave = st.form_submit_button("إرسال طلب الإجازة للمراجعة", use_container_width=True)
             
             if submit_leave:
                 days = (end_date - start_date).days + 1
@@ -1217,6 +1270,7 @@ elif choice == "تسجيل طلب إجازة جديد":
                     st.session_state.requests = pd.concat([st.session_state.requests, pd.DataFrame([new_req])], ignore_index=True)
                     auto_save_data()
                     st.success("تم تقديم طلب الإجازة وحفظه تلقائياً في ملف الشركة!")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # 📝 2. سجل طلبات قيد الانتظار
@@ -1266,6 +1320,7 @@ elif choice == "تعديل أو حذف طلب إجازة":
         
         req_to_edit = st.session_state.requests.loc[selected_req_idx]
         
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with st.form("edit_req_form"):
             st.markdown(f"**تعديل طلب الإجازة رقم #{req_to_edit['رقم الطلب']} للموظف: {req_to_edit['اسم الموظف']}**")
             
@@ -1305,6 +1360,7 @@ elif choice == "تعديل أو حذف طلب إجازة":
                 auto_save_data()
                 st.error("تم حذف طلب الإجازة بنجاح!")
                 st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # 👥 1. إضافة موظف جديد
@@ -1312,6 +1368,7 @@ elif choice == "تعديل أو حذف طلب إجازة":
 elif choice == "إضافة موظف جديد":
     st.subheader(f"👥 1. إضافة موظف جديد - {company_display_name}")
     
+    st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     with st.form("new_employee_form_full"):
         c_code = st.text_input("كود الموظف")
         c_name = st.text_input("اسم الموظف الكامل")
@@ -1342,6 +1399,7 @@ elif choice == "إضافة موظف جديد":
                 auto_save_data()
                 st.success("تم إضافة الموظف بنجاح!")
                 st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # 👥 2. سجل الموظفين والأرصدة
@@ -1368,6 +1426,7 @@ elif choice == "تعديل أو حذف موظف":
         
         emp_to_edit = st.session_state.employees.loc[selected_emp_idx]
         
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with st.form("edit_emp_form"):
             st.markdown(f"**تعديل بيانات الموظف: {emp_to_edit['اسم الموظف']} (كود: {emp_to_edit['كود الموظف']})**")
             
@@ -1403,12 +1462,14 @@ elif choice == "تعديل أو حذف موظف":
                 auto_save_data()
                 st.error("تم حذف الموظف بنجاح!")
                 st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # ⚙️ 1. إدارة المستخدمين والصلاحيات
 # =========================================================
 elif choice == "إدارة المستخدمين والصلاحيات":
     st.subheader("🔒 1. إدارة مستخدمي النظام والصلاحيات")
+    st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     with st.form("new_user_form"):
         u_username = st.text_input("اسم المستخدم (للدخول مثل: supervisor1)")
         u_fullname = st.text_input("الاسم الكامل للمستخدم")
@@ -1416,13 +1477,14 @@ elif choice == "إدارة المستخدمين والصلاحيات":
         u_dept = st.text_input("القسم التابع له")
         u_role = st.selectbox("الصلاحية والدور في النظام", ["مشرف عام (Admin)", "مدير شؤون إدارية", "متابع فرع", "موظف إدخال"])
         u_pattern = st.text_input("الرسم السري (مثل: 1-2-3)")
-        if st.form_submit_button("حفظ المستخدم الجديد"):
+        if st.form_submit_button("حفظ المستخدم الجديد", use_container_width=True):
             if u_username and u_pattern:
                 new_u = {"اسم المستخدم": u_username, "الاسم الكامل": u_fullname, "الفرع التابع": u_branch, "القسم التابع": u_dept, "الصلاحية": u_role, "البريد الإلكتروني": "user@company.com", "الحالة": "نشط", "الرسم السري": u_pattern}
                 st.session_state.users = pd.concat([st.session_state.users, pd.DataFrame([new_u])], ignore_index=True)
                 auto_save_data()
                 st.success("تم إضافة المستخدم بنجاح!")
                 st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
     render_printable_table(st.session_state.users.drop(columns=["الرسم السري"], errors="ignore"))
 
 # =========================================================
@@ -1536,6 +1598,7 @@ elif choice == "إعدادات الشركة":
         
     info = st.session_state.company_info
     
+    st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     with st.form("company_settings_direct_form"):
         c_name = st.text_input("اسم الشركة", value=info.get("name", ""))
         c_address = st.text_input("عنوان الشركة", value=info.get("address", ""))
@@ -1564,12 +1627,14 @@ elif choice == "إعدادات الشركة":
             auto_save_data()
             st.success("تم تحديث إعدادات وحفظ بيانات الشركة بنجاح!")
             st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # ⚙️ 5. تصدير وتحميل Excel
 # =========================================================
 elif choice == "تصدير وتحميل Excel":
     st.subheader("📥 5. تصدير وتحميل بيانات النظام بصيغة Excel")
+    st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         st.session_state.employees.to_excel(writer, sheet_name='الموظفين', index=False)
@@ -1577,13 +1642,15 @@ elif choice == "تصدير وتحميل Excel":
         st.session_state.attendance.to_excel(writer, sheet_name='الحضور والانصراف', index=False)
         st.session_state.financial_transactions.to_excel(writer, sheet_name='السلف والماليات', index=False)
     output.seek(0)
-    st.download_button(label="تحميل ملف الإكسيل الآن", data=output, file_name=f"Leave_System_{company_id}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    st.download_button(label="📥 تحميل ملف الإكسيل الآن", data=output, file_name=f"Leave_System_{company_id}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # ⚙️ 6. نسخة احتياطية واستعادة
 # =========================================================
 elif choice == "نسخة احتياطية واستعادة":
     st.subheader("💾 6. النسخ الاحتياطي والاستعادة")
+    st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     backup_dict = {
         "employees": st.session_state.employees.to_dict(orient='records'),
         "requests": st.session_state.requests.to_dict(orient='records'),
@@ -1592,13 +1659,15 @@ elif choice == "نسخة احتياطية واستعادة":
         "users": st.session_state.users.to_dict(orient='records'),
         "company_info": st.session_state.company_info
     }
-    st.download_button("تحميل النسخة الاحتياطية (JSON)", data=json.dumps(backup_dict, ensure_ascii=False, indent=4), file_name=f"backup_{company_id}.json", mime="application/json")
+    st.download_button("💾 تحميل النسخة الاحتياطية (JSON)", data=json.dumps(backup_dict, ensure_ascii=False, indent=4), file_name=f"backup_{company_id}.json", mime="application/json")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # ⚙️ 7. مسح البيانات
 # =========================================================
 elif choice == "مسح البيانات":
     st.subheader("🗑️ 7. مسح وحذف كافة بيانات الشركة")
+    st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     confirm_text = st.text_input("اكتب 'تأكيد الحذف' للتأكيد:")
     if confirm_text == "تأكيد الحذف" and st.button("حذف كافة البيانات نهائياً", type="primary"):
         st.session_state.employees = pd.DataFrame(columns=["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "صلاحية الموظف", "الراتب الأساسي", "رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي", "رصيد أسبوعي (إجمالي)", "أسبوعي مستهلك", "أسبوعي متبقي", "رصيد رسمي (إجمالي)", "رسمي مستهلك", "رسمي متبقي", "إجازات مرضية (أيام)"])
@@ -1608,3 +1677,4 @@ elif choice == "مسح البيانات":
         auto_save_data()
         st.success("تم مسح كافة البيانات بنجاح!")
         st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
