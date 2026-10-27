@@ -8,7 +8,7 @@ import base64
 import json
 import os
 
-# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة مع السماح بفتح القائمة الجانبية (الهامبرغر)
+# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة
 st.set_page_config(
     page_title="النظام المتكامل لإدارة الموارد البشرية",
     page_icon="🏢",
@@ -199,7 +199,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS الزجاجي وتخصيص قائمة الهامبرغر الجانبية
+# 🎨 تصميم CSS الزجاجي وتفعيل خاصية التثبيت (Sticky Menu) لهيدر الشركة وقائمة التنقل
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: visible !important; background-color: transparent !important; }
@@ -221,7 +221,20 @@ st.markdown("""
         min-height: 100vh;
     }
     
-    /* 📱 تنسيق القائمة الجانبية (الهامبرغر ☰) الزجاجية الفاخرة */
+    /* 📌 إبقاء هيدر الشركة في أعلى الشاشة أثناء التمرير (Sticky Header) */
+    .sticky-header-container {
+        position: sticky;
+        top: 0rem;
+        z-index: 999;
+        background: rgba(235, 230, 240, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding-top: 10px;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+    /* 📱 تنسيق القائمة الجانبية (الهامبرغر ☰) الزجاجية */
     [data-testid="stSidebar"] {
         background: rgba(255, 255, 255, 0.9) !important;
         backdrop-filter: blur(20px) !important;
@@ -258,27 +271,26 @@ st.markdown("""
     
     /* 🏢 هيدر الشركة الزجاجي */
     .glass-header {
-        background: rgba(255, 255, 255, 0.75);
+        background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.9);
         color: #2D3748 !important;
-        padding: 24px 30px;
+        padding: 18px 24px;
         border-radius: 20px;
-        margin-bottom: 18px !important;
         width: 100%;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         box-sizing: border-box;
     }
     .header-top-system {
         text-align: center !important;
         width: 100%;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-        padding-bottom: 10px;
+        padding-bottom: 8px;
     }
     .header-top-system h2 {
-        font-size: 17px !important;
+        font-size: 16px !important;
         font-weight: bold !important;
         color: #4C1D95 !important;
         margin: 0 !important;
@@ -298,16 +310,16 @@ st.markdown("""
         align-items: center;
     }
     .comp-name-txt {
-        font-size: 18px !important;
+        font-size: 17px !important;
         font-weight: bold !important;
-        margin-bottom: 6px !important;
+        margin-bottom: 4px !important;
         color: #1A202C !important;
     }
     .comp-info-txt {
-        font-size: 13px !important;
-        margin: 3px 0 !important;
+        font-size: 12.5px !important;
+        margin: 2px 0 !important;
         color: #718096 !important;
-        line-height: 1.5;
+        line-height: 1.4;
     }
     
     /* 📊 بطاقات مؤشرات الأداء الزجاجية */
@@ -408,7 +420,7 @@ st.markdown("""
             margin: 0 !important;
             padding: 0 !important;
         }
-        button, .stButton, iframe, div[data-testid="stHeader"], .no-print, .entry-form-area, hr { display: none !important; }
+        button, .stButton, iframe, div[data-testid="stHeader"], .no-print, .entry-form-area, hr, .sticky-header-container { display: none !important; }
         .glass-header { background: #FFFFFF !important; border: 1.5px solid #4C1D95; box-shadow: none; }
         table.custom-table { width: 100% !important; border: 1.5px solid #4C1D95 !important; }
         table.custom-table th { background-color: #4C1D95 !important; color: #FFFFFF !important; }
@@ -431,10 +443,10 @@ def render_printable_table(df):
 
 def render_company_header():
     info = st.session_state.company_info
-    logo_html = '<div style="padding: 12px 18px; border: 1.5px dashed rgba(76,29,149,0.3); border-radius: 12px; font-size: 13px; color: #4C1D95; background: rgba(255,255,255,0.6); font-weight: bold;">🏢 شعار الشركة</div>'
+    logo_html = '<div style="padding: 10px 15px; border: 1.5px dashed rgba(76,29,149,0.3); border-radius: 12px; font-size: 12px; color: #4C1D95; background: rgba(255,255,255,0.6); font-weight: bold;">🏢 شعار الشركة</div>'
     if info.get("logo") is not None:
         try:
-            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 90px; max-width: 180px; object-fit: contain; background: white; border-radius: 10px; padding: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />'
+            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 75px; max-width: 150px; object-fit: contain; background: white; border-radius: 10px; padding: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />'
         except Exception:
             pass
             
@@ -509,12 +521,14 @@ with st.sidebar:
         st.rerun()
 
 # ---------------------------------------------------------
-# 🎯 1. عرض هيدر الشركة أولاً
+# 🎯 1. وضع هيدر الشركة والمكونات داخل الحاوية المثبتة (Sticky Header Container)
 # ---------------------------------------------------------
+st.markdown('<div class="sticky-header-container">', unsafe_allow_html=True)
 render_company_header()
+st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# 🎯 2. بطاقات المؤشرات الأربعة مباشرة تحت الهيدر
+# 🎯 2. بطاقات المؤشرات الأربعة
 # ---------------------------------------------------------
 branch_filter = st.session_state.current_user_branch
 dept_filter = st.session_state.current_user_dept
@@ -543,7 +557,7 @@ with col4:
     st.markdown(f'<div class="glass-card" style="border-right-color: #2563EB;"><div class="glass-card-title">💰 إجمالي الرواتب الأساسية</div><div class="glass-card-value" style="font-size: 22px; color: #2563EB;">{total_payroll_est:,.0f} ج.م</div></div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# 🎯 3. قائمة التنقل الضخمة (Mega Menu الشبكية الفاخرة)
+# 🎯 3. قائمة التنقل الضخمة (Mega Menu الفاخرة)
 # ---------------------------------------------------------
 st.markdown("<br>", unsafe_allow_html=True)
 
