@@ -199,7 +199,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS الزجاجي العصري المتطابق مع الصورة (Glassmorphic Dashboard UI) وإخفاء الشريط الجانبي تماماً
+# 🎨 تصميم CSS الزجاجي العصري وتجاوب الشاشات
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -303,7 +303,7 @@ st.markdown("""
         line-height: 1.5;
     }
     
-    /* 📊 بطاقات مؤشرات الأداء الزجاجية (Glass Cards) */
+    /* 📊 بطاقات مؤشرات الأداء الزجاجية */
     .glass-card {
         background: rgba(255, 255, 255, 0.75);
         backdrop-filter: blur(15px);
@@ -493,7 +493,7 @@ if not st.session_state.is_authenticated:
 render_company_header()
 
 # ---------------------------------------------------------
-# 🎯 2. بطاقات المؤشرات الأربعة مباشرة تحت الهيدر (مطابق تماماً للصورة)
+# 🎯 2. بطاقات المؤشرات الأربعة مباشرة تحت الهيدر
 # ---------------------------------------------------------
 branch_filter = st.session_state.current_user_branch
 dept_filter = st.session_state.current_user_dept
@@ -522,7 +522,7 @@ with col4:
     st.markdown(f'<div class="glass-card" style="border-right-color: #2563EB;"><div class="glass-card-title">💰 إجمالي الرواتب الأساسية</div><div class="glass-card-value" style="font-size: 22px; color: #2563EB;">{total_payroll_est:,.0f} ج.م</div></div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# 🎯 3. تحويل أقسام القائمة الجانبية إلى أزرار أفقية فاخرة (Tabs) تحت لوحة التحكم مباشرة
+# 🎯 3. تحويل أقسام القائمة الجانبية إلى أزرار أفقية فاخرة تحت لوحة التحكم
 # ---------------------------------------------------------
 st.markdown("<br>", unsafe_allow_html=True)
 main_menu = st.radio(
