@@ -4,6 +4,7 @@ import pandas as pd
 from datetime import datetime, date
 import json
 import os
+import io
 
 # ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة مع إخفاء القائمة الجانبية تماماً
 st.set_page_config(
@@ -338,7 +339,7 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    /* 🖨️ إعدادات الطباعة: خلفية بيضاء، نصوص سوداء، إظهار الهيدر والمستخدم، وإخفاء شريط الأقسام تماماً */
+    /* 🖨️ إعدادات الطباعة */
     @media print {
         @page { size: A4 landscape; margin: 10mm; }
         body, .stApp, .block-container {
@@ -392,6 +393,10 @@ if 'current_logged_user' not in st.session_state: st.session_state.current_logge
 if 'current_user_dept' not in st.session_state: st.session_state.current_user_dept = ""
 if 'current_user_branch' not in st.session_state: st.session_state.current_user_branch = ""
 if 'current_user_role' not in st.session_state: st.session_state.current_user_role = ""
+
+# تهيئة حالة التنقل بين الأقسام عبر الأزرار
+if 'selected_main_cat' not in st.session_state: st.session_state.selected_main_cat = "الرئيسية"
+if 'choice' not in st.session_state: st.session_state.choice = "لوحة التحكم والمؤشرات"
 
 def render_printable_table(df):
     if df.empty:
@@ -469,24 +474,47 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 3. خانات الأقسام والعمليات الفرعية المنسدلة المتجاورة (تختفي تلقائياً عند الطباعة)
+# 3. لوحة التحكم وأزرار التنقل السريعة (Buttons) بدلاً من القوائم المنسدلة
 st.markdown('<div class="cinema-top-bar" style="margin: 0; box-shadow: none;">', unsafe_allow_html=True)
-col_nav1, col_nav2, col_nav3 = st.columns([1.5, 2.5, 1])
 
-with col_nav1:
-    selected_main_cat = st.selectbox("📂 القسم الرئيسي:", [
-        "الرئيسية", 
-        "الحضور والانصراف", 
-        "طلبات الاجازة", 
-        "المعاملات المالية", 
-        "كشف الرواتب", 
-        "شؤون الموظفين", 
-        "المستخدمين", 
-        "التقارير", 
-        "اعدادات الشركة", 
-        "أدوات النظام"
-    ], label_visibility="collapsed")
+main_cats = [
+    "الرئيسية", 
+    "الحضور والانصراف", 
+    "طلبات الاجازة", 
+    "المعاملات المالية", 
+    "كشف الرواتب", 
+    "شؤون الموظفين", 
+    "المستخدمين", 
+    "التقارير", 
+    "اعدادات الشركة", 
+    "أدوات النظام"
+]
 
+# عرض الأقسام الرئيسية في صف أفقي من الأزرار
+cols_main = st.columns(len(main_cats))
+for idx, cat in enumerate(main_cats):
+    with cols_main[idx]:
+        is_active = (st.session_state.selected_main_cat == cat)
+        btn_type = "primary" if is_active else "secondary"
+        if st.button(cat, key=f"main_btn_{idx}", use_container_width=True, type=btn_type):
+            st.session_state.selected_main_cat = cat
+            # تعيين الخيار الفرعي الافتراضي عند النقر على القسم الرئيسي
+            sub_map_default = {
+                "الرئيسية": "لوحة التحكم والمؤشرات",
+                "الحضور والانصراف": "تسجيل حضور وانصراف",
+                "طلبات الاجازة": "تسجيل طلب إجازة",
+                "المعاملات المالية": "تسجيل معاملة مالية",
+                "كشف الرواتب": "كشف الرواتب والمستحقات الشامل",
+                "شؤون الموظفين": "إضافة موظف جديد",
+                "المستخدمين": "إدارة المستخدمين والصلاحيات",
+                "التقارير": "طباعة التقارير العامة",
+                "اعدادات الشركة": "إعدادات الشركة وبياناتها",
+                "أدوات النظام": "تصدير وتحميل Excel"
+            }
+            st.session_state.choice = sub_map_default.get(cat, "لوحة التحكم والمؤشرات")
+            st.rerun()
+
+# خريطة العمليات الفرعية لكل قسم رئيسي
 sub_options_map = {
     "الرئيسية": ["لوحة التحكم والمؤشرات"],
     "الحضور والانصراف": ["تسجيل حضور وانصراف", "سجل الحضور والانصراف", "تعديل أو حذف حركة حضور"],
@@ -500,15 +528,24 @@ sub_options_map = {
     "أدوات النظام": ["تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"]
 }
 
-with col_nav2:
-    sub_options_list = sub_options_map.get(selected_main_cat, ["لوحة التحكم والمؤشرات"])
-    choice = st.selectbox("📑 العمليات الفرعية:", sub_options_list, label_visibility="collapsed")
+# عرض العمليات الفرعية كأزرار متجاورة للقسم المختار حالياً
+current_subs = sub_options_map.get(st.session_state.selected_main_cat, [])
+if len(current_subs) > 1:
+    st.markdown("<div style='margin-top: 8px;'></div>", unsafe_allow_html=True)
+    cols_sub = st.columns(len(current_subs))
+    for s_idx, sub_opt in enumerate(current_subs):
+        with cols_sub[s_idx]:
+            is_sub_active = (st.session_state.choice == sub_opt)
+            sub_btn_type = "primary" if is_sub_active else "secondary"
+            if st.button(sub_opt, key=f"sub_btn_{s_idx}", use_container_width=True, type=sub_btn_type):
+                st.session_state.choice = sub_opt
+                st.rerun()
 
-with col_nav3:
-    if st.button("⏹️ خروج", use_container_width=True):
-        st.session_state.is_authenticated = False
-        st.session_state.current_logged_user = ""
-        st.rerun()
+# زر الخروج السريع
+if st.button("⏹️ تسجيل الخروج", use_container_width=True, type="secondary"):
+    st.session_state.is_authenticated = False
+    st.session_state.current_logged_user = ""
+    st.rerun()
 
 st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)  # إغلاق الحاوية المثبتة
@@ -542,8 +579,11 @@ with col4:
 st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 15px 0 25px 0;'>", unsafe_allow_html=True)
 
 # =========================================================
-# منطق عرض الشاشات والأقسام حسب الاختيار المنسدل
+# منطق عرض الشاشات والأقسام حسب الأزرار المختارة
 # =========================================================
+selected_main_cat = st.session_state.selected_main_cat
+choice = st.session_state.choice
+
 if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم والمؤشرات":
     st.markdown(f'<div class="section-header">📊 لوحة إحصائيات وأرصدة الموظفين</div>', unsafe_allow_html=True)
     render_printable_table(view_employees)
