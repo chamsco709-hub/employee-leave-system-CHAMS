@@ -76,18 +76,18 @@ def load_company_data():
                     df_att = pd.DataFrame(data["attendance"])
                     expected_att_cols = [
                         "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", 
-                        "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", 
-                        "الحالة", "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"
+                        "وقت الحضور الفعلي", "وقت الانصراف الفعلي", "ساعات العمل الفعلية", 
+                        "فترة السماح (دقيقة)", "الحالة", "التأخير (دقيقة)", "إضافي (دقيقة)"
                     ]
                     for col in expected_att_cols:
                         if col not in df_att.columns:
-                            df_att[col] = 0 if "(دقيقة)" in col else ""
+                            df_att[col] = 0 if "(دقيقة)" in col or "ساعات" in col else ""
                     st.session_state.attendance = df_att[expected_att_cols]
                 else:
                     st.session_state.attendance = pd.DataFrame(columns=[
                         "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", 
-                        "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", 
-                        "الحالة", "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"
+                        "وقت الحضور الفعلي", "وقت الانصراف الفعلي", "ساعات العمل الفعلية", 
+                        "فترة السماح (دقيقة)", "الحالة", "التأخير (دقيقة)", "إضافي (دقيقة)"
                     ])
 
                 if "financial_transactions" in data and len(data["financial_transactions"]) > 0:
@@ -124,8 +124,8 @@ def load_company_data():
         ])
         st.session_state.attendance = pd.DataFrame(columns=[
             "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", 
-            "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", 
-            "الحالة", "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"
+            "وقت الحضور الفعلي", "وقت الانصراف الفعلي", "ساعات العمل الفعلية", 
+            "فترة السماح (دقيقة)", "الحالة", "التأخير (دقيقة)", "إضافي (دقيقة)"
         ])
         st.session_state.financial_transactions = pd.DataFrame(columns=[
             "التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "النوع", "المبلغ / القيمة", "البيان / السبب"
@@ -598,7 +598,7 @@ if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم �
     render_printable_table(view_employees)
 
 elif choice == "تسجيل حضور وانصراف":
-    st.subheader("⏱️ تسجيل حركة حضور / انصراف (ساعات ودقائق من 00 إلى 59 مع AM/PM)")
+    st.subheader("⏱️ تسجيل حركة الحضور والانصراف (مع حساب الساعات الفعلية وفترة السماح)")
     emp_names = st.session_state.employees["اسم الموظف"].tolist()
     if emp_names:
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
@@ -613,27 +613,21 @@ elif choice == "تسجيل حضور وانصراف":
             st.info(f"📍 الفرع: {c_branch} &nbsp;|&nbsp; 💼 الوظيفة: {c_job}")
             
             st.markdown("---")
-            st.markdown("🕒 **المواعيد الرسمية للشركة:**")
-            col_r1, col_r2, col_r3 = st.columns(3)
-            with col_r1: start_h = st.selectbox("ساعة البداية", list(range(1, 13)), index=7)
-            with col_r2: start_m = st.selectbox("دقيقة البداية (00-59)", list(range(0, 60)), index=0)
-            with col_r3: start_ampm = st.selectbox("فترة البداية", ["AM", "PM"], index=0)
-            
-            col_e1, col_e2, col_e3 = st.columns(3)
-            with col_e1: end_h = st.selectbox("ساعة النهاية", list(range(1, 13)), index=3)
-            with col_e2: end_m = st.selectbox("دقيقة النهاية (00-59)", list(range(0, 60)), index=0)
-            with col_e3: end_ampm = st.selectbox("فترة النهاية", ["AM", "PM"], index=1)
+            st.markdown("🕒 **إعدادات الدوام وفترة السماح:**")
+            col_gr1, col_gr2 = st.columns(2)
+            with col_gr1:
+                standard_hours = st.number_input("عدد ساعات العمل القياسية", min_value=1.0, max_value=12.0, value=8.0)
+            with col_gr2:
+                grace_period_min = st.number_input("فترة السماح (بالدقائق)", min_value=0, max_value=60, value=15)
 
             st.markdown("---")
-            st.markdown("⏰ **الأوقات الفعلية (حضور وانصراف الموظف):**")
+            st.markdown("⏰ **الأوقات الفعلية للحضور والانصراف:**")
             
-            st.markdown("📍 **وقت الحضور الفعلي:**")
             col_in1, col_in2, col_in3 = st.columns(3)
             with col_in1: act_in_h = st.selectbox("ساعة الحضور", list(range(1, 13)), index=7, key="ain_h")
             with col_in2: act_in_m = st.selectbox("دقيقة الحضور (00-59)", list(range(0, 60)), index=0, key="ain_m")
             with col_in3: act_in_ampm = st.selectbox("صباحاً / مساءً (حضور)", ["AM", "PM"], index=0, key="ain_ap")
 
-            st.markdown("📍 **وقت الانصراف الفعلي:**")
             col_out1, col_out2, col_out3 = st.columns(3)
             with col_out1: act_out_h = st.selectbox("ساعة الانصراف", list(range(1, 13)), index=3, key="aout_h")
             with col_out2: act_out_m = st.selectbox("دقيقة الانصراف (00-59)", list(range(0, 60)), index=0, key="aout_m")
@@ -642,8 +636,6 @@ elif choice == "تسجيل حضور وانصراف":
             att_status = st.selectbox("حالة الحضور", ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"])
             
             if st.form_submit_button("💾 حساب تلقائي وحفظ الحركة", use_container_width=True):
-                start_work_str = f"{start_h:02d}:{start_m:02d} {start_ampm}"
-                end_work_str = f"{end_h:02d}:{end_m:02d} {end_ampm}"
                 actual_in_str = f"{act_in_h:02d}:{act_in_m:02d} {act_in_ampm}"
                 actual_out_str = f"{act_out_h:02d}:{act_out_m:02d} {act_out_ampm}"
 
@@ -653,14 +645,30 @@ elif choice == "تسجيل حضور وانصراف":
                         hour_24 += 12
                     return hour_24 * 60 + m
 
-                start_total_min = to_minutes(start_h, start_m, start_ampm)
-                end_total_min = to_minutes(end_h, end_m, end_ampm)
                 act_in_total_min = to_minutes(act_in_h, act_in_m, act_in_ampm)
                 act_out_total_min = to_minutes(act_out_h, act_out_m, act_out_ampm)
-
-                tardy_min = max(0, act_in_total_min - start_total_min)
-                early_min = max(0, end_total_min - act_out_total_min)
-                overtime_min = max(0, act_out_total_min - end_total_min)
+                
+                # حساب إجمالي الدقائق الفعلية المنقضية
+                worked_minutes = act_out_total_min - act_in_total_min
+                if worked_minutes < 0:
+                    worked_minutes += 24 * 60  # تجاوز منتصف الليل إذا وجد
+                
+                actual_hours_worked = round(worked_minutes / 60.0, 2)
+                standard_minutes = standard_hours * 60.0
+                
+                diff_minutes = worked_minutes - standard_minutes
+                overtime_min = 0
+                tardy_min = 0
+                
+                if diff_minutes > 0:
+                    overtime_min = int(diff_minutes)
+                elif diff_minutes < 0:
+                    shortage = abs(diff_minutes)
+                    # تطبيق فترة السماح على النقص / التأخير
+                    if shortage > grace_period_min:
+                        tardy_min = int(shortage - grace_period_min)
+                    else:
+                        tardy_min = 0
 
                 new_att = {
                     "التاريخ": str(att_date),
@@ -668,14 +676,13 @@ elif choice == "تسجيل حضور وانصراف":
                     "اسم الموظف": selected_emp,
                     "الوظيفة": c_job,
                     "الفرع": c_branch,
-                    "بداية العمل الرسمية": start_work_str,
-                    "نهاية العمل الرسمية": end_work_str,
                     "وقت الحضور الفعلي": actual_in_str,
                     "وقت الانصراف الفعلي": actual_out_str,
+                    "ساعات العمل الفعلية": actual_hours_worked,
+                    "فترة السماح (دقيقة)": grace_period_min,
                     "الحالة": att_status,
-                    "التأخير الصباحي (دقيقة)": tardy_min,
-                    "انصراف مبكر (دقيقة)": early_min,
-                    "إضافي بعد العمل (دقيقة)": overtime_min
+                    "التأخير (دقيقة)": tardy_min,
+                    "إضافي (دقيقة)": overtime_min
                 }
                 
                 st.session_state.attendance = st.session_state.attendance[
@@ -685,7 +692,7 @@ elif choice == "تسجيل حضور وانصراف":
                 
                 st.session_state.attendance = pd.concat([st.session_state.attendance, pd.DataFrame([new_att])], ignore_index=True)
                 auto_save_data()
-                st.success(f"تم الحساب والحفظ بنجاح! (تأخير: {tardy_min} دقيقة | إضافي: {overtime_min} دقيقة)")
+                st.success(f"تم الحساب والحفظ بنجاح! (ساعات العمل الفعلية: {actual_hours_worked} ساعة | إضافي: {overtime_min} دقيقة | تأخير: {tardy_min} دقيقة)")
                 st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -697,12 +704,12 @@ elif choice == "سجل الحضور والانصراف":
     clean_att_df = st.session_state.attendance.copy()
     expected_cols = [
         "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", 
-        "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", 
-        "الحالة", "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"
+        "وقت الحضور الفعلي", "وقت الانصراف الفعلي", "ساعات العمل الفعلية", 
+        "فترة السماح (دقيقة)", "الحالة", "التأخير (دقيقة)", "إضافي (دقيقة)"
     ]
     for col in expected_cols:
         if col not in clean_att_df.columns:
-            clean_att_df[col] = 0 if "(دقيقة)" in col else ""
+            clean_att_df[col] = 0 if "(دقيقة)" in col or "ساعات" in col else ""
     clean_att_df = clean_att_df[expected_cols].fillna(0)
     render_printable_table(clean_att_df)
 
@@ -895,10 +902,8 @@ elif choice == "كشف الرواتب والمستحقات الشامل":
     with col_t1: st.subheader("💰 كشف الرواتب والتفصيل الشامل (المستحقات والاستقطاعات)")
     with col_t2: render_print_button()
     
-    # 1. الجدول الأساسي للموظفين
     payroll_df = st.session_state.employees[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "الراتب الأساسي"]].copy()
     
-    # 2. معالجة المعاملات المالية وفصلها بدقة للمستحقات (مكافآت، بدلات) والاستقطاعات (سلف، جزاءات، غياب)
     if not st.session_state.financial_transactions.empty:
         fin_df = st.session_state.financial_transactions.copy()
         fin_df["مكافآت وبدلات"] = fin_df.apply(lambda r: r["المبلغ / القيمة"] if r["النوع"] in ["مكافأة (إضافي)", "بدلات"] else 0, axis=1)
@@ -910,37 +915,27 @@ elif choice == "كشف الرواتب والمستحقات الشامل":
         payroll_df["مكافآت وبدلات"] = 0.0
         payroll_df["سلف وجزاءات وغياب"] = 0.0
 
-    # 3. معالجة وحساب إجماليات الحضور (إضافي vs تأخير وانصراف مبكر)
     if not st.session_state.attendance.empty:
-        att_agg = st.session_state.attendance.groupby("كود الموظف")[["التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"]].sum().reset_index()
+        att_agg = st.session_state.attendance.groupby("كود الموظف")[["التأخير (دقيقة)", "إضافي (دقيقة)"]].sum().reset_index()
         payroll_df = payroll_df.merge(att_agg, on="كود الموظف", how="left")
     else:
-        payroll_df["التأخير الصباحي (دقيقة)"] = 0
-        payroll_df["انصراف مبكر (دقيقة)"] = 0
-        payroll_df["إضافي بعد العمل (دقيقة)"] = 0
+        payroll_df["التأخير (دقيقة)"] = 0
+        payroll_df["إضافي (دقيقة)"] = 0
 
     payroll_df = payroll_df.fillna(0)
 
-    # حساب القيم النقدية لدقائق الحضور والانصراف
     minute_rate = payroll_df["الراتب الأساسي"] / 10000
-    payroll_df["قيمة الإضافي"] = payroll_df["إضافي بعد العمل (دقيقة)"] * minute_rate
-    payroll_df["قيمة التأخير والمبكر"] = (payroll_df["التأخير الصباحي (دقيقة)"] + payroll_df["انصراف مبكر (دقيقة)"]) * minute_rate
+    payroll_df["قيمة الإضافي"] = payroll_df["إضافي (دقيقة)"] * minute_rate
+    payroll_df["قيمة التأخير والاستقطاع"] = payroll_df["التأخير (دقيقة)"] * minute_rate
 
-    # 4. تطبيق المعادلة المطلوبة بدقة:
-    # إجمالي المستحقات = الراتب الأساسي + (الإضافي + مكافآت وبدلات)
     payroll_df["إجمالي المستحقات"] = payroll_df["الراتب الأساسي"] + payroll_df["قيمة الإضافي"] + payroll_df["مكافآت وبدلات"]
-    
-    # إجمالي الاستقطاعات = (سلف وجزاءات وغياب) + (قيمة التأخير والمبكر)
-    payroll_df["إجمالي الاستقطاعات"] = payroll_df["سلف وجزاءات وغياب"] + payroll_df["قيمة التأخير والمبكر"]
-    
-    # صافي الراتب = إجمالي المستحقات - إجمالي الاستقطاعات
+    payroll_df["إجمالي الاستقطاعات"] = payroll_df["سلف وجزاءات وغياب"] + payroll_df["قيمة التأخير والاستقطاع"]
     payroll_df["صافي الراتب"] = payroll_df["إجمالي المستحقات"] - payroll_df["إجمالي الاستقطاعات"]
 
-    # تنسيق وتسمية الأعمدة للعرض التفصيلي
     display_payroll_cols = [
         "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", "الراتب الأساسي",
-        "إضافي بعد العمل (دقيقة)", "قيمة الإضافي", "مكافآت وبدلات", "إجمالي المستحقات",
-        "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "قيمة التأخير والمبكر", "سلف وجزاءات وغياب", "إجمالي الاستقطاعات",
+        "إضافي (دقيقة)", "قيمة الإضافي", "مكافآت وبدلات", "إجمالي المستحقات",
+        "التأخير (دقيقة)", "قيمة التأخير والاستقطاع", "سلف وجزاءات وغياب", "إجمالي الاستقطاعات",
         "صافي الراتب"
     ]
     
