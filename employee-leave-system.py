@@ -180,10 +180,7 @@ def render_print_button():
     components.html("""
         <div style="text-align: left; margin-bottom: 15px;" class="no-print">
             <button onclick="
-                const sidebar = window.parent.document.querySelector('[data-testid=\\'stSidebar\\']');
-                if (sidebar) sidebar.style.display = 'none';
                 window.parent.print();
-                setTimeout(() => { if (sidebar) sidebar.style.display = 'block'; }, 1000);
             " style="
                 background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);
                 color: white;
@@ -202,10 +199,11 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS الزجاجي العصري المتطابق تماماً لتخطيط الصورة (Glassmorphic Dashboard UI)
+# 🎨 تصميم CSS الزجاجي العصري المتطابق مع الصورة (Glassmorphic Dashboard UI) وإخفاء الشريط الجانبي تماماً
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
+    [data-testid="stSidebar"] { display: none !important; width: 0px !important; }
     
     html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6, label {
         font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
@@ -222,27 +220,6 @@ st.markdown("""
         max-width: 100% !important;
         background: linear-gradient(135deg, #DFDBE5 0%, #E8E4EC 50%, #CAB6C2 100%) !important;
         min-height: 100vh;
-    }
-    
-    /* 📋 القائمة الجانبية الزجاجية العصرية */
-    [data-testid="stSidebar"] {
-        background: rgba(255, 255, 255, 0.85) !important;
-        backdrop-filter: blur(20px) !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.6);
-        padding-top: 1.5rem;
-        min-width: 320px !important;
-        box-shadow: -10px 0 30px rgba(0,0,0,0.08);
-    }
-    
-    [data-testid="stSidebar"] div, [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] h3 {
-        color: #2D3748 !important;
-        text-align: right !important;
-        direction: rtl !important;
-    }
-    
-    [data-testid="stSidebar"] div[data-baseweb="select"] {
-        background-color: rgba(255, 255, 255, 0.9) !important;
-        border-radius: 12px !important;
     }
     
     div[data-testid="stDateInput"],
@@ -281,7 +258,7 @@ st.markdown("""
         color: #2D3748 !important;
         padding: 24px 30px;
         border-radius: 20px;
-        margin-bottom: 22px !important;
+        margin-bottom: 18px !important;
         width: 100%;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
         box-sizing: border-box;
@@ -424,7 +401,6 @@ st.markdown("""
             margin: 0 !important;
             padding: 0 !important;
         }
-        [data-testid="stSidebar"] { display: none !important; width: 0px !important; }
         button, .stButton, iframe, div[data-testid="stHeader"], .no-print, .entry-form-area, hr { display: none !important; }
         .glass-header { background: #FFFFFF !important; border: 1.5px solid #4C1D95; box-shadow: none; }
         table.custom-table { width: 100% !important; border: 1.5px solid #4C1D95 !important; }
@@ -511,63 +487,14 @@ if not st.session_state.is_authenticated:
                     st.error("❌ الرسم السري غير صحيح!")
     st.stop()
 
-# =========================================================
-# 🗂️ القائمة الجانبية الثابتة والمنسقة
-# =========================================================
-with st.sidebar:
-    st.markdown("### 🗂️ لوحة التحكم الرئيسية")
-    st.markdown("---")
-    
-    main_menu = st.radio("اختر القسم الرئيسي:", [
-        "🏠 الشاشة الرئيسية",
-        "🔍 صندوق البحث الشامل",
-        "⏱️ الحضور والانصراف",
-        "💰 المعاملات المالية",
-        "📝 طلبات الإجازات",
-        "👥 شؤون الموظفين",
-        "⚙️ الأدوات والنظام"
-    ], index=0)
-    
-    st.markdown("---")
-    
-    if main_menu == "🏠 الشاشة الرئيسية":
-        sub_options = ["لوحة المؤشرات والتحكم"]
-        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
-    elif main_menu == "🔍 صندوق البحث الشامل":
-        sub_options = ["محرك البحث المتطور والفلترة"]
-        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
-    elif main_menu == "⏱️ الحضور والانصراف":
-        sub_options = ["تسجيل حضور وانصراف", "سجل الحضور والانصراف", "تعديل أو حذف حركة حضور"]
-        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
-    elif main_menu == "💰 المعاملات المالية":
-        sub_options = ["تسجيل معاملة مالية", "سجل المعاملات المالية", "تعديل أو حذف معاملة مالية"]
-        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
-    elif main_menu == "📝 طلبات الإجازات":
-        sub_options = ["تسجيل طلب إجازة جديد", "سجل طلبات قيد الانتظار", "سجل الطلبات المقبولة", "سجل الطلبات المرفوضة", "تعديل أو حذف طلب إجازة"]
-        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
-    elif main_menu == "👥 شؤون الموظفين":
-        sub_options = ["إضافة موظف جديد", "سجل الموظفين والأرصدة", "تعديل أو حذف موظف"]
-        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
-    elif main_menu == "⚙️ الأدوات والنظام":
-        sub_options = ["إدارة المستخدمين والصلاحيات", "كشف الرواتب والمستحقات", "طباعة التقارير", "إعدادات الشركة", "تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"]
-        choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
-    
-    st.markdown("---")
-    st.markdown(f"**👤 المستخدم:** {st.session_state.current_logged_user}")
-    st.markdown(f"**🛡️ الصلاحية:** {st.session_state.current_user_role}")
-    st.markdown(f"**🏢 الفرع:** {st.session_state.current_user_branch}")
-    
-    st.markdown("---")
-    if st.button("🚪 تسجيل خروج آمن", use_container_width=True):
-        st.session_state.is_authenticated = False
-        st.session_state.current_logged_user = ""
-        st.rerun()
-
 # ---------------------------------------------------------
-# 🎯 ثابتاً في الأعلى: هيدر الشركة يليه مباشرة لوحة مؤشرات الأداء (Glass Cards)
+# 🎯 1. عرض هيدر الشركة أولاً
 # ---------------------------------------------------------
 render_company_header()
 
+# ---------------------------------------------------------
+# 🎯 2. بطاقات المؤشرات الأربعة مباشرة تحت الهيدر (مطابق تماماً للصورة)
+# ---------------------------------------------------------
 branch_filter = st.session_state.current_user_branch
 dept_filter = st.session_state.current_user_dept
 
@@ -594,10 +521,44 @@ with col4:
     total_payroll_est = float(view_employees["الراتب الأساسي"].sum()) if not view_employees.empty and "الراتب الأساسي" in view_employees.columns else 0.0
     st.markdown(f'<div class="glass-card" style="border-right-color: #2563EB;"><div class="glass-card-title">💰 إجمالي الرواتب الأساسية</div><div class="glass-card-value" style="font-size: 22px; color: #2563EB;">{total_payroll_est:,.0f} ج.م</div></div>', unsafe_allow_html=True)
 
-st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.4); margin: 20px 0;'>", unsafe_allow_html=True)
+# ---------------------------------------------------------
+# 🎯 3. تحويل أقسام القائمة الجانبية إلى أزرار أفقية فاخرة (Tabs) تحت لوحة التحكم مباشرة
+# ---------------------------------------------------------
+st.markdown("<br>", unsafe_allow_html=True)
+main_menu = st.radio(
+    "🧭 التنقل السريع بين الأقسام الرئيسية:", 
+    [
+        "🏠 الشاشة الرئيسية",
+        "🔍 صندوق البحث الشامل",
+        "⏱️ الحضور والانصراف",
+        "💰 المعاملات المالية",
+        "📝 طلبات الإجازات",
+        "👥 شؤون الموظفين",
+        "⚙️ الأدوات والنظام"
+    ], 
+    horizontal=True,
+    label_visibility="collapsed"
+)
+st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.4); margin: 15px 0 25px 0;'>", unsafe_allow_html=True)
+
+# تحديد الإجراء الفرعي لكل قسم رئيسي
+if main_menu == "🏠 الشاشة الرئيسية":
+    choice = "لوحة المؤشرات والتحكم"
+elif main_menu == "🔍 صندوق البحث الشامل":
+    choice = "محرك البحث المتطور والفلترة"
+elif main_menu == "⏱️ الحضور والانصراف":
+    choice = st.selectbox("حدد الإجراء المطلوب في الحضور والانصراف:", ["تسجيل حضور وانصراف", "سجل الحضور والانصراف", "تعديل أو حذف حركة حضور"])
+elif main_menu == "💰 المعاملات المالية":
+    choice = st.selectbox("حدد الإجراء المطلوب في المعاملات المالية:", ["تسجيل معاملة مالية", "سجل المعاملات المالية", "تعديل أو حذف معاملة مالية"])
+elif main_menu == "📝 طلبات الإجازات":
+    choice = st.selectbox("حدد الإجراء المطلوب في الإجازات:", ["تسجيل طلب إجازة جديد", "سجل طلبات قيد الانتظار", "سجل الطلبات المقبولة", "سجل الطلبات المرفوضة", "تعديل أو حذف طلب إجازة"])
+elif main_menu == "👥 شؤون الموظفين":
+    choice = st.selectbox("حدد الإجراء المطلوب في شؤون الموظفين:", ["إضافة موظف جديد", "سجل الموظفين والأرصدة", "تعديل أو حذف موظف"])
+elif main_menu == "⚙️ الأدوات والنظام":
+    choice = st.selectbox("حدد الإجراء المطلوب في الأدوات والنظام:", ["إدارة المستخدمين والصلاحيات", "كشف الرواتب والمستحقات", "طباعة التقارير", "إعدادات الشركة", "تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"])
 
 # =========================================================
-# 🔍 صندوق البحث الشامل
+# 🔍 صندوق البحث المتطور والشامل
 # =========================================================
 if main_menu == "🔍 صندوق البحث الشامل" or choice == "محرك البحث المتطور والفلترة":
     st.markdown(f'<div class="section-header">🔍 صندوق البحث المتطور والشامل في قواعد بيانات الشركة</div>', unsafe_allow_html=True)
@@ -745,10 +706,7 @@ elif choice == "لوحة المؤشرات والتحكم" or choice == "الشا
         components.html("""
             <div style="text-align: left;" class="no-print">
                 <button onclick="
-                    const sidebar = window.parent.document.querySelector('[data-testid=\\'stSidebar\\']');
-                    if (sidebar) sidebar.style.display = 'none';
                     window.parent.print();
-                    setTimeout(() => { if (sidebar) sidebar.style.display = 'block'; }, 1000);
                 " style="
                     background-color: #7C3AED;
                     color: white;
@@ -887,6 +845,64 @@ elif choice == "سجل الحضور والانصراف":
     with col_t2: render_print_button()
     render_printable_table(st.session_state.attendance)
 
+elif choice == "تعديل أو حذف حركة حضور":
+    st.subheader("⏱️ 3. تعديل أو حذف حركة تسجيل حضور وانصراف")
+    if st.session_state.attendance.empty:
+        st.info("لا توجد حركات حضور مسجلة حالياً.")
+    else:
+        att_records = [f"الموظف: {row['اسم الموظف']} | التاريخ: {row['التاريخ']} | الحالة: {row['الحالة']}" for _, row in st.session_state.attendance.iterrows()]
+        selected_att_label = st.selectbox("اختر الحركة المراد تعديلها أو حذفها:", att_records)
+        selected_att_idx = att_records.index(selected_att_label)
+        row_to_edit = st.session_state.attendance.loc[selected_att_idx]
+        
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
+        with st.form("edit_attendance_full_form"):
+            st.markdown(f"**تعديل تفاصيل حركة الحضور للموظف: {row_to_edit['اسم الموظف']} (بتاريخ {row_to_edit['التاريخ']})**")
+            ed_emp = st.text_input("اسم الموظف", value=str(row_to_edit["اسم الموظف"]))
+            ed_date = st.text_input("التاريخ", value=str(row_to_edit["التاريخ"]))
+            status_options = ["حضور", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "غياب", "إجازة رسمية", "مأمورية"]
+            current_st_idx = status_options.index(row_to_edit["الحالة"]) if row_to_edit["الحالة"] in status_options else 0
+            ed_status = st.selectbox("حالة اليوم", status_options, index=current_st_idx)
+            
+            col_e1, col_e2 = st.columns(2)
+            with col_e1:
+                ed_start_r = st.text_input("بداية العمل الرسمية", value=str(row_to_edit["بداية العمل الرسمية"]))
+                ed_in_f = st.text_input("وقت الحضور الفعلي", value=str(row_to_edit["وقت الحضور الفعلي"]))
+            with col_e2:
+                ed_end_r = st.text_input("نهاية العمل الرسمية", value=str(row_to_edit["نهاية العمل الرسمية"]))
+                ed_out_f = st.text_input("وقت الانصراف الفعلي", value=str(row_to_edit["وقت الانصراف الفعلي"]))
+            
+            ed_morning_delay = st.number_input("التأخير الصباحي (دقيقة)", min_value=0, value=int(row_to_edit.get("التأخير الصباحي (دقيقة)", 0)))
+            ed_early_leave = st.number_input("انصراف مبكر (دقيقة)", min_value=0, value=int(row_to_edit.get("انصراف مبكر (دقيقة)", 0)))
+            ed_overtime = st.number_input("إضافي بعد العمل (دقيقة)", min_value=0, value=int(row_to_edit.get("إضافي بعد العمل (دقيقة)", 0)))
+            
+            col_btn1, col_btn2 = st.columns(2)
+            with col_btn1:
+                submit_edit_att = st.form_submit_button("💾 حفظ التعديلات", use_container_width=True)
+            with col_btn2:
+                submit_del_att = st.form_submit_button("🗑️ حذف الحركة نهائياً", use_container_width=True)
+                
+            if submit_edit_att:
+                st.session_state.attendance.loc[selected_att_idx, "اسم الموظف"] = ed_emp
+                st.session_state.attendance.loc[selected_att_idx, "التاريخ"] = ed_date
+                st.session_state.attendance.loc[selected_att_idx, "الحالة"] = ed_status
+                st.session_state.attendance.loc[selected_att_idx, "بداية العمل الرسمية"] = ed_start_r
+                st.session_state.attendance.loc[selected_att_idx, "نهاية العمل الرسمية"] = ed_end_r
+                st.session_state.attendance.loc[selected_att_idx, "وقت الحضور الفعلي"] = ed_in_f
+                st.session_state.attendance.loc[selected_att_idx, "وقت الانصراف الفعلي"] = ed_out_f
+                st.session_state.attendance.loc[selected_att_idx, "التأخير الصباحي (دقيقة)"] = ed_morning_delay
+                st.session_state.attendance.loc[selected_att_idx, "انصراف مبكر (دقيقة)"] = ed_early_leave
+                st.session_state.attendance.loc[selected_att_idx, "إضافي بعد العمل (دقيقة)"] = ed_overtime
+                auto_save_data()
+                st.success("تم تعديل تفاصيل حركة الحضور بنجاح!")
+                st.rerun()
+            elif submit_del_att:
+                st.session_state.attendance = st.session_state.attendance.drop(index=selected_att_idx).reset_index(drop=True)
+                auto_save_data()
+                st.error("تم حذف الحركة بنجاح!")
+                st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+
 elif choice == "تسجيل معاملة مالية":
     st.subheader("💰 1. إضافة معاملة مالية جديدة")
     emp_names = st.session_state.employees["اسم الموظف"].tolist()
@@ -921,6 +937,47 @@ elif choice == "سجل المعاملات المالية":
     with col_t1: st.subheader("💰 2. سجل المعاملات المالية والسلف العام")
     with col_t2: render_print_button()
     render_printable_table(st.session_state.financial_transactions)
+
+elif choice == "تعديل أو حذف معاملة مالية":
+    st.subheader("💰 3. تعديل أو حذف معاملة مالية")
+    if st.session_state.financial_transactions.empty:
+        st.info("لا توجد معاملات مالية مسجلة.")
+    else:
+        fin_records = [f"الموظف: {row['اسم الموظف']} | النوع: {row['النوع']} | المبلغ: {row['المبلغ / القيمة']} | التاريخ: {row['التاريخ']}" for _, row in st.session_state.financial_transactions.iterrows()]
+        selected_fin_label = st.selectbox("اختر المعاملة المراد تعديلها أو حذفها:", fin_records)
+        selected_fin_idx = fin_records.index(selected_fin_label)
+        fin_to_edit = st.session_state.financial_transactions.loc[selected_fin_idx]
+        
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
+        with st.form("edit_fin_form"):
+            st.markdown(f"**تعديل المعاملة المالية للموظف: {fin_to_edit['اسم الموظف']}**")
+            ed_f_emp = st.text_input("اسم الموظف", value=str(fin_to_edit["اسم الموظف"]))
+            fin_types = ["سلفة", "جزاء (خصم)", "مكافأة (إضافي)", "بدلات (إضافي مستحق)", "إضافي (ساعات عمل إضافية)"]
+            current_f_idx = fin_types.index(fin_to_edit["النوع"]) if fin_to_edit["النوع"] in fin_types else 0
+            ed_f_type = st.selectbox("نوع المعاملة", fin_types, index=current_f_idx)
+            ed_f_amt = st.number_input("المبلغ / القيمة", min_value=0.0, value=float(fin_to_edit["المبلغ / القيمة"]))
+            ed_f_reason = st.text_input("البيان / السبب", value=str(fin_to_edit["البيان / السبب"]))
+            
+            col_f1, col_f2 = st.columns(2)
+            with col_f1:
+                submit_edit_fin = st.form_submit_button("💾 حفظ تعديل المعاملة المالية", use_container_width=True)
+            with col_f2:
+                submit_del_fin = st.form_submit_button("🗑️ حذف المعاملة نهائياً", use_container_width=True)
+                
+            if submit_edit_fin:
+                st.session_state.financial_transactions.loc[selected_fin_idx, "اسم الموظف"] = ed_f_emp
+                st.session_state.financial_transactions.loc[selected_fin_idx, "النوع"] = ed_f_type
+                st.session_state.financial_transactions.loc[selected_fin_idx, "المبلغ / القيمة"] = ed_f_amt
+                st.session_state.financial_transactions.loc[selected_fin_idx, "البيان / السبب"] = ed_f_reason
+                auto_save_data()
+                st.success("تم تعديل المعاملة المالية بنجاح!")
+                st.rerun()
+            elif submit_del_fin:
+                st.session_state.financial_transactions = st.session_state.financial_transactions.drop(index=selected_fin_idx).reset_index(drop=True)
+                auto_save_data()
+                st.error("تم حذف المعاملة المالية بنجاح!")
+                st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 elif choice == "تسجيل طلب إجازة جديد":
     st.subheader(f"📝 1. تقديم طلب إجازة جديد - {company_display_name}")
@@ -971,6 +1028,55 @@ elif choice == "سجل الطلبات المرفوضة":
     with col_t2: render_print_button()
     render_printable_table(st.session_state.requests[st.session_state.requests["الحالة"] == "مرفوض"] if not st.session_state.requests.empty else pd.DataFrame())
 
+elif choice == "تعديل أو حذف طلب إجازة":
+    st.subheader("📝 5. تعديل أو حذف طلب إجازة")
+    if st.session_state.requests.empty:
+        st.info("لا توجد طلبات إجازات مسجلة.")
+    else:
+        req_records = [f"طلب رقم #{row['رقم الطلب']} - الموظف: {row['اسم الموظف']} ({row['نوع الإجازة']}) - الحالة: {row['الحالة']}" for _, row in st.session_state.requests.iterrows()]
+        selected_req_label = st.selectbox("اختر الطلب المراد تعديله أو حذفه:", req_records)
+        selected_req_idx = req_records.index(selected_req_label)
+        req_to_edit = st.session_state.requests.loc[selected_req_idx]
+        
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
+        with st.form("edit_req_form"):
+            st.markdown(f"**تعديل طلب الإجازة رقم #{req_to_edit['رقم الطلب']} للموظف: {req_to_edit['اسم الموظف']}**")
+            ed_req_emp = st.text_input("اسم الموظف", value=str(req_to_edit["اسم الموظف"]))
+            ed_req_branch = st.text_input("الفرع", value=str(req_to_edit["الفرع"]))
+            ed_req_type = st.text_input("نوع الإجازة", value=str(req_to_edit["نوع الإجازة"]))
+            status_list = ["قيد الانتظار", "مقبول", "مرفوض"]
+            current_st_idx = status_list.index(req_to_edit["الحالة"]) if req_to_edit["الحالة"] in status_list else 0
+            ed_req_status = st.selectbox("حالة الطلب", status_list, index=current_st_idx)
+            ed_req_from = st.text_input("من تاريخ", value=str(req_to_edit["من تاريخ"]))
+            ed_req_to = st.text_input("إلى تاريخ", value=str(req_to_edit["إلى تاريخ"]))
+            ed_req_days = st.number_input("عدد الأيام", min_value=1, value=int(req_to_edit["عدد الأيام"]))
+            ed_req_reason = st.text_area("سبب الإجازة", value=str(req_to_edit.get("السبب", "")))
+            
+            col_r1, col_r2 = st.columns(2)
+            with col_r1:
+                submit_edit_req = st.form_submit_button("💾 حفظ تعديل الطلب", use_container_width=True)
+            with col_r2:
+                submit_del_req = st.form_submit_button("🗑️ حذف طلب الإجازة", use_container_width=True)
+                
+            if submit_edit_req:
+                st.session_state.requests.loc[selected_req_idx, "اسم الموظف"] = ed_req_emp
+                st.session_state.requests.loc[selected_req_idx, "الفرع"] = ed_req_branch
+                st.session_state.requests.loc[selected_req_idx, "نوع الإجازة"] = ed_req_type
+                st.session_state.requests.loc[selected_req_idx, "الحالة"] = ed_req_status
+                st.session_state.requests.loc[selected_req_idx, "من تاريخ"] = ed_req_from
+                st.session_state.requests.loc[selected_req_idx, "إلى تاريخ"] = ed_req_to
+                st.session_state.requests.loc[selected_req_idx, "عدد الأيام"] = ed_req_days
+                st.session_state.requests.loc[selected_req_idx, "سبب الإجازة"] = ed_req_reason
+                auto_save_data()
+                st.success("تم تعديل طلب الإجازة بنجاح!")
+                st.rerun()
+            elif submit_del_req:
+                st.session_state.requests = st.session_state.requests.drop(index=selected_req_idx).reset_index(drop=True)
+                auto_save_data()
+                st.error("تم حذف طلب الإجازة بنجاح!")
+                st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+
 elif choice == "إضافة موظف جديد":
     st.subheader(f"👥 1. إضافة موظف جديد - {company_display_name}")
     st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
@@ -1008,6 +1114,53 @@ elif choice == "سجل الموظفين والأرصدة":
     with col_t2: render_print_button()
     render_printable_table(st.session_state.employees)
 
+elif choice == "تعديل أو حذف موظف":
+    st.subheader("👥 3. تعديل أو حذف بيانات موظف")
+    if st.session_state.employees.empty:
+        st.info("لا توجد موظفين مسجلين.")
+    else:
+        emp_records = [f"الكود: {row['كود الموظف']} - الاسم: {row['اسم الموظف']} ({row['الوظيفة']})" for _, row in st.session_state.employees.iterrows()]
+        selected_emp_label = st.selectbox("اختر الموظف المراد تعديله أو حذفه:", emp_records)
+        selected_emp_idx = emp_records.index(selected_emp_label)
+        emp_to_edit = st.session_state.employees.loc[selected_emp_idx]
+        
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
+        with st.form("edit_emp_form"):
+            st.markdown(f"**تعديل بيانات الموظف: {emp_to_edit['اسم الموظف']} (كود: {emp_to_edit['كود الموظف']})**")
+            ed_emp_code = st.text_input("كود الموظف", value=str(emp_to_edit["كود الموظف"]))
+            ed_emp_name = st.text_input("اسم الموظف", value=str(emp_to_edit["اسم الموظف"]))
+            ed_emp_job = st.text_input("الوظيفة", value=str(emp_to_edit["الوظيفة"]))
+            ed_emp_dept = st.text_input("القسم", value=str(emp_to_edit["القسم"]))
+            ed_emp_branch = st.text_input("الفرع", value=str(emp_to_edit["الفرع"]))
+            ed_emp_sal = st.number_input("الراتب الأساسي", min_value=0.0, value=float(emp_to_edit["الراتب الأساسي"]))
+            ed_emp_annual = st.number_input("رصيد سنوي (إجمالي)", min_value=0, value=int(emp_to_edit["رصيد سنوي (إجمالي)"]))
+            ed_emp_annual_rem = st.number_input("سنوي متبقي", min_value=0, value=int(emp_to_edit["سنوي متبقي"]))
+            
+            col_em1, col_em2 = st.columns(2)
+            with col_em1:
+                submit_edit_emp = st.form_submit_button("💾 حفظ تعديلات الموظف", use_container_width=True)
+            with col_em2:
+                submit_del_emp = st.form_submit_button("🗑️ حذف الموظف نهائياً", use_container_width=True)
+                
+            if submit_edit_emp:
+                st.session_state.employees.loc[selected_emp_idx, "كود الموظف"] = ed_emp_code
+                st.session_state.employees.loc[selected_emp_idx, "اسم الموظف"] = ed_emp_name
+                st.session_state.employees.loc[selected_emp_idx, "الوظيفة"] = ed_emp_job
+                st.session_state.employees.loc[selected_emp_idx, "القسم"] = ed_emp_dept
+                st.session_state.employees.loc[selected_emp_idx, "الفرع"] = ed_emp_branch
+                st.session_state.employees.loc[selected_emp_idx, "الراتب الأساسي"] = ed_emp_sal
+                st.session_state.employees.loc[selected_emp_idx, "رصيد سنوي (إجمالي)"] = ed_emp_annual
+                st.session_state.employees.loc[selected_emp_idx, "سنوي متبقي"] = ed_emp_annual_rem
+                auto_save_data()
+                st.success("تم تعديل بيانات الموظف بنجاح!")
+                st.rerun()
+            elif submit_del_emp:
+                st.session_state.employees = st.session_state.employees.drop(index=selected_emp_idx).reset_index(drop=True)
+                auto_save_data()
+                st.error("تم حذف الموظف بنجاح!")
+                st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+
 elif choice == "إدارة المستخدمين والصلاحيات":
     st.subheader("🔒 1. إدارة مستخدمي النظام والصلاحيات")
     st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
@@ -1032,7 +1185,71 @@ elif choice == "كشف الرواتب والمستحقات":
     col_t1, col_t2 = st.columns([3, 1])
     with col_t1: st.subheader("💰 2. كشف الرواتب وتفاصيل الاستحقاقات والاستقطاعات الشامل")
     with col_t2: render_print_button()
-    render_printable_table(st.session_state.employees)
+    
+    employees_df = st.session_state.employees.copy()
+    attendance_df = st.session_state.attendance.copy()
+    financial_df = st.session_state.financial_transactions.copy()
+    
+    if employees_df.empty:
+        st.warning("لا توجد بيانات موظفين مسجلة لحساب المرتبات.")
+    else:
+        payroll_data = []
+        for _, emp in employees_df.iterrows():
+            emp_code = emp["كود الموظف"]
+            emp_name = emp["اسم الموظف"]
+            emp_branch = emp["الفرع"]
+            basic_salary = float(emp.get("الراتب الأساسي", 5000.0))
+            
+            emp_delays_mins = 0
+            emp_overtime_mins = 0
+            if not attendance_df.empty and "كود الموظف" in attendance_df.columns:
+                emp_att = attendance_df[attendance_df["كود الموظف"] == emp_code]
+                if not emp_att.empty:
+                    emp_delays_mins = emp_att["التأخير الصباحي (دقيقة)"].sum() if "التأخير الصباحي (دقيقة)" in emp_att.columns else 0
+                    emp_overtime_mins = emp_att["إضافي بعد العمل (دقيقة)"].sum() if "إضافي بعد العمل (دقيقة)" in emp_att.columns else 0
+            
+            total_advances = 0.0
+            total_penalties = 0.0
+            total_rewards = 0.0
+            total_allowances = 0.0
+            total_extra_manual = 0.0
+            
+            if not financial_df.empty and "كود الموظف" in financial_df.columns:
+                emp_fin = financial_df[financial_df["كود الموظف"] == emp_code]
+                if not emp_fin.empty:
+                    for _, f_row in emp_fin.iterrows():
+                        f_type = f_row["النوع"]
+                        f_amount = float(f_row["المبلغ / القيمة"])
+                        if f_type == "سلفة":
+                            total_advances += f_amount
+                        elif "جزاء" in f_type:
+                            total_penalties += f_amount
+                        elif "مكافأة" in f_type:
+                            total_rewards += f_amount
+                        elif "بدلات" in f_type:
+                            total_allowances += f_amount
+                        elif "إضافي" in f_type:
+                            total_extra_manual += f_amount
+            
+            minute_rate = (basic_salary / 30.0 / 8.0 / 60.0) if basic_salary > 0 else 0
+            delay_deduction_val = round(emp_delays_mins * minute_rate, 2)
+            
+            hour_rate = (basic_salary / 30.0 / 8.0) if basic_salary > 0 else 0
+            overtime_amount_val = round((emp_overtime_mins / 60.0) * hour_rate * 1.5, 2)
+            
+            total_additions = round(overtime_amount_val + total_rewards + total_allowances + total_extra_manual, 2)
+            total_deductions = round(delay_deduction_val + total_penalties + total_advances, 2)
+            net_salary = round(basic_salary + total_additions - total_deductions, 2)
+            
+            payroll_data.append({
+                "كود الموظف": emp_code, "اسم الموظف": emp_name, "الفرع": emp_branch, "الراتب الأساسي": basic_salary,
+                "البدلات": total_allowances, "الإضافي والمكافآت": round(overtime_amount_val + total_rewards + total_extra_manual, 2),
+                "إجمالي الاستحقاقات": round(basic_salary + total_additions, 2), "خصم التأخيرات": delay_deduction_val,
+                "الجزاءات والخصومات": total_penalties, "السلف المالية": total_advances,
+                "إجمالي الاستقطاعات": total_deductions, "صافي المستحق": net_salary
+            })
+        payroll_df = pd.DataFrame(payroll_data)
+        render_printable_table(payroll_df)
 
 elif choice == "طباعة التقارير":
     col_t1, col_t2 = st.columns([3, 1])
