@@ -113,7 +113,7 @@ def load_company_data():
             "رقم الطلب", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", "نوع الإجازة", "من تاريخ", "إلى تاريخ", "عدد الأيام", "السبب", "الحالة"
         ])
         st.session_state.attendance = pd.DataFrame(columns=[
-            "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", "بداية العمل الرسمية", "نهاية العمل الرسمية", 
+            "التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "بداية العمل الرسمية", "نهاية العمل الرسمية", 
             "وقت الحضور الفعلي", "وقت الانصراف الفعلي", "الحالة", 
             "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"
         ])
@@ -128,10 +128,10 @@ def load_company_data():
             "address": "القاهرة، جمهورية مصر العربية",
             "cr": "123456",
             "tax": "987-654-321",
-            "contact": "هاتف: 01000000000",
+            "contact": "01000000000",
             "email": "info@company.com",
             "license": company_license,
-            "logo": None
+            "logo": "🏢"
         }
 
 def auto_save_data():
@@ -176,7 +176,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS السينمائي الداكن وتثبيت القائمة العلوية تماماً
+# 🎨 تصميم CSS السينمائي الداكن
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -233,26 +233,39 @@ st.markdown("""
         background: rgba(30, 30, 30, 0.85);
         border: 1px solid rgba(255, 255, 255, 0.08);
         color: #FFFFFF !important;
-        padding: 12px 18px;
+        padding: 14px 20px;
         border-radius: 14px;
         width: 100%;
         margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
-    .header-top-system h2 {
-        font-size: 14px !important;
-        font-weight: bold !important;
-        color: #F87171 !important;
-        margin: 0 !important;
+    
+    .header-logo-box {
+        font-size: 28px;
+        background: rgba(229, 9, 20, 0.2);
+        padding: 8px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(229, 9, 20, 0.4);
         text-align: center;
     }
+    
+    .header-top-system h2 {
+        font-size: 13px !important;
+        font-weight: bold !important;
+        color: #F87171 !important;
+        margin: 0 0 4px 0 !important;
+    }
     .comp-name-txt {
-        font-size: 15px !important;
+        font-size: 16px !important;
         font-weight: bold !important;
         color: #FFFFFF !important;
     }
     .comp-info-txt {
-        font-size: 11px !important;
+        font-size: 11.5px !important;
         color: #94A3B8 !important;
+        margin-top: 3px;
     }
     
     .user-badge-box {
@@ -402,15 +415,24 @@ def render_printable_table(df):
 
 def render_company_header():
     info = st.session_state.company_info
+    logo_val = info.get("logo", "🏢")
+    
+    # التحقق مما إذا كان الشعار رابط صورة أو رمز تعبيري/نص
+    if logo_val and (logo_val.startswith("http://") or logo_val.startswith("https://") or logo_val.endswith((".png", ".jpg", ".jpeg"))):
+        logo_html = f'<img src="{logo_val}" style="width: 45px; height: 45px; object-fit: contain; border-radius: 8px;" />'
+    else:
+        logo_html = f'<div class="header-logo-box">{logo_val}</div>'
+
     st.markdown(
         f"""
         <div class="glass-header">
-            <div class="header-top-system">
-                <h2>🍿 منصة عرض شؤون الموظفين والإدارة &nbsp;|&nbsp; شركة: {info.get("name", "")}</h2>
-            </div>
-            <div>
-                <div class="comp-name-txt">{info.get("name", "")}</div>
-                <div class="comp-info-txt">📍 {info.get("address", "")} &nbsp;|&nbsp; 📋 سجل تجاري: {info.get("cr", "")} &nbsp;|&nbsp; 🧾 بطاقة ضريبية: {info.get("tax", "")} &nbsp;|&nbsp; 🔑 ترخيص: {info.get("license", "")}</div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                {logo_html}
+                <div>
+                    <div class="header-top-system"><h2>🍿 منصة عرض شؤون الموظفين والإدارة</h2></div>
+                    <div class="comp-name-txt">{info.get("name", "")}</div>
+                    <div class="comp-info-txt">📍 {info.get("address", "")} &nbsp;|&nbsp; 📋 س.ت: {info.get("cr", "")} &nbsp;|&nbsp; 🧾 ب.ض: {info.get("tax", "")} &nbsp;|&nbsp; 📞 هاتف: {info.get("contact", "")} &nbsp;|&nbsp; ✉️ بريد: {info.get("email", "")} &nbsp;|&nbsp; 🔑 ترخيص: {info.get("license", "")}</div>
+                </div>
             </div>
         </div>
         """,
@@ -969,7 +991,7 @@ elif choice == "إعدادات الشركة وبياناتها الشاملة":
         c_addr_set = st.text_input("العنوان", value=info.get("address", ""))
         c_contact_set = st.text_input("أرقام التواصل", value=info.get("contact", ""))
         c_email_set = st.text_input("البريد الإلكتروني", value=info.get("email", ""))
-        uploaded_logo = st.file_uploader("رفع شعار الشركة (Logo)", type=["png", "jpg", "jpeg"])
+        c_logo_set = st.text_input("شعار الشركة (رابط صورة أو رمز تعبيري مثل 🏢 أو 🌟)", value=str(info.get("logo", "")))
         
         if st.form_submit_button("💾 حفظ إعدادات الشركة", use_container_width=True):
             info["name"] = c_name_set
