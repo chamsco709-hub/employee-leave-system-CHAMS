@@ -199,7 +199,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS الزجاجي والانسيابي الفائق مع إلغاء القائمة الجانبية وتثبيت الهيدر والقوائم المنسدلة
+# 🎨 تصميم CSS الزجاجي والانسيابي الفائق مع إلغاء القائمة الجانبية تماماً وتثبيت الهيدر والقوائم المنسدلة
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
