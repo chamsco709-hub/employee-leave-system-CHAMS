@@ -13,7 +13,7 @@ st.set_page_config(
     page_title="النظام المتكامل لإدارة الموارد البشرية",
     page_icon="🏢",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # 🔑 ملف الترخيص الخاص بهذه النسخة
@@ -176,7 +176,6 @@ def select_time_12h(label_prefix, key_prefix, default_hour=8, default_minute=0, 
     formatted_str = f"{hour:02d}:{minute:02d} {'AM' if period == 'صباحاً (AM)' else 'PM'}"
     return time(h_24, minute), formatted_str
 
-# 🖨️ زر طباعة ذكي مع عزل القائمة الجانبية تماماً
 def render_print_button():
     components.html("""
         <div style="text-align: left; margin-bottom: 15px;" class="no-print">
@@ -186,15 +185,15 @@ def render_print_button():
                 window.parent.print();
                 setTimeout(() => { if (sidebar) sidebar.style.display = 'block'; }, 1000);
             " style="
-                background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+                background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);
                 color: white;
                 padding: 10px 22px;
                 border: none;
-                border-radius: 10px;
+                border-radius: 12px;
                 font-size: 13px;
                 font-weight: bold;
                 cursor: pointer;
-                box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+                box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
                 font-family: 'Tahoma', sans-serif;
                 transition: all 0.3s ease;
             ">
@@ -203,7 +202,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم الواجهة الأولى (الأزرق الملكي الاحترافي العريض Full-Width)
+# 🎨 تصميم CSS الزجاجي العصري المطابق تماماً للصورة (Glassmorphic Dashboard UI)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -212,120 +211,93 @@ st.markdown("""
         font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
         direction: rtl !important;
         text-align: right !important;
-        color: #0F172A !important;
+        color: #2D3748 !important;
     }
     
     .block-container {
-        padding-top: 2rem !important;
+        padding-top: 1.5rem !important;
         padding-bottom: 4rem !important;
-        padding-left: 3rem !important;
-        padding-right: 3rem !important;
+        padding-left: 2.5rem !important;
+        padding-right: 2.5rem !important;
         max-width: 100% !important;
-        background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%) !important;
+        background: linear-gradient(135deg, #DFDBE5 0%, #E8E4EC 50%, #CAB6C2 100%) !important;
+        min-height: 100vh;
     }
     
-    /* 📋 القائمة الجانبية الانسيابية */
+    /* 📋 القائمة الجانبية الزجاجية العصرية */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0F172A 0%, #1E3A8A 100%) !important;
-        color: #FFFFFF !important;
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(20px) !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.6);
         padding-top: 1.5rem;
-        border-left: 1px solid rgba(255, 255, 255, 0.08);
-        min-width: 310px !important;
-        box-shadow: -10px 0 30px rgba(0,0,0,0.15);
+        min-width: 320px !important;
+        box-shadow: -10px 0 30px rgba(0,0,0,0.08);
     }
     
     [data-testid="stSidebar"] div, [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] h3 {
-        color: #FFFFFF !important;
+        color: #2D3748 !important;
         text-align: right !important;
         direction: rtl !important;
     }
     
     [data-testid="stSidebar"] div[data-baseweb="select"] {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        border-radius: 10px !important;
-    }
-    
-    [data-testid="stSidebar"] div[data-baseweb="select"] > div {
-        background-color: transparent !important;
-        color: #FFFFFF !important;
-        border-color: rgba(255, 255, 255, 0.2) !important;
-    }
-    
-    [data-testid="stSidebar"] div[data-baseweb="select"] span, 
-    [data-testid="stSidebar"] div[data-baseweb="select"] div,
-    [data-testid="stSidebar"] div[data-baseweb="select"] input {
-        color: #FFFFFF !important;
-        -webkit-text-fill-color: #FFFFFF !important;
-        font-weight: bold !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        border-radius: 12px !important;
     }
     
     div[data-testid="stDateInput"],
     div[data-testid="stDateInput"] > div,
     div[data-testid="stDateInput"] input,
     div[data-testid="stDateInput"] div {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        color: #2D3748 !important;
         font-weight: bold !important;
-        border-radius: 10px !important;
-        border-color: #CBD5E1 !important;
-    }
-
-    div[data-baseweb="popover"],
-    div[data-baseweb="calendar"],
-    div[role="dialog"],
-    div[data-baseweb="popover"] *,
-    div[data-baseweb="calendar"] *,
-    div[role="dialog"] * {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
+        border-radius: 12px !important;
+        border-color: #E2E8F0 !important;
     }
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
-        color: #334155 !important;
+        color: #4A5568 !important;
         font-weight: bold !important;
         font-size: 13.5px !important;
     }
     
     input, textarea, select {
-        background-color: #FFFFFF !important;
-        color: #0F172A !important;
-        -webkit-text-fill-color: #0F172A !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        color: #2D3748 !important;
         font-size: 13.5px !important;
         font-weight: bold !important;
-        border-radius: 10px !important;
-        border: 1.5px solid #CBD5E1 !important;
+        border-radius: 12px !important;
+        border: 1.5px solid #E2E8F0 !important;
         padding: 10px !important;
     }
     
-    /* 🏢 هيدر الشركة الاحترافي الملكي */
-    .company-header-container {
-        background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%);
-        color: #FFFFFF !important;
-        padding: 26px 32px;
-        border-radius: 16px;
-        margin-bottom: 25px !important;
+    /* 🏢 هيدر الشركة الزجاجي الفاخر */
+    .glass-header {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        color: #2D3748 !important;
+        padding: 24px 30px;
+        border-radius: 20px;
+        margin-bottom: 22px !important;
         width: 100%;
-        box-shadow: 0 12px 30px -8px rgba(30, 58, 138, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
         box-sizing: border-box;
     }
     .header-top-system {
         text-align: center !important;
         width: 100%;
-        margin-bottom: 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        margin-bottom: 10px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
         padding-bottom: 10px;
     }
     .header-top-system h2 {
-        font-size: 18px !important;
+        font-size: 17px !important;
         font-weight: bold !important;
-        color: #FFFFFF !important;
-        -webkit-text-fill-color: #FFFFFF !important;
+        color: #4C1D95 !important;
         margin: 0 !important;
-        padding: 0 !important;
-        text-align: center !important;
-        letter-spacing: 0.4px;
     }
     .header-bottom-content {
         display: flex;
@@ -340,56 +312,56 @@ st.markdown("""
         display: flex;
         justify-content: flex-end;
         align-items: center;
-        padding-left: 5px;
     }
     .comp-name-txt {
         font-size: 18px !important;
         font-weight: bold !important;
-        margin-bottom: 8px !important;
-        color: #FFFFFF !important;
-        -webkit-text-fill-color: #FFFFFF !important;
+        margin-bottom: 6px !important;
+        color: #1A202C !important;
     }
     .comp-info-txt {
         font-size: 13px !important;
-        margin: 4px 0 !important;
-        color: #E2E8F0 !important;
-        -webkit-text-fill-color: #E2E8F0 !important;
-        line-height: 1.6;
+        margin: 3px 0 !important;
+        color: #718096 !important;
+        line-height: 1.5;
     }
     
-    /* 📊 بطاقات مؤشرات الأداء العريضة */
-    .dashboard-card {
-        background: #FFFFFF;
-        border-right: 6px solid #1E3A8A;
-        padding: 22px 24px;
-        border-radius: 14px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    /* 📊 بطاقات مؤشرات الأداء الزجاجية (Glass Cards) */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-right: 6px solid #7C3AED;
+        padding: 20px 22px;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
         text-align: right !important;
         margin-bottom: 15px;
         transition: all 0.3s ease;
     }
-    .dashboard-card:hover {
+    .glass-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        box-shadow: 0 12px 30px rgba(124, 58, 237, 0.1);
     }
-    .dashboard-card-title {
+    .glass-card-title {
         font-size: 13px;
-        color: #64748B;
+        color: #718096;
         font-weight: bold;
         margin-bottom: 8px;
     }
-    .dashboard-card-value {
-        font-size: 28px;
-        color: #1E3A8A;
+    .glass-card-value {
+        font-size: 26px;
+        color: #4C1D95;
         font-weight: bold;
     }
     
-    /* 📌 رؤوس الأقسام المتميزة */
+    /* 📌 رؤوس الأقسام */
     .section-header {
         font-size: 17px !important;
         font-weight: bold !important;
-        color: #1E3A8A !important;
-        border-bottom: 2.5px solid #3B82F6;
+        color: #4C1D95 !important;
+        border-bottom: 2.5px solid #8B5CF6;
         padding-bottom: 10px;
         margin-top: 22px !important;
         margin-bottom: 16px !important;
@@ -397,110 +369,66 @@ st.markdown("""
         direction: rtl !important;
     }
     
-    /* 📋 الجداول الانسيابية النظيفة واسعة النطاق */
+    /* 📋 الجداول الزجاجية */
     table.custom-table {
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
         margin-top: 10px !important;
         margin-bottom: 20px !important;
-        background-color: #FFFFFF;
-        color: #0F172A;
+        background-color: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        color: #2D3748;
         direction: rtl !important;
         text-align: right !important;
-        border-radius: 12px;
+        border-radius: 14px;
         overflow: hidden;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.04);
-        border: 1px solid #E2E8F0;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+        border: 1px solid rgba(255, 255, 255, 0.9);
     }
     table.custom-table th, table.custom-table td {
-        border-bottom: 1px solid #E2E8F0;
-        border-left: 1px solid #F1F5F9;
+        border-bottom: 1px solid #EDF2F7;
+        border-left: 1px solid #F7FAFC;
         padding: 12px 16px;
         text-align: right !important;
         font-size: 13px;
-        color: #1E293B !important;
-        background-color: #FFFFFF !important;
+        color: #2D3748 !important;
+        background-color: transparent !important;
     }
     table.custom-table th {
-        background-color: #F8FAFC !important;
+        background-color: rgba(124, 58, 237, 0.08) !important;
         font-weight: bold;
-        color: #1E3A8A !important;
-        border-bottom: 2.5px solid #CBD5E1;
+        color: #4C1D95 !important;
+        border-bottom: 2.5px solid #C4B5FD;
     }
     
-    /* 📝 مناطق النماذج والإدخال العريضة */
+    /* 📝 مناطق النماذج العريضة */
     .entry-form-area {
-        background: #FFFFFF;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(15px);
         padding: 26px;
-        border-radius: 16px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.04);
-        border: 1px solid #E2E8F0;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+        border: 1px solid rgba(255, 255, 255, 0.9);
         margin-bottom: 20px;
     }
     
-    /* 🖨️ قواعد الطباعة الصارمة */
     @media print {
-        @page {
-            size: A4 landscape;
-            margin: 10mm;
-        }
+        @page { size: A4 landscape; margin: 10mm; }
         body, .stApp, .block-container {
             background-color: #FFFFFF !important;
             color: #000000 !important;
             direction: rtl !important;
             text-align: right !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
             width: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
         }
-        [data-testid="stSidebar"], 
-        section[data-testid="stSidebar"],
-        div[data-testid="stSidebar"] {
-            display: none !important;
-            visibility: hidden !important;
-            width: 0px !important;
-            max-width: 0px !important;
-            flex: 0 0 0% !important;
-        }
-        button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"],
-        .dashboard-card, div[data-testid="stForm"], .no-print, .entry-form-area, hr {
-            display: none !important;
-            visibility: hidden !important;
-        }
-        .company-header-container {
-            background: #FFFFFF !important;
-            color: #000000 !important;
-            border: 1.5px solid #1E3A8A;
-            box-shadow: none;
-            padding: 12px !important;
-            margin-bottom: 15px !important;
-        }
-        .header-top-system {
-            border-bottom: 1px solid #1E3A8A !important;
-        }
-        .header-top-system h2, .comp-name-txt, .comp-info-txt {
-            color: #000000 !important;
-            -webkit-text-fill-color: #000000 !important;
-        }
-        table.custom-table {
-            width: 100% !important;
-            margin-top: 10px !important;
-            box-shadow: none !important;
-            border: 1px solid #1E3A8A !important;
-        }
-        table.custom-table th {
-            background-color: #1E3A8A !important;
-            color: #FFFFFF !important;
-            -webkit-text-fill-color: #FFFFFF !important;
-            border: 1px solid #1E3A8A !important;
-        }
-        table.custom-table td {
-            border: 1px solid #CBD5E1 !important;
-            color: #000000 !important;
-        }
+        [data-testid="stSidebar"] { display: none !important; width: 0px !important; }
+        button, .stButton, iframe, div[data-testid="stHeader"], .no-print, .entry-form-area, hr { display: none !important; }
+        .glass-header { background: #FFFFFF !important; border: 1.5px solid #4C1D95; box-shadow: none; }
+        table.custom-table { width: 100% !important; border: 1.5px solid #4C1D95 !important; }
+        table.custom-table th { background-color: #4C1D95 !important; color: #FFFFFF !important; }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -520,23 +448,23 @@ def render_printable_table(df):
 
 def render_company_header():
     info = st.session_state.company_info
-    logo_html = '<div style="padding: 12px 18px; border: 1.5px dashed rgba(255,255,255,0.4); border-radius: 12px; font-size: 13px; color: white; background: rgba(255,255,255,0.06); font-weight: bold;">🏢 شعار الشركة</div>'
+    logo_html = '<div style="padding: 12px 18px; border: 1.5px dashed rgba(76,29,149,0.3); border-radius: 12px; font-size: 13px; color: #4C1D95; background: rgba(255,255,255,0.6); font-weight: bold;">🏢 شعار الشركة</div>'
     if info.get("logo") is not None:
         try:
-            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 95px; max-width: 190px; object-fit: contain; background: white; border-radius: 10px; padding: 6px; box-shadow: 0 6px 15px rgba(0,0,0,0.2);" />'
+            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 90px; max-width: 180px; object-fit: contain; background: white; border-radius: 10px; padding: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />'
         except Exception:
             pass
             
     st.markdown(
         f"""
-        <div class="company-header-container">
+        <div class="glass-header">
             <div class="header-top-system">
-                <h2>🏢 النظام المتكامل لإدارة الموارد البشرية والشؤون الإدارية &nbsp;|&nbsp; شركة: {info.get("name", "")}</h2>
+                <h2>✨ النظام المتكامل لإدارة الموارد البشرية والشؤون الإدارية &nbsp;|&nbsp; شركة: {info.get("name", "")}</h2>
             </div>
             <div class="header-bottom-content">
                 <div class="header-right-info">
                     <div class="comp-name-txt">{info.get("name", "")}</div>
-                    <div class="comp-info-txt">📍 {info.get("address", "")} &nbsp;|&nbsp; 📋 سجل تجاري: {info.get("cr", "")} &nbsp;|&nbsp; 🧾 رقم ضريبي: {info.get("tax", "")} &nbsp;|&nbsp; 🔑 ترخيص التشغيل: {info.get("license", "")}</div>
+                    <div class="comp-info-txt">📍 {info.get("address", "")} &nbsp;|&nbsp; 📋 سجل تجاري: {info.get("cr", "")} &nbsp;|&nbsp; 🧾 رقم ضريبي: {info.get("tax", "")} &nbsp;|&nbsp; 🔑 ترخيص: {info.get("license", "")}</div>
                     <div class="comp-info-txt">📞 {info.get("contact", "")}</div>
                 </div>
                 <div class="header-left-logo">
@@ -551,9 +479,9 @@ def render_company_header():
 if not st.session_state.is_authenticated:
     st.markdown(
         f"""
-        <div style="max-width: 480px; margin: 80px auto; background: #FFFFFF; padding: 40px; border-radius: 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); text-align: center; direction: rtl; border: 1px solid #E2E8F0;">
-            <h2 style="color: #1E3A8A; margin-bottom: 15px; font-size: 22px;">🔐 تسجيل الدخول للنظام</h2>
-            <p style="color: #64748B; font-size: 13.5px; margin-bottom: 25px;">{company_display_name} | رخصة التشغيل: {company_license}</p>
+        <div style="max-width: 480px; margin: 80px auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); text-align: center; direction: rtl; border: 1px solid rgba(255,255,255,0.9);">
+            <h2 style="color: #4C1D95; margin-bottom: 15px; font-size: 22px;">🔐 تسجيل الدخول للنظام</h2>
+            <p style="color: #718096; font-size: 13.5px; margin-bottom: 25px;">{company_display_name} | رخصة التشغيل: {company_license}</p>
         </div>
         """,
         unsafe_allow_html=True
@@ -611,45 +539,19 @@ with st.sidebar:
         sub_options = ["محرك البحث المتطور والفلترة"]
         choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     elif main_menu == "⏱️ الحضور والانصراف":
-        sub_options = [
-            "تسجيل حضور وانصراف", 
-            "سجل الحضور والانصراف", 
-            "تعديل أو حذف حركة حضور"
-        ]
+        sub_options = ["تسجيل حضور وانصراف", "سجل الحضور والانصراف", "تعديل أو حذف حركة حضور"]
         choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     elif main_menu == "💰 المعاملات المالية":
-        sub_options = [
-            "تسجيل معاملة مالية", 
-            "سجل المعاملات المالية", 
-            "تعديل أو حذف معاملة مالية"
-        ]
+        sub_options = ["تسجيل معاملة مالية", "سجل المعاملات المالية", "تعديل أو حذف معاملة مالية"]
         choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     elif main_menu == "📝 طلبات الإجازات":
-        sub_options = [
-            "تسجيل طلب إجازة جديد", 
-            "سجل طلبات قيد الانتظار", 
-            "سجل الطلبات المقبولة", 
-            "سجل الطلبات المرفوضة", 
-            "تعديل أو حذف طلب إجازة"
-        ]
+        sub_options = ["تسجيل طلب إجازة جديد", "سجل طلبات قيد الانتظار", "سجل الطلبات المقبولة", "سجل الطلبات المرفوضة", "تعديل أو حذف طلب إجازة"]
         choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     elif main_menu == "👥 شؤون الموظفين":
-        sub_options = [
-            "إضافة موظف جديد", 
-            "سجل الموظفين والأرصدة", 
-            "تعديل أو حذف موظف"
-        ]
+        sub_options = ["إضافة موظف جديد", "سجل الموظفين والأرصدة", "تعديل أو حذف موظف"]
         choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     elif main_menu == "⚙️ الأدوات والنظام":
-        sub_options = [
-            "إدارة المستخدمين والصلاحيات", 
-            "كشف الرواتب والمستحقات", 
-            "طباعة التقارير", 
-            "إعدادات الشركة", 
-            "تصدير وتحميل Excel", 
-            "نسخة احتياطية واستعادة", 
-            "مسح البيانات"
-        ]
+        sub_options = ["إدارة المستخدمين والصلاحيات", "كشف الرواتب والمستحقات", "طباعة التقارير", "إعدادات الشركة", "تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"]
         choice = st.selectbox("حدد الإجراء المطلوب:", sub_options)
     
     st.markdown("---")
@@ -730,7 +632,7 @@ if main_menu == "🔍 صندوق البحث الشامل" or choice == "محرك
             render_printable_table(fin_df)
 
 # =========================================================
-# 🏠 الشاشة الرئيسية / لوحة المؤشرات العريضة
+# 🏠 الشاشة الرئيسية / لوحة المؤشرات الزجاجية المطابقة للصورة
 # =========================================================
 elif choice == "لوحة المؤشرات والتحكم" or choice == "الشاشة الرئيسية":
     st.markdown(f'<div class="section-header">📈 مؤشرات الأداء العامة - شركة: {company_display_name}</div>', unsafe_allow_html=True)
@@ -752,11 +654,11 @@ elif choice == "لوحة المؤشرات والتحكم" or choice == "الشا
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown(f'<div class="dashboard-card"><div class="dashboard-card-title">👥 إجمالي موظفي الشركة</div><div class="dashboard-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="glass-card"><div class="glass-card-title">👥 إجمالي موظفي الشركة</div><div class="glass-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown(f'<div class="dashboard-card" style="border-right-color: #D97706;"><div class="dashboard-card-title">⏳ الطلبات المعلقة</div><div class="dashboard-card-value" style="color: #D97706;">{pending_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="glass-card" style="border-right-color: #D97706;"><div class="glass-card-title">⏳ الطلبات المعلقة</div><div class="glass-card-value" style="color: #D97706;">{pending_count}</div></div>', unsafe_allow_html=True)
     with col3:
-        st.markdown(f'<div class="dashboard-card" style="border-right-color: #16A34A;"><div class="dashboard-card-title">✅ الطلبات المقبولة</div><div class="dashboard-card-value" style="color: #16A34A;">{accepted_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="glass-card" style="border-right-color: #059669;"><div class="glass-card-title">✅ الطلبات المقبولة</div><div class="glass-card-value" style="color: #059669;">{accepted_count}</div></div>', unsafe_allow_html=True)
 
     if not pending_requests.empty:
         st.markdown(f'<div class="section-header">⏳ اتخاذ القرار بشأن الطلبات المعلقة ({pending_count} طلب)</div>', unsafe_allow_html=True)
@@ -842,7 +744,7 @@ elif choice == "لوحة المؤشرات والتحكم" or choice == "الشا
                     window.parent.print();
                     setTimeout(() => { if (sidebar) sidebar.style.display = 'block'; }, 1000);
                 " style="
-                    background-color: #1E3A8A;
+                    background-color: #7C3AED;
                     color: white;
                     padding: 8px 14px;
                     border: none;
@@ -861,7 +763,7 @@ elif choice == "لوحة المؤشرات والتحكم" or choice == "الشا
     st.markdown('</div>', unsafe_allow_html=True)
 
     if not filtered_chart_emps.empty:
-        st.markdown(f'<div style="text-align: right; direction: rtl; font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1E3A8A;">📌 {chart_subtitle}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="text-align: right; direction: rtl; font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #4C1D95;">📌 {chart_subtitle}</div>', unsafe_allow_html=True)
         
         chart_df_melted = filtered_chart_emps.melt(
             id_vars=["اسم الموظف"],
@@ -870,23 +772,23 @@ elif choice == "لوحة المؤشرات والتحكم" or choice == "الشا
             value_name="عدد الأيام"
         )
         
-        c1 = alt.Chart(chart_df_melted).mark_bar().encode(
-            x=alt.X('اسم الموظف:N', title='الموظف', axis=alt.Axis(labelAngle=0, labelColor='#334155', titleColor='#1E3A8A')),
-            y=alt.Y('عدد الأيام:Q', title='عدد الأيام', axis=alt.Axis(labelColor='#334155', titleColor='#1E3A8A')),
+        c1 = alt.Chart(chart_df_melted).mark_bar(color='#7C3AED').encode(
+            x=alt.X('اسم الموظف:N', title='الموظف', axis=alt.Axis(labelAngle=0, labelColor='#2D3748', titleColor='#4C1D95')),
+            y=alt.Y('عدد الأيام:Q', title='عدد الأيام', axis=alt.Axis(labelColor='#2D3748', titleColor='#4C1D95')),
             color=alt.Color('نوع الرصيد:N', legend=alt.Legend(
                 orient='bottom', 
                 direction='horizontal',
                 title='نوع الرصيد:',
-                titleColor='#1E3A8A',
-                labelColor='#334155',
+                titleColor='#4C1D95',
+                labelColor='#2D3748',
                 titleAnchor='middle'
             )),
             tooltip=['اسم الموظف', 'نوع الرصيد', 'عدد الأيام']
         ).properties(
             height=360,
-            background='white'
+            background='transparent'
         ).configure_view(
-            fill='white',
+            fill=None,
             stroke=None
         )
         
