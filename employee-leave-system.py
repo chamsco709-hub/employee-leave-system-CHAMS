@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
-from datetime import datetime, date
+from datetime import datetime, date, time, timedelta
 import json
 import os
 import io
@@ -76,9 +76,9 @@ def load_company_data():
                     st.session_state.attendance = pd.DataFrame(data["attendance"])
                 else:
                     st.session_state.attendance = pd.DataFrame(columns=[
-                        "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", "بداية العمل الرسمية", "نهاية العمل الرسمية", 
-                        "وقت الحضور الفعلي", "وقت الانصراف الفعلي", "الحالة", 
-                        "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"
+                        "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", 
+                        "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", 
+                        "الحالة", "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"
                     ])
 
                 if "financial_transactions" in data and len(data["financial_transactions"]) > 0:
@@ -114,9 +114,9 @@ def load_company_data():
             "رقم الطلب", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", "نوع الإجازة", "من تاريخ", "إلى تاريخ", "عدد الأيام", "السبب", "الحالة"
         ])
         st.session_state.attendance = pd.DataFrame(columns=[
-            "التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "بداية العمل الرسمية", "نهاية العمل الرسمية", 
-            "وقت الحضور الفعلي", "وقت الانصراف الفعلي", "الحالة", 
-            "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"
+            "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", 
+            "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", 
+            "الحالة", "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"
         ])
         st.session_state.financial_transactions = pd.DataFrame(columns=[
             "التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "النوع", "المبلغ / القيمة", "البيان / السبب"
@@ -419,7 +419,6 @@ def render_company_header():
     info = st.session_state.company_info
     logo_val = info.get("logo", "")
     
-    # دعم عرض الشعار سواء كان صورة مرفوعة (Base64) أو رابط أو رمز افتراضي
     if logo_val and logo_val.startswith("data:image"):
         logo_html = f'<img src="{logo_val}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: white; padding: 2px;" />'
     elif logo_val and (logo_val.startswith("http://") or logo_val.startswith("https://")):
@@ -590,11 +589,11 @@ if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم �
     render_printable_table(view_employees)
 
 elif choice == "تسجيل حضور وانصراف":
-    st.subheader("⏱️ تسجيل حركة حضور / انصراف شاملة")
+    st.subheader("⏱️ تسجيل حركة حضور / انصراف (بأزرار زمنية واحتساب آلي)")
     emp_names = st.session_state.employees["اسم الموظف"].tolist()
     if emp_names:
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with st.form("att_form_full"):
+        with st.form("att_form_buttons"):
             selected_emp = st.selectbox("اختر الموظف", emp_names)
             att_date = st.date_input("تاريخ الحركة", value=date.today())
             
@@ -602,24 +601,38 @@ elif choice == "تسجيل حضور وانصراف":
             c_job = emp_info["الوظيفة"]
             c_branch = emp_info["الفرع"]
             
-            st.info(f"📍 الفرع التابع: {c_branch} &nbsp;|&nbsp; 💼 الوظيفة: {c_job}")
+            st.info(f"📍 الفرع: {c_branch} &nbsp;|&nbsp; 💼 الوظيفة: {c_job}")
             
-            col_t1, col_t2 = st.columns(2)
-            with col_t1:
-                start_work = st.text_input("بداية العمل الرسمية", value="08:00 AM")
-                actual_in = st.text_input("وقت الحضور الفعلي", value="08:00 AM")
-            with col_t2:
-                end_work = st.text_input("نهاية العمل الرسمية", value="04:00 PM")
-                actual_out = st.text_input("وقت الانصراف الفعلي", value="04:00 PM")
+            # أزرار اختيار الأوقات الرسمية والفعلية بضغطة زر
+            st.markdown("🕒 **أزرار الأوقات الرسمية:**")
+            col_b1, col_b2 = st.columns(2)
+            with col_b1:
+                start_work = st.selectbox("بداية العمل الرسمية", ["08:00 AM", "09:00 AM", "10:00 AM"])
+            with col_b2:
+                end_work = st.selectbox("نهاية العمل الرسمية", ["04:00 PM", "05:00 PM", "06:00 PM"])
+                
+            st.markdown("🕒 **أزرار الأوقات الفعلية:**")
+            time_options = ["07:30 AM", "08:00 AM", "08:15 AM", "08:30 AM", "09:00 AM", "03:00 PM", "04:00 PM", "04:30 PM", "05:00 PM", "06:00 PM"]
+            col_b3, col_b4 = st.columns(2)
+            with col_b3:
+                actual_in = st.selectbox("وقت الحضور الفعلي", time_options, index=1)
+            with col_b4:
+                actual_out = st.selectbox("وقت الانصراف الفعلي", time_options, index=7)
+                
+            att_status = st.selectbox("حالة الحضور", ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"])
             
-            att_status = st.selectbox("حالة الحضور", ["حضور منتظم", "تأخير صباحي", "انصراف مبكر", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"])
-            
-            col_d1, col_d2, col_d3 = st.columns(3)
-            with col_d1: tardy_min = st.number_input("التأخير الصباحي (دقيقة)", min_value=0, value=0)
-            with col_d2: early_min = st.number_input("انصراف مبكر (دقيقة)", min_value=0, value=0)
-            with col_d3: overtime_min = st.number_input("إضافي بعد العمل (دقيقة)", min_value=0, value=0)
-            
-            if st.form_submit_button("💾 حفظ حركة الحضور والانصراف", use_container_width=True):
+            if st.form_submit_button("💾 حساب تلقائي وحفظ الحركة", use_container_width=True):
+                # حساب التأخير الصباحي والانصراف المبكر والإضافي آلياً
+                fmt = "%I:%M %p"
+                t_start_work = datetime.strptime(start_work, fmt)
+                t_end_work = datetime.strptime(end_work, fmt)
+                t_actual_in = datetime.strptime(actual_in, fmt)
+                t_actual_out = datetime.strptime(actual_out, fmt)
+                
+                tardy_min = max(0, int((t_actual_in - t_start_work).total_seconds() / 60))
+                early_min = max(0, int((t_end_work - t_actual_out).total_seconds() / 60))
+                overtime_min = max(0, int((t_actual_out - t_end_work).total_seconds() / 60))
+                
                 new_att = {
                     "التاريخ": str(att_date),
                     "كود الموظف": emp_info["كود الموظف"],
@@ -637,7 +650,7 @@ elif choice == "تسجيل حضور وانصراف":
                 }
                 st.session_state.attendance = pd.concat([st.session_state.attendance, pd.DataFrame([new_att])], ignore_index=True)
                 auto_save_data()
-                st.success("تم حفظ سجل الحضور والانصراف بنجاح!")
+                st.success(f"تم الحساب والحفظ بنجاح! (تأخير: {tardy_min} دقيقة | إضافي: {overtime_min} دقيقة)")
                 st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -655,7 +668,7 @@ elif choice == "تعديل أو حذف حركة حضور":
         record = st.session_state.attendance.loc[selected_att_idx]
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with st.form("edit_att_form"):
-            new_status = st.selectbox("حالة الحضور", ["حضور منتظم", "تأخير صباحي", "انصراف مبكر", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"])
+            new_status = st.selectbox("حالة الحضور", ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"])
             col_eb1, col_eb2 = st.columns(2)
             with col_eb1:
                 if st.form_submit_button("💾 حفظ التعديلات", use_container_width=True):
@@ -833,18 +846,34 @@ elif choice == "تعديل أو حذف معاملة مالية":
 
 elif choice == "كشف الرواتب والمستحقات الشامل":
     col_t1, col_t2 = st.columns([3, 1])
-    with col_t1: st.subheader("💰 كشف الرواتب والمستحقات المالي")
+    with col_t1: st.subheader("💰 كشف الرواتب والمستحقات والاحتساب الآلي")
     with col_t2: render_print_button()
     
     payroll_df = st.session_state.employees[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "الراتب الأساسي"]].copy()
+    
+    # دمج المعاملات المالية
     if not st.session_state.financial_transactions.empty:
         trans_sum = st.session_state.financial_transactions.groupby("كود الموظف")["المبلغ / القيمة"].sum().reset_index()
         payroll_df = payroll_df.merge(trans_sum, on="كود الموظف", how="left").fillna(0)
         payroll_df.rename(columns={"المبلغ / القيمة": "إجمالي المعاملات المالية"}, inplace=True)
-        payroll_df["صافي الراتب المستحق"] = payroll_df["الراتب الأساسي"] + payroll_df["إجمالي المعاملات المالية"]
     else:
-        payroll_df["إجمالي المعاملات المالية"] = 0
-        payroll_df["صافي الراتب المستحق"] = payroll_df["الراتب الأساسي"]
+        payroll_df["إجمالي المعاملات المالية"] = 0.0
+
+    # دمج وحساب إجماليات التأخير والإضافي من سجل الحضور والانصراف تلقائياً
+    if not st.session_state.attendance.empty:
+        att_agg = st.session_state.attendance.groupby("كود الموظف")[["التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)"]].sum().reset_index()
+        payroll_df = payroll_df.merge(att_agg, on="كود الموظف", how="left").fillna(0)
+    else:
+        payroll_df["التأخير الصباحي (دقيقة)"] = 0
+        payroll_df["انصراف مبكر (دقيقة)"] = 0
+        payroll_df["إضافي بعد العمل (دقيقة)"] = 0
+
+    # حساب قيمة الإضافي والخصومات (افتراضياً: سعر دقيقة الإضافي = أساسي / 10000، وسعر دقيقة التأخير = خصم)
+    # يمكن تعديلها حسب رغبة الشركة
+    payroll_df["قيمة الإضافي"] = payroll_df["إضافي بعد العمل (دقيقة)"] * (payroll_df["الراتب الأساسي"] / 10000)
+    payroll_df["قيمة الخصومات (تأخير)"] = (payroll_df["التأخير الصباحي (دقيقة)"] + payroll_df["انصراف مبكر (دقيقة)"]) * (payroll_df["الراتب الأساسي"] / 10000)
+    
+    payroll_df["صافي الراتب المستحق"] = payroll_df["الراتب الأساسي"] + payroll_df["إجمالي المعاملات المالية"] + payroll_df["قيمة الإضافي"] - payroll_df["قيمة الخصومات (تأخير)"]
         
     render_printable_table(payroll_df)
 
@@ -991,13 +1020,11 @@ elif choice == "طباعة التقارير العامة":
     with col_t2: render_print_button()
     render_printable_table(st.session_state.employees)
 
-elif choice == "إعدادات الشركة وبياناتها الشاملة":
+elif choice == "اعدادات الشركة وبياناتها الشاملة":
     st.subheader("⚙️ إعدادات الشركة وبياناتها الشاملة")
     info = st.session_state.company_info
     
     st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-    
-    # نموذج رفع شعار الشركة كصورة
     uploaded_logo = st.file_uploader("🖼️ اختر صورة شعار الشركة (PNG أو JPG)", type=["png", "jpg", "jpeg"])
     
     with st.form("settings_full"):
@@ -1018,7 +1045,6 @@ elif choice == "إعدادات الشركة وبياناتها الشاملة":
             info["contact"] = c_contact_set
             info["email"] = c_email_set
             
-            # إذا قام المستخدم برفع صورة جديدة، يتم تحويلها وتخزينها تلقائياً
             if uploaded_logo is not None:
                 bytes_data = uploaded_logo.getvalue()
                 encoded_img = base64.b64encode(bytes_data).decode("utf-8")
