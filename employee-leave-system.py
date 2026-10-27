@@ -199,7 +199,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS الزجاجي وإلغاء القائمة الجانبية تماماً مع تثبيت الهيدر وقوائم التنقل
+# 🎨 تصميم CSS الزجاجي والانسيابي الفائق مع إلغاء القائمة الجانبية وتثبيت الهيدر والقوائم المنسدلة
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -222,7 +222,7 @@ st.markdown("""
         min-height: 100vh;
     }
     
-    /* 📌 تثبيت الهيدر وأدوات التنقل في أعلى الشاشة أثناء التمرير (Sticky Fixed Menu) */
+    /* 📌 تثبيت الهيدر وقوائم التنقل العلوية بانسيابية تامة أثناء التمرير */
     .sticky-header-container {
         position: sticky;
         top: 0rem;
@@ -233,7 +233,9 @@ st.markdown("""
         padding-top: 8px;
         padding-bottom: 12px;
         margin-bottom: 15px;
-        border-bottom: 1px solid rgba(124, 58, 237, 0.15);
+        border-bottom: 1.5px solid rgba(124, 58, 237, 0.2);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
     }
     
     div[data-testid="stDateInput"],
@@ -496,12 +498,12 @@ if not st.session_state.is_authenticated:
     st.stop()
 
 # ---------------------------------------------------------
-# 🎯 1. الحاوية المثبتة العلوية (Sticky Header + Navigation Dropdowns)
+# 🎯 1. الحاوية المثبتة العلوية الانسيابية (Sticky Header + Fluid Dropdowns)
 # ---------------------------------------------------------
 st.markdown('<div class="sticky-header-container">', unsafe_allow_html=True)
 render_company_header()
 
-# القوائم المنسدلة الفرعية داخل الهيدر المثبت للتنقل السريع
+# القوائم المنسدلة الفرعية داخل الهيدر المثبت للتنقل السريع والانسيابي
 dropdown_menu_categories = {
     "🏠 الشاشة الرئيسية": ["لوحة المؤشرات والتحكم"],
     "🔍 صندوق البحث": ["محرك البحث المتطور والفلترة"],
