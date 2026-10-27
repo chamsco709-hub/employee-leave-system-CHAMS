@@ -4,6 +4,7 @@ import pandas as pd
 from datetime import datetime, date
 import json
 import os
+import io
 
 # ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة مع إخفاء القائمة الجانبية تماماً
 st.set_page_config(
@@ -176,7 +177,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS السينمائي الداكن وتثبيت القائمة العلوية تماماً (Sticky Menu)
+# 🎨 تصميم CSS السينمائي الداكن وتثبيت القائمة العلوية تماماً (Sticky / Fixed Menu)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -338,7 +339,7 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    /* 🖨️ إعدادات الطباعة: خلفية بيضاء، نصوص سوداء، إظهار الهيدر والمستخدم، وإخفاء شريط الأقسام تماماً */
+    /* 🖨️ إعدادات الطباعة النظيفة */
     @media print {
         @page { size: A4 landscape; margin: 10mm; }
         body, .stApp, .block-container {
@@ -447,7 +448,7 @@ if not st.session_state.is_authenticated:
     st.stop()
 
 # ---------------------------------------------------------
-# 📌 الحاوية المثبتة العلوية الموحدة (Sticky Top Menu)
+# 📌 الحاوية المثبتة العلوية (Sticky Top Menu)
 # ---------------------------------------------------------
 st.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
 
@@ -469,7 +470,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 3. خانات الأقسام والعمليات الفرعية المنسدلة المتجاورة
+# 3. الأزرار أو الخانات المنسدلة للتحكم والتنقل
 st.markdown('<div class="cinema-top-bar" style="margin: 0; box-shadow: none;">', unsafe_allow_html=True)
 col_nav1, col_nav2, col_nav3 = st.columns([1.5, 2.5, 1])
 
@@ -502,7 +503,7 @@ sub_options_map = {
 
 with col_nav2:
     sub_options_list = sub_options_map.get(selected_main_cat, ["لوحة التحكم والمؤشرات"])
-    choice = st.selectbox("📑 العمليات الفرعية:", sub_options_list, label_visibility="collapsed")
+    choice = st.selectbox("📑 العمليات الفرعية (زر منسدل):", sub_options_list, label_visibility="collapsed")
 
 with col_nav3:
     if st.button("⏹️ خروج", use_container_width=True):
