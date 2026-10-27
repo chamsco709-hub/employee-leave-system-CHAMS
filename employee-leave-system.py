@@ -179,7 +179,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS السينمائي الداكن مع إعدادات الطباعة الدقيقة (خلفية بيضاء ونصوص سوداء)
+# 🎨 تصميم CSS السينمائي الداكن مع إعدادات الطباعة الدقيقة
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -202,7 +202,6 @@ st.markdown("""
         min-height: 100vh;
     }
     
-    /* 📌 تثبيت الهيدر، بيانات المستخدم، وشريط الأقسام معاً بانسيابية عند التمرير */
     .sticky-top-wrapper {
         position: sticky;
         top: 0rem;
@@ -451,7 +450,7 @@ if not st.session_state.is_authenticated:
     st.stop()
 
 # ---------------------------------------------------------
-# 📌 الحاوية العلوية الموحدة والثابتة (هيدر + مستخدم + شريط الأقسام)
+# 📌 الحاوية العلوية الموحدة والثابتة (هيدر + مستخدم + خانات الأقسام المنسدلة)
 # ---------------------------------------------------------
 st.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
 
@@ -473,12 +472,12 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 3. شريط الأقسام والقوائم المنسدلة الأفقية (يختفي تلقائياً عند الطباعة)
+# 3. خانات الأقسام والقوائم المنسدلة المتجاورة (تختفي تلقائياً عند الطباعة)
 st.markdown('<div class="cinema-top-bar" style="margin: 0; box-shadow: none;">', unsafe_allow_html=True)
 col_nav1, col_nav2, col_nav3 = st.columns([1.5, 2.5, 1])
 
 with col_nav1:
-    selected_main_cat = st.selectbox("🎬 القسم الرئيسي:", [
+    selected_main_cat = st.selectbox("📂 القسم الرئيسي:", [
         "الرئيسية", 
         "الحضور والانصراف", 
         "طلبات الاجازة", 
@@ -506,7 +505,7 @@ sub_options_map = {
 
 with col_nav2:
     sub_options_list = sub_options_map.get(selected_main_cat, ["لوحة التحكم والمؤشرات"])
-    choice = st.selectbox("🍿 العمليات الفرعية:", sub_options_list, label_visibility="collapsed")
+    choice = st.selectbox("📑 العمليات الفرعية:", sub_options_list, label_visibility="collapsed")
 
 with col_nav3:
     if st.button("⏹️ خروج", use_container_width=True):
@@ -515,7 +514,7 @@ with col_nav3:
         st.rerun()
 
 st.markdown('</div>', unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)  # إغلاق الـ sticky-top-wrapper
+st.markdown('</div>', unsafe_allow_html=True)  # إغلاق الحاوية العلوية الثابتة
 
 # ---------------------------------------------------------
 # 🎯 بطاقات المؤشرات الأربعة المتجاورة
