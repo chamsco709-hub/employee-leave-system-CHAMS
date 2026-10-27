@@ -8,15 +8,15 @@ import base64
 import json
 import os
 
-# ضبط إعدادات الصفحة وتفعيل الواجهة الواسعة والأنيقة
+# ضبط اعدادات الصفحة وتفعيل الواجهة الواسعة والانيقة
 st.set_page_config(
-    page_title="النظام المتكامل لإدارة الموارد البشرية والشؤون الإدارية",
+    page_title="النظام المتكامل لادارة الموارد البشرية والشؤون الادارية",
     page_icon="🏢",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# 🔑 ملف الترخيص الخاص بهذه النسخة
+# ملف الترخيص الخاص بهذه النسخة
 LICENSE_FILE = "client_license.json"
 
 def get_client_license():
@@ -30,7 +30,7 @@ def get_client_license():
     return {
         "id": "company_default",
         "license": "LIC-1001",
-        "name": "شركة الشمس لإدارة المنشآت السياحية"
+        "name": "شركة الشمس لادارة المنشآت السياحية"
     }
 
 client_data = get_client_license()
@@ -45,7 +45,7 @@ if not os.path.exists(COMPANIES_DIR):
 COMPANY_FILE = os.path.join(COMPANIES_DIR, f"{company_id}_data.json")
 
 # ---------------------------------------------------------
-# 💾 دوال الحفظ والاستعادة التلقائية للبيانات
+# دوال الحفظ والاستعادة التلقائية للبيانات
 # ---------------------------------------------------------
 def load_company_data():
     """تحميل بيانات الشركة الحالية"""
@@ -197,14 +197,14 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تطبيق واجهة مستخدم CSS عصرية ومضغوطة لمنع أي خطأ تجميع نصوص في Streamlit
+# واجهة مستخدم CSS احترافية وعصرية بالكامل
 style_css = (
     "<style>"
     "header[data-testid='stHeader'] { visibility: hidden; height: 0px; }"
     "[data-testid='stSidebar'] { display: none !important; width: 0px !important; }"
     "html, body, [class*='css'], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6, label {"
     "font-family: 'Segoe UI', 'Arial', sans-serif !important; direction: rtl !important; text-align: right !important; color: #1E293B !important;}"
-يُرجى استخدام الرمز البرمجي بحذر.
+
 ".block-container { padding-top: 1.5rem !important; padding-bottom: 4rem !important; padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; background-color: #F8FAFC !important; min-height: 100vh; }"
 "div[data-testid='stDateInput'] input, input, textarea, select { background-color: #FFFFFF !important; color: #0F172A !important; font-weight: 500 !important; border-radius: 10px !important; border: 1px solid #CBD5E1 !important; padding: 10px 14px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important; }"
 "label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label { color: #475569 !important; font-weight: 600 !important; font-size: 13.5px !important; margin-bottom: 6px !important; }"
@@ -301,23 +301,11 @@ else:
 st.error("❌ الرسم السري غير صحيح!")
 st.stop()
 
----------------------------------------------------------
-
-
-🎯 1. عرض هيدر الشركة أولاً
-
-
----------------------------------------------------------
+عرض هيدر الشركة أولاً
 
 render_company_header()
 
----------------------------------------------------------
-
-
-🎯 2. بطاقات المؤشرات الأربعة مباشرة تحت الهيدر
-
-
----------------------------------------------------------
+بطاقات المؤشرات الأربعة مباشرة تحت الهيدر
 
 branch_filter = st.session_state.current_user_branch
 dept_filter = st.session_state.current_user_dept
@@ -342,13 +330,7 @@ with col4:
 total_payroll_est = float(view_employees["الراتب الأساسي"].sum()) if not view_employees.empty and "الراتب الأساسي" in view_employees.columns else 0.0
 st.markdown(f'💰 إجمالي الرواتب الأساسية{total_payroll_est:,.0f} ج.م', unsafe_allow_html=True)
 
----------------------------------------------------------
-
-
-🎯 3. تبويبات أفقية للتنقل السريع بين الأقسام الرئيسية
-
-
----------------------------------------------------------
+تبويبات أفقية للتنقل السريع بين الأقسام الرئيسية
 
 st.markdown("
 ", unsafe_allow_html=True)
@@ -385,13 +367,7 @@ choice = st.selectbox("حدد الإجراء المطلوب في شؤون الم
 elif main_menu == "⚙️ الأدوات والنظام":
 choice = st.selectbox("حدد الإجراء المطلوب في الأدوات والنظام:", ["إدارة المستخدمين والصلاحيات", "كشف الرواتب والمستحقات", "طباعة التقارير", "إعدادات الشركة", "تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"])
 
-=========================================================
-
-
-🔍 صندوق البحث المتطور والشامل
-
-
-=========================================================
+صندوق البحث المتطور والشامل
 
 if main_menu == "🔍 صندوق البحث الشامل" or choice == "محرك البحث المتطور والفلترة":
 st.markdown(f'🔍 صندوق البحث المتطور والشامل في قواعد بيانات الشركة', unsafe_allow_html=True)
@@ -449,13 +425,7 @@ mask = fin_df.astype(str).apply(lambda x: x.str.lower().str.contains(keyword)).a
 fin_df = fin_df[mask]
 render_printable_table(fin_df)
 
-=========================================================
-
-
-🏠 الشاشة الرئيسية
-
-
-=========================================================
+الشاشة الرئيسية
 
 elif choice == "لوحة المؤشرات والتحكم" or choice == "الشاشة الرئيسية":
 if not pending_requests.empty:
@@ -561,15 +531,6 @@ else:
 st.info("لا توجد بيانات متاحة للمخطط حسب الفلتر المختار.")
 st.markdown(f'📋 أرصدة إجازات موظفي الشركة: {company_display_name}', unsafe_allow_html=True)
 render_printable_table(view_employees)
-
-=========================================================
-
-
-باقي الأقسام والنماذج (الحضور، المعاملات، الإجازات، الموظفين، النظام)
-
-
-=========================================================
-
 elif choice == "تسجيل حضور وانصراف":
 st.subheader("⏱️ 1. تسجيل حركة حضور / انصراف جديدة")
 emp_names = st.session_state.employees["اسم الموظف"].tolist()
@@ -802,7 +763,7 @@ with col_t2: render_print_button()
 render_printable_table(st.session_state.requests[st.session_state.requests["الحالة"] == "مقبول"] if not st.session_state.requests.empty else pd.DataFrame())
 elif choice == "سجل الطلبات المرفوضة":
 col_t1, col_t2 = st.columns(2)
-with col_t1: st.subheader("❌ 4. سجل طلبات الإجازات المرفوضة")
+with col_t1: st.subheader("🗑️ 4. سجل طلبات الإجازات المرفوضة")
 with col_t2: render_print_button()
 render_printable_table(st.session_state.requests[st.session_state.requests["الحالة"] == "مرفوض"] if not st.session_state.requests.empty else pd.DataFrame())
 elif choice == "تعديل أو حذف طلب إجازة":
@@ -810,15 +771,15 @@ st.subheader("📝 5. تعديل أو حذف طلب إجازة")
 if st.session_state.requests.empty:
 st.info("لا توجد طلبات إجازات مسجلة.")
 else:
-req_records = [f"طلب رقم #{row['رقم الطلب']} - الموظف: {row['اسم الموظف']} ({row['نوع الإجازة']}) - الحالة: {row['الحالة']}" for _, row in st.session_state.
-requests.iterrows()]
+req_records = [f"طلب رقم #{row['رقم الطلب']} - الموظف: {row['اسم الموظف']} ({row['نوع الإجازة']}) - الحالة: {row['الحالة']}" for _, row in st.session_state.requests.iterrows()]
 selected_req_label = st.selectbox("اختر الطلب المراد تعديله أو حذفه:", req_records)
 selected_req_idx = req_records.index(selected_req_label)
 req_to_edit = st.session_state.requests.loc[selected_req_idx]
 st.markdown('', unsafe_allow_html=True)
 with st.form("edit_req_form"):
 st.markdown(f"تعديل طلب الإجازة رقم #{req_to_edit['رقم الطلب']} للموظف: {req_to_edit['اسم الموظف']}")
-ed_req_emp = st.text_input("اسم الموظف", value=str(req_to_edit["اسم الموظف"]))
+ed_req_emp = st.text_input("اسم الموظف", value=str(req_to
+_edit["اسم الموظف"]))
 ed_req_branch = st.text_input("الفرع", value=str(req_to_edit["الفرع"]))
 ed_req_type = st.text_input("نوع الإجازة", value=str(req_to_edit["نوع الإجازة"]))
 status_list = ["قيد الانتظار", "مقبول", "مرفوض"]
@@ -828,250 +789,3 @@ ed_req_from = st.text_input("من تاريخ", value=str(req_to_edit["من تا�
 ed_req_to = st.text_input("إلى تاريخ", value=str(req_to_edit["إلى تاريخ"]))
 ed_req_days = st.number_input("عدد الأيام", min_value=1, value=int(req_to_edit["عدد الأيام"]))
 ed_req_reason = st.text_area("سبب الإجازة", value=str(req_to_edit.get("السبب", "")))
-col_r1, col_r2 = st.columns(2)
-with col_r1:
-submit_edit_req = st.form_submit_button("💾 حفظ تعديل الطلب", use_container_width=True)
-with col_r2:
-submit_del_req = st.form_submit_button("🗑️ حذف طلب الإجازة", use_container_width=True)
-if submit_edit_req:
-st.session_state.requests.loc[selected_req_idx, "اسم الموظف"] = ed_req_emp
-st.session_state.requests.loc[selected_req_idx, "الفرع"] = ed_req_branch
-st.session_state.requests.loc[selected_req_idx, "نوع الإجازة"] = ed_req_type
-st.session_state.requests.loc[selected_req_idx, "الحالة"] = ed_req_status
-st.session_state.requests.loc[selected_req_idx, "من تاريخ"] = ed_req_from
-st.session_state.requests.loc[selected_req_idx, "إلى تاريخ"] = ed_req_to
-st.session_state.requests.loc[selected_req_idx, "عدد الأيام"] = ed_req_days
-st.session_state.requests.loc[selected_req_idx, "سبب الإجازة"] = ed_req_reason
-auto_save_data()
-st.success("تم تعديل طلب الإجازة بنجاح!")
-st.rerun()
-elif submit_del_req:
-st.session_state.requests = st.session_state.requests.drop(index=selected_req_idx).reset_index(drop=True)
-auto_save_data()
-st.error("تم حذف طلب الإجازة بنجاح!")
-st.rerun()
-st.markdown('', unsafe_allow_html=True)
-elif choice == "إضافة موظف جديد":
-st.subheader(f"👥 1. إضافة موظف جديد - {company_display_name}")
-st.markdown('', unsafe_allow_html=True)
-with st.form("new_employee_form_full"):
-c_code = st.text_input("كود الموظف")
-c_name = st.text_input("اسم الموظف الكامل")
-c_job = st.text_input("الوظيفة")
-c_dept = st.text_input("القسم")
-c_branch = st.text_input("الفرع")
-c_salary = st.number_input("الراتب الأساسي (جنيه)", min_value=0.0, value=5000.0)
-c_emp_permission = st.selectbox("صلاحية الموظف المخصصة", ["إدخل طلبات فقط", "اعتماد الطلبات", "مدير شؤون إدارية", "صلاحيات كاملة للقسم"])
-col_b1, col_b2, col_b3 = st.columns(3)
-with col_b1: c_annual = st.number_input("الرصيد السنوي", min_value=0, value=21)
-with col_b2: c_weekly = st.number_input("الرصيد الأسبوعي", min_value=0, value=4)
-with col_b3: c_official = st.number_input("رصيد الإجازات الرسمية", min_value=0, value=10)
-if st.form_submit_button("إضافة الموظف الجديد وحفظ البيانات", use_container_width=True):
-if c_code and c_name:
-new_emp = {
-"كود الموظف": c_code, "اسم الموظف": c_name, "الوظيفة": c_job, "القسم": c_dept, "الفرع": c_branch,
-"الراتب الأساسي": c_salary, "صلاحية الموظف": c_emp_permission,
-"رصيد سنوي (إجمالي)": c_annual, "سنوي مستهلك": 0, "سنوي متبقي": c_annual,
-"رصيد أسبوعي (إجمالي)": c_weekly, "أسبوعي مستهلك": 0, "أسبوعي متبقي": c_weekly,
-"رصيد رسمي (إجمالي)": c_official, "رسمي مستهلك": 0, "رسمي متبقي": c_official, "إجازات مرضية (أيام)": 0
-}
-st.session_state.employees = pd.concat([st.session_state.employees, pd.DataFrame([new_emp])], ignore_index=True)
-auto_save_data()
-st.success("تم إضافة الموظف بنجاح!")
-st.rerun()
-st.markdown('', unsafe_allow_html=True)
-elif choice == "سجل الموظفين والأرصدة":
-col_t1, col_t2 = st.columns(2)
-with col_t1: st.subheader(f"👥 2. سجل الموظفين والأرصدة - {company_display_name}")
-with col_t2: render_print_button()
-render_printable_table(st.session_state.employees)
-elif choice == "تعديل أو حذف موظف":
-st.subheader("👥 3. تعديل أو حذف بيانات موظف")
-if st.session_state.employees.empty:
-st.info("لا توجد موظفين مسجلين.")
-else:
-emp_records = [f"الكود: {row['كود الموظف']} - الاسم: {row['اسم الموظف']} ({row['الوظيفة']})" for _, row in st.session_state.employees.iterrows()]
-selected_emp_label = st.selectbox("اختر الموظف المراد تعديله أو حذفه:", emp_records)
-selected_emp_idx = emp_records.index(selected_emp_label)
-emp_to_edit = st.session_state.employees.loc[selected_emp_idx]
-st.markdown('', unsafe_allow_html=True)
-with st.form("edit_emp_form"):
-st.markdown(f"تعديل بيانات الموظف: {emp_to_edit['اسم الموظف']} (كود: {emp_to_edit['كود الموظف']})")
-ed_emp_code = st.text_input("كود الموظف", value=str(emp_to_edit["كود الموظف"]))
-ed_emp_name = st.text_input("اسم الموظف", value=str(emp_to_edit["اسم الموظف"]))
-ed_emp_job = st.text_input("الوظيفة", value=str(emp_to_edit["الوظيفة"]))
-ed_emp_dept = st.text_input("القسم", value=str(emp_to_edit["القسم"]))
-ed_emp_branch = st.text_input("الفرع", value=str(emp_to_edit["الفرع"]))
-ed_emp_sal = st.number_input("الراتب الأساسي", min_value=0.0, value=float(emp_to_edit["الراتب الأساسي"]))
-ed_emp_annual = st.number_input("رصيد سنوي (إجمالي)", min_value=0, value=int(emp_to_edit["رصيد سنوي (إجمالي)"]))
-ed_emp_annual_rem = st.number_input("سنوي متبقي", min_value=0, value=int(emp_to_edit["سنوي متبقي"]))
-col_em1, col_em2 = st.columns(2)
-with col_em1:
-submit_edit_emp = st.form_submit_button("💾 حفظ تعديلات الموظف", use_container_width=True)
-with col_em2:
-submit_del_emp = st.form_submit_button("🗑️ حذف الموظف نهائياً", use_container_width=True)
-if submit_edit_emp:
-st.session_state.employees.loc[selected_emp_idx, "كود الموظف"] = ed_emp_code
-st.session_state.employees.loc[selected_emp_idx, "اسم الموظف"] = ed_emp_name
-st.session_state.employees.loc[selected_emp_idx, "الوظيفة"] = ed_emp_job
-st.session_state.employees.loc[selected_emp_idx, "القسم"] = ed_emp_dept
-st.session_state.employees.loc[selected_emp_idx, "الفرع"] = ed_emp_branch
-st.session_state.employees.loc[selected_emp_idx, "الراتب الأساسي"] = ed_emp_sal
-st.session_state.employees.loc[selected_emp_idx, "رصيد سنوي (إجمالي)"] = ed_emp_annual
-st.session_state.employees.loc[selected_emp_idx, "سنوي متبقي"] = ed_emp_annual_rem
-auto_save_data()
-st.success("تم تعديل بيانات الموظف بنجاح!")
-st.rerun()
-elif submit_del_emp:
-st.session_state.employees = st.session_state.employees.drop(index=selected_emp_idx).reset_index(drop=True)
-auto_save_data()
-st.error("تم حذف الموظف بنجاح!")
-st.rerun()
-st.markdown('', unsafe_allow_html=True)
-elif choice == "إدارة المستخدمين والصلاحيات":
-st.subheader("🔒 1. إدارة مستخدمي النظام والصلاحيات")
-st.markdown('', unsafe_allow_html=True)
-with st.form("new_user_form"):
-u_username = st.text_input("اسم المستخدم (للدخول مثل: supervisor1)")
-u_fullname = st.text_input("الاسم الكامل للمستخدم")
-u_branch = st.text_input("الفرع التابع له")
-u_dept = st.text_input("القسم التابع له")
-u_role = st.selectbox("الصلاحية والدور في النظام", ["مشرف عام (Admin)", "مدير شؤون إدارية", "متابع فرع", "موظف إدخل"])
-u_pattern = st.text_input("الرسم السري (مثل: 1-2-3)")
-if st.form_submit_button("حفظ المستخدم الجديد", use_container_width=True):
-if u_username and u_pattern:
-new_u = {"اسم المستخدم": u_username, "الاسم الكامل": u_fullname, "الفرع التابع": u_branch, "القسم التابع": u_dept, "الصلاحية": u_role, "البريد الإلكتروني": "user@company.com", "الحالة": "نشط", "الرسم السري": u_pattern}
-st.session_state.users = pd.concat([st.session_state.users, pd.DataFrame([new_u])], ignore_index=True)
-auto_save_data()
-st.success("تم إضافة المستخدم بنجاح!")
-st.rerun()
-st.markdown('', unsafe_allow_html=True)
-render_printable_table(st.session_state.users.drop(columns=["الرسم السري"], errors="ignore"))
-elif choice == "كشف الرواتب والمستحقات":
-col_t1, col_t2 = st.columns(2)
-with col_t1: st.subheader("💰 2. كشف الرواتب وتفاصيل الاستحقاقات والاستقطاعات الشامل")
-with col_t2: render_print_button()
-employees_df = st.session_state.employees.copy()
-attendance_df = st.session_state.attendance.copy()
-financial_df = st.session_state.financial_transactions.copy()
-if employees_df.empty:
-st.warning("لا توجد بيانات موظفين مسجلة لحساب المرتبات.")
-else:
-payroll_data = []
-for _, emp in employees_df.iterrows():
-emp_code = emp["كود الموظف"]
-emp_name = emp["اسم الموظف"]
-emp_branch = emp["الفرع"]
-basic_salary = float(emp.get("الراتب الأساسي", 5000.0))
-emp_delays_mins = 0
-emp_overtime_mins = 0
-if not attendance_df.empty and "كود الموظف" in attendance_df.columns:
-emp_att = attendance_df[attendance_df["كود الموظف"] == emp_code]
-if not emp_att.empty:
-emp_delays_mins = emp_att["التأخير الصباحي (دقيقة)"].sum() if "التأخير الصباحي (دقيقة)" in emp_att.columns else 0
-emp_overtime_mins = emp_att["إضافي بعد العمل (دقيقة)"].sum() if "إضافي بعد العمل (دقيقة)" in emp_att.columns else 0
-total_advances = 0.0
-total_penalties = 0.0
-total_rewards = 0.0
-total_allowances = 0.0
-total_extra_manual = 0.0
-if not financial_df.empty and "كود الموظف" in financial_df.columns:
-emp_fin = financial_df[financial_df["كود الموظف"] == emp_code]
-if not emp_fin.empty:
-for _, f_row in emp_fin.iterrows():
-f_type = f_row["النوع"]
-f_amount = float(f_row["المبلغ / القيمة"])
-if f_type == "سلفة":
-total_advances += f_amount
-elif "جزاء" in f_type:
-total_penalties += f_amount
-elif "مكافأة" in f_type:
-total_rewards += f_amount
-elif "بدلات" in f_type:
-total_allowances += f_amount
-elif "إضافي" in f_type:
-total_extra_manual += f_amount
-minute_rate = (basic_salary / 30.0 / 8.0 / 60.0) if basic_salary > 0 else 0
-delay_deduction_val = round(emp_delays_mins * minute_rate, 2)
-hour_rate = (basic_salary / 30.0 / 8.0) if basic_salary > 0 else 0
-overtime_amount_val = round((emp_overtime_mins / 60.0) * hour_rate * 1.5, 2)
-total_additions = round(overtime_amount_val + total_rewards + total_allowances + total_extra_manual, 2)
-total_deductions = round(delay_deduction_val + total_penalties + total_advances, 2)
-net_salary = round(basic_salary + total_additions - total_deductions, 2)
-payroll_data.append({
-"كود الموظف": emp_code, "اسم الموظف": emp_name, "الفرع": emp_branch, "الراتب الأساسي": basic_salary,
-"البدلات": total_allowances, "الإضافي والمكافآت": round(overtime_amount_val + total_rewards + total_extra_manual, 2),
-"إجمالي الاستحقاقات": round(basic_salary + total_additions, 2), "خصم التأخيرات": delay_deduction_val,
-"الجزاءات والخصومات": total_penalties, "السلف المالية": total_advances,
-"إجمالي الاستقطاعات": total_deductions, "صافي المستحق": net_salary
-})
-payroll_df = pd.DataFrame(payroll_data)
-render_printable_table(payroll_df)
-elif choice == "طباعة التقارير":
-col_t1, col_t2 = st.columns(2)
-with col_t1: st.subheader("🖨️ 3. طباعة التقارير العامة")
-with col_t2: render_print_button()
-render_printable_table(st.session_state.employees)
-elif choice == "إعدادات الشركة":
-st.subheader("⚙️ 4. إعدادات وبيانات الشركة")
-info = st.session_state.company_info
-st.markdown('', unsafe_allow_html=True)
-with st.form("company_settings_direct_form"):
-c_name = st.text_input("اسم الشركة", value=info.get("name", ""))
-c_address = st.text_input("عنوان الشركة", value=info.get("address", ""))
-c_cr = st.text_input("السجل التجاري", value=info.get("cr", ""))
-c_tax = st.text_input("الرقم الضريبي", value=info.get("tax", ""))
-c_contact = st.text_input("معلومات الاتصال", value=info.get("contact", ""))
-c_license = st.text_input("رقم الترخيص", value=info.get("license", ""))
-uploaded_logo = st.file_uploader("رفع شعار الشركة (Logo)", type=["png", "jpg", "jpeg"])
-if st.form_submit_button("💾 حفظ وتحديث إعدادات الشركة", use_container_width=True):
-info["name"] = c_name
-info["address"] = c_address
-info["cr"] = c_cr
-info["tax"] = c_tax
-info["contact"] = c_contact
-info["license"] = c_license
-if uploaded_logo is not None:
-info["logo"] = base64.b64encode(uploaded_logo.getvalue()).decode('utf-8')
-auto_save_data()
-st.success("تم تحديث إعدادات الشركة بنجاح!")
-st.rerun()
-st.markdown('', unsafe_allow_html=True)
-elif choice == "تصدير وتحميل Excel":
-st.subheader("📥 5. تصدير وتحميل بيانات النظام بصيغة Excel")
-st.markdown('', unsafe_allow_html=True)
-output = io.BytesIO()
-with pd.ExcelWriter(output, engine='openpyxl') as writer:
-st.session_state.employees.to_excel(writer, sheet_name='الموظفين', index=False)
-st.session_state.requests.to_excel(writer, sheet_name='سجل الإجازات', index=False)
-st.session_state.attendance.to_excel(writer, sheet_name='الحضور والانصراف', index=False)
-st.session_state.financial_transactions.to_excel(writer, sheet_name='السلف والماليات', index=False)
-output.seek(0)
-st.download_button(label="📥 تحميل ملف الإكسيل الآن", data=output, file_name=f"Leave_System_{company_id}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-st.markdown('', unsafe_allow_html=True)
-elif choice == "نسخة احتياطية واستعادة":
-st.subheader("💾 6. النسخ الاحتياطي والاستعادة")
-st.markdown('', unsafe_allow_html=True)
-backup_dict = {
-"employees": st.session_state.employees.to_dict(orient='records'),
-"requests": st.session_state.requests.to_dict(orient='records'),
-"attendance": st.session_state.attendance.to_dict(orient='records'),
-"financial_transactions": st.session_state.financial_transactions.to_dict(orient='records'),
-"users": st.session_state.users.to_dict(orient='records'),
-"company_info": st.session_state.company_info
-}
-st.download_button("💾 تحميل النسخة الاحتياطية (JSON)", data=json.dumps(backup_dict, ensure_ascii=False, indent=4), file_name=f"backup_{company_id}.json", mime="application/json")
-st.markdown('', unsafe_allow_html=True)
-elif choice == "مسح البيانات":
-st.subheader("🗑️ 7. مسح وحذف كافة بيانات الشركة")
-st.markdown('', unsafe_allow_html=True)
-confirm_text = st.text_input("اكتب 'تأكيد الحذف' للتأكيد:")
-if confirm_text == "تأكيد الحذف" and st.button("حذف كافة البيانات نهائياً", type="primary"):
-st.session_state.employees = pd.DataFrame(columns=["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "صلاحية الموظف", "الراتب الأساسي", "رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي", "رصيد أسبوعي (إجمالي)", "أسبوعي مستهلك", "أسبوعي متبقي", "رصيد رسمي (إجمالي)", "رسمي مستهلك", "رسمي متبقي", "إجازات مرضية (أيام)"])
-st.session_state.requests = pd.DataFrame(columns=["رقم الطلب", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", "نوع الإجازة", "من تاريخ", "إلى تاريخ", "عدد الأيام", "السبب", "الحالة"])
-st.session_state.attendance = pd.DataFrame(columns=["التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", "الحالة", "التأخير الصباحي (دقيقة)", "انصراف مبكر (دقيقة)", "إضافي بعد العمل (دقيقة)", "حضور مبكر (دقيقة)", "خروج متأخر (دقيقة)", "دقائق التأخير"])
-st.session_state.financial_transactions = pd.DataFrame(columns=["التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "النوع", "المبلغ / القيمة", "البيان / السبب"])
-auto_save_data()
-st.success("تم مسح كافة البيانات بنجاح!")
-st.rerun()
-st.markdown('', unsafe_allow_html=True)
