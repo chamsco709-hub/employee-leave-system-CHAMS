@@ -177,7 +177,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS السينمائي الداكن وتثبيت القائمة العلوية تماماً (Sticky / Fixed Menu)
+# 🎨 تصميم CSS السينمائي الداكن وتثبيت القائمة العلوية تماماً (Sticky Menu)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -394,6 +394,9 @@ if 'current_user_dept' not in st.session_state: st.session_state.current_user_de
 if 'current_user_branch' not in st.session_state: st.session_state.current_user_branch = ""
 if 'current_user_role' not in st.session_state: st.session_state.current_user_role = ""
 
+# تهيئة الأقسام في الذاكرة لتكون الأزرار ديناميكية
+if 'active_main_section' not in st.session_state: st.session_state.active_main_section = "الرئيسية"
+
 def render_printable_table(df):
     if df.empty:
         st.info("لا توجد بيانات متاحة للعرض.")
@@ -448,7 +451,7 @@ if not st.session_state.is_authenticated:
     st.stop()
 
 # ---------------------------------------------------------
-# 📌 الحاوية المثبتة العلوية (Sticky Top Menu)
+# 📌 الحاوية المثبتة العلوية (Sticky Top Menu) مع أزرار الأقسام
 # ---------------------------------------------------------
 st.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
 
@@ -470,24 +473,32 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 3. الأزرار والخانات المنسدلة للتحكم والتنقل
-st.markdown('<div class="cinema-top-bar" style="margin: 0; box-shadow: none;">', unsafe_allow_html=True)
-col_nav1, col_nav2, col_nav3 = st.columns([1.5, 2.5, 1])
+# 3. شريط أزرار الأقسام الرئيسية في الأعلى (لكل قسم زر خاص به)
+st.markdown("📂 **أقسام النظام الرئيسية:**", unsafe_allow_html=True)
+main_sections = [
+    "الرئيسية", 
+    "الحضور والانصراف", 
+    "طلبات الاجازة", 
+    "المعاملات المالية", 
+    "كشف الرواتب", 
+    "شؤون الموظفين", 
+    "المستخدمين", 
+    "التقارير", 
+    "اعدادات الشركة", 
+    "أدوات النظام"
+]
 
-with col_nav1:
-    selected_main_cat = st.selectbox("📂 القسم الرئيسي:", [
-        "الرئيسية", 
-        "الحضور والانصراف", 
-        "طلبات الاجازة", 
-        "المعاملات المالية", 
-        "كشف الرواتب", 
-        "شؤون الموظفين", 
-        "المستخدمين", 
-        "التقارير", 
-        "اعدادات الشركة", 
-        "أدوات النظام"
-    ], label_visibility="collapsed")
+# توزيع أزرار الأقسام بشكل أفقي متجاوب
+sec_cols = st.columns(len(main_sections))
+for idx, sec_name in enumerate(main_sections):
+    with sec_cols[idx]:
+        if st.button(sec_name, use_container_width=True, key=f"btn_sec_{idx}"):
+            st.session_state.active_main_section = sec_name
+            st.rerun()
 
+selected_main_cat = st.session_state.active_main_section
+
+# خريطة العمليات الفرعية لكل قسم
 sub_options_map = {
     "الرئيسية": ["لوحة التحكم والمؤشرات"],
     "الحضور والانصراف": ["تسجيل حضور وانصراف", "سجل الحضور والانصراف", "تعديل أو حذف حركة حضور"],
@@ -501,18 +512,23 @@ sub_options_map = {
     "أدوات النظام": ["تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"]
 }
 
-with col_nav2:
-    sub_options_list = sub_options_map.get(selected_main_cat, ["لوحة التحكم والمؤشرات"])
-    choice = st.selectbox("📑 العمليات الفرعية:", sub_options_list, label_visibility="collapsed")
+# 4. الزر المنسدل للعمليات الفرعية للقسم المحدد + زر الخروج
+st.markdown('<div class="cinema-top-bar" style="margin-top: 8px;">', unsafe_allow_html=True)
+col_sub1, col_sub2 = st.columns([4, 1])
 
-with col_nav3:
-    if st.button("⏹️ خروج", use_container_width=True):
+with col_sub1:
+    sub_options_list = sub_options_map.get(selected_main_cat, ["لوحة التحكم والمؤشرات"])
+    choice = st.selectbox(f"📑 العمليات الفرعية لقسم ({selected_main_cat}):", sub_options_list)
+
+with col_sub2:
+    st.write("") # محاذاة رأسية
+    if st.button("⏹️ خروج من النظام", use_container_width=True):
         st.session_state.is_authenticated = False
         st.session_state.current_logged_user = ""
         st.rerun()
 
 st.markdown('</div>', unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True) # إغلاق الحاوية المثبتة
 
 # ---------------------------------------------------------
 # 🎯 بطاقات المؤشرات الأربعة المتجاورة
@@ -543,7 +559,7 @@ with col4:
 st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 15px 0 25px 0;'>", unsafe_allow_html=True)
 
 # =========================================================
-# منطق عرض الشاشات والأقسام حسب الاختيار المنسدل
+# منطق عرض الشاشات والأقسام حسب الاختيار المنسدل والزر النشط
 # =========================================================
 if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم والمؤشرات":
     st.markdown(f'<div class="section-header">📊 لوحة إحصائيات وأرصدة الموظفين</div>', unsafe_allow_html=True)
