@@ -179,7 +179,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS السينمائي الداكن المتميز
+# 🎨 تصميم CSS السينمائي الداكن مع إعدادات الطباعة الدقيقة (خلفية بيضاء ونصوص سوداء)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -202,14 +202,16 @@ st.markdown("""
         min-height: 100vh;
     }
     
-    .cinema-top-bar {
+    /* 📌 تثبيت الهيدر، بيانات المستخدم، وشريط الأقسام معاً بانسيابية عند التمرير */
+    .sticky-top-wrapper {
         position: sticky;
         top: 0rem;
-        z-index: 9999;
-        background: rgba(18, 18, 18, 0.95);
+        z-index: 99999;
+        background: rgba(18, 18, 18, 0.96);
         backdrop-filter: blur(20px);
-        padding: 12px 20px;
-        border-radius: 16px;
+        -webkit-backdrop-filter: blur(20px);
+        padding-top: 10px;
+        padding-bottom: 10px;
         margin-bottom: 20px;
         border-bottom: 2.5px solid #E50914;
         box-shadow: 0 15px 35px rgba(0,0,0,0.7);
@@ -233,14 +235,12 @@ st.markdown("""
     
     .glass-header {
         background: rgba(30, 30, 30, 0.85);
-        backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.08);
         color: #FFFFFF !important;
-        padding: 16px 22px;
-        border-radius: 18px;
+        padding: 14px 20px;
+        border-radius: 14px;
         width: 100%;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        margin-bottom: 12px;
+        margin-bottom: 8px;
     }
     .header-top-system h2 {
         font-size: 15px !important;
@@ -250,27 +250,26 @@ st.markdown("""
         text-align: center;
     }
     .comp-name-txt {
-        font-size: 17px !important;
+        font-size: 16px !important;
         font-weight: bold !important;
-        margin-bottom: 3px !important;
+        margin-bottom: 2px !important;
         color: #FFFFFF !important;
     }
     .comp-info-txt {
-        font-size: 12px !important;
-        margin: 2px 0 !important;
+        font-size: 11.5px !important;
         color: #94A3B8 !important;
     }
     
     .user-badge-box {
         background: rgba(229, 9, 20, 0.15);
         border: 1px solid rgba(229, 9, 20, 0.4);
-        padding: 8px 14px;
-        border-radius: 12px;
-        font-size: 12.5px;
+        padding: 6px 12px;
+        border-radius: 10px;
+        font-size: 12px;
         color: #FCA5A5;
         font-weight: bold;
         text-align: center;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
     
     .glass-card {
@@ -342,6 +341,53 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.08);
         margin-bottom: 20px;
     }
+    
+    /* 🖨️ إعدادات الطباعة: خلفية بيضاء، نصوص سوداء، إظهار الهيدر والمستخدم، وإخفاء شريط الأقسام تماماً */
+    @media print {
+        @page { size: A4 landscape; margin: 10mm; }
+        body, .stApp, .block-container {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+            direction: rtl !important;
+            text-align: right !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        button, .stButton, iframe, div[data-testid="stHeader"], .no-print, .entry-form-area, hr, .cinema-top-bar { 
+            display: none !important; 
+        }
+        .sticky-top-wrapper {
+            position: relative !important;
+            background: #FFFFFF !important;
+            box-shadow: none !important;
+            border-bottom: 2px solid #000000 !important;
+        }
+        .glass-header, .user-badge-box { 
+            background: #FFFFFF !important; 
+            border: 1px solid #000000 !important; 
+            color: #000000 !important;
+            box-shadow: none !important;
+        }
+        .header-top-system h2, .comp-name-txt, .comp-info-txt, .user-badge-box {
+            color: #000000 !important;
+        }
+        table.custom-table { 
+            width: 100% !important; 
+            border: 1px solid #000000 !important; 
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+        }
+        table.custom-table th { 
+            background-color: #E2E8F0 !important; 
+            color: #000000 !important; 
+            border-bottom: 2px solid #000000 !important;
+        }
+        table.custom-table td {
+            color: #000000 !important;
+            border-bottom: 1px solid #CBD5E1 !important;
+        }
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -405,8 +451,14 @@ if not st.session_state.is_authenticated:
     st.stop()
 
 # ---------------------------------------------------------
-# 👤 عرض شريط بيانات المستخدم الحالي في الأعلى
+# 📌 الحاوية العلوية الموحدة والثابتة (هيدر + مستخدم + شريط الأقسام)
 # ---------------------------------------------------------
+st.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
+
+# 1. هيدر الشركة
+render_company_header()
+
+# 2. بيانات المستخدم الحالي
 logged_username = st.session_state.current_logged_user
 user_role = st.session_state.current_user_role
 user_branch = st.session_state.current_user_branch
@@ -421,28 +473,35 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ---------------------------------------------------------
-# 🎬 بار القوائم السينمائي العلوي المنسدل (أفقي متجاور)
-# ---------------------------------------------------------
-render_company_header()
-
-st.markdown('<div class="cinema-top-bar">', unsafe_allow_html=True)
-
+# 3. شريط الأقسام والقوائم المنسدلة الأفقية (يختفي تلقائياً عند الطباعة)
+st.markdown('<div class="cinema-top-bar" style="margin: 0; box-shadow: none;">', unsafe_allow_html=True)
 col_nav1, col_nav2, col_nav3 = st.columns([1.5, 2.5, 1])
+
 with col_nav1:
     selected_main_cat = st.selectbox("🎬 القسم الرئيسي:", [
-        "🏠 الرئيسية", "🔍 البحث المتقدم", "⏱️ الحضور والانصراف", 
-        "💰 المعاملات المالية", "📝 طلبات الإجازات", "👥 شؤون الموظفين", "⚙️ الأدوات والنظام"
+        "الرئيسية", 
+        "الحضور والانصراف", 
+        "طلبات الاجازة", 
+        "المعاملات المالية", 
+        "كشف الرواتب", 
+        "شؤون الموظفين", 
+        "المستخدمين", 
+        "التقارير", 
+        "اعدادات الشركة", 
+        "أدوات النظام"
     ], label_visibility="collapsed")
 
 sub_options_map = {
-    "🏠 الرئيسية": ["لوحة التحكم والمؤشرات"],
-    "🔍 البحث المتقدم": ["بحث شامل في قواعد البيانات"],
-    "⏱️ الحضور والانصراف": ["تسجيل حضور وانصراف", "سجل الحضور والانصراف", "تعديل أو حذف حركة حضور"],
-    "💰 المعاملات المالية": ["تسجيل معاملة مالية", "سجل المعاملات المالية", "تعديل أو حذف معاملة مالية"],
-    "📝 طلبات الإجازات": ["تسجيل طلب إجازة جديد", "سجل طلبات قيد الانتظار", "سجل الطلبات المقبولة", "سجل الطلبات المرفوضة", "تعديل أو حذف طلب إجازة"],
-    "👥 شؤون الموظفين": ["إضافة موظف جديد", "سجل الموظفين والأرصدة", "تعديل أو حذف موظف"],
-    "⚙️ الأدوات والنظام": ["إدارة المستخدمين والصلاحيات", "كشف الرواتب والمستحقات", "طباعة التقارير", "إعدادات الشركة", "تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"]
+    "الرئيسية": ["لوحة التحكم والمؤشرات"],
+    "الحضور والانصراف": ["تسجيل حضور وانصراف", "سجل الحضور والانصراف", "تعديل أو حذف حركة حضور"],
+    "طلبات الاجازة": ["تسجيل طلب إجازة", "سجل طلبات قيد الانتظار", "سجل الطلبات المقبولة", "سجل الطلبات المرفوضة", "تعديل أو حذف طلب إجازة"],
+    "المعاملات المالية": ["تسجيل معاملة مالية", "سجل المعاملات المالية", "تعديل أو حذف معاملة مالية"],
+    "كشف الرواتب": ["كشف الرواتب والمستحقات الشامل"],
+    "شؤون الموظفين": ["إضافة موظف جديد", "سجل الموظفين والأرصدة", "تعديل أو حذف موظف"],
+    "المستخدمين": ["إدارة المستخدمين والصلاحيات"],
+    "التقارير": ["طباعة التقارير العامة"],
+    "اعدادات الشركة": ["إعدادات الشركة وبياناتها"],
+    "أدوات النظام": ["تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"]
 }
 
 with col_nav2:
@@ -456,6 +515,7 @@ with col_nav3:
         st.rerun()
 
 st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)  # إغلاق الـ sticky-top-wrapper
 
 # ---------------------------------------------------------
 # 🎯 بطاقات المؤشرات الأربعة المتجاورة
@@ -486,31 +546,10 @@ with col4:
 st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 15px 0 25px 0;'>", unsafe_allow_html=True)
 
 # =========================================================
-# منطق عرض الشاشات والأقسام المختار
+# منطق عرض الشاشات والأقسام حسب الاختيار المنسدل
 # =========================================================
-if selected_main_cat == "🔍 البحث المتقدم" or choice == "بحث شامل في قواعد البيانات":
-    st.markdown(f'<div class="section-header">🔍 محرك البحث السينمائي الشامل</div>', unsafe_allow_html=True)
-    st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-    with st.form("advanced_search_form"):
-        col_s1, col_s2, col_s3 = st.columns(3)
-        with col_s1: search_keyword = st.text_input("بحث نصي (الاسم، الوظيفة، أو الكود):")
-        with col_s2: 
-            branches_avail = ["الكل"] + sorted(st.session_state.employees["الفرع"].dropna().unique().tolist()) if not st.session_state.employees.empty else ["الكل"]
-            selected_search_branch = st.selectbox("تصفية حسب الفرع:", branches_avail)
-        with col_s3: search_target_section = st.selectbox("نطاق البحث:", ["جميع السجلات (شامل)", "سجل الموظفين", "سجل الحضور", "سجل الإجازات", "سجل المعاملات المالية"])
-        submit_adv_search = st.form_submit_button("🔍 ابدأ البحث", use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    keyword = search_keyword.strip().lower()
-    if search_target_section in ["جميع السجلات (شامل)", "سجل الموظفين"]:
-        st.markdown("##### 👥 نتائج البحث في (الموظفين):")
-        emp_df = st.session_state.employees.copy()
-        if selected_search_branch != "الكل": emp_df = emp_df[emp_df["الفرع"] == selected_search_branch]
-        if keyword: emp_df = emp_df[emp_df.astype(str).apply(lambda x: x.str.lower().str.contains(keyword)).any(axis=1)]
-        render_printable_table(emp_df)
-
-elif selected_main_cat == "🏠 الرئيسية" or choice == "لوحة التحكم والمؤشرات":
-    st.markdown(f'<div class="section-header">📊 لوحة إحصائيات وأرصدة النجوم</div>', unsafe_allow_html=True)
+if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم والمؤشرات":
+    st.markdown(f'<div class="section-header">📊 لوحة إحصائيات وأرصدة الموظفين</div>', unsafe_allow_html=True)
     render_printable_table(view_employees)
 
 elif choice == "تسجيل حضور وانصراف":
@@ -537,32 +576,7 @@ elif choice == "سجل الحضور والانصراف":
     with col_t2: render_print_button()
     render_printable_table(st.session_state.attendance)
 
-elif choice == "تسجيل معاملة مالية":
-    st.subheader("💰 تسجيل معاملة مالية جديدة")
-    emp_names = st.session_state.employees["اسم الموظف"].tolist()
-    if emp_names:
-        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with st.form("fin_form"):
-            emp_f = st.selectbox("الموظف", emp_names)
-            t_type = st.selectbox("نوع المعاملة", ["سلفة", "جزاء (خصم)", "مكافأة (إضافي)", "بدلات"])
-            t_amt = st.number_input("المبلغ", min_value=0.0, value=100.0)
-            t_reas = st.text_input("البيان / السبب")
-            if st.form_submit_button("حفظ المعاملة المالية", use_container_width=True):
-                emp_data = st.session_state.employees[st.session_state.employees["اسم الموظف"] == emp_f].iloc[0]
-                new_f = {"التاريخ": str(date.today()), "كود الموظف": emp_data["كود الموظف"], "اسم الموظف": emp_f, "الفرع": emp_data["الفرع"], "النوع": t_type, "المبلغ / القيمة": t_amt, "البيان / السبب": t_reas}
-                st.session_state.financial_transactions = pd.concat([st.session_state.financial_transactions, pd.DataFrame([new_f])], ignore_index=True)
-                auto_save_data()
-                st.success("تم الحفظ بنجاح!")
-                st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-
-elif choice == "سجل المعاملات المالية":
-    col_t1, col_t2 = st.columns([3, 1])
-    with col_t1: st.subheader("💰 سجل المعاملات المالية")
-    with col_t2: render_print_button()
-    render_printable_table(st.session_state.financial_transactions)
-
-elif choice == "تسجيل طلب إجازة جديد":
+elif choice == "تسجيل طلب إجازة":
     st.subheader("📝 تقديم طلب إجازة جديد")
     emp_names = st.session_state.employees["اسم الموظف"].tolist()
     if emp_names:
@@ -590,8 +604,45 @@ elif choice == "سجل طلبات قيد الانتظار":
     with col_t2: render_print_button()
     render_printable_table(st.session_state.requests[st.session_state.requests["الحالة"] == "قيد الانتظار"] if not st.session_state.requests.empty else pd.DataFrame())
 
+elif choice == "سجل الطلبات المقبولة":
+    col_t1, col_t2 = st.columns([3, 1])
+    with col_t1: st.subheader("✅ سجل الطلبات المقبولة")
+    with col_t2: render_print_button()
+    render_printable_table(st.session_state.requests[st.session_state.requests["الحالة"] == "مقبول"] if not st.session_state.requests.empty else pd.DataFrame())
+
+elif choice == "تسجيل معاملة مالية":
+    st.subheader("💰 تسجيل معاملة مالية جديدة")
+    emp_names = st.session_state.employees["اسم الموظف"].tolist()
+    if emp_names:
+        st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
+        with st.form("fin_form"):
+            emp_f = st.selectbox("الموظف", emp_names)
+            t_type = st.selectbox("نوع المعاملة", ["سلفة", "جزاء (خصم)", "مكافأة (إضافي)", "بدلات"])
+            t_amt = st.number_input("المبلغ", min_value=0.0, value=100.0)
+            t_reas = st.text_input("البيان / السبب")
+            if st.form_submit_button("حفظ المعاملة المالية", use_container_width=True):
+                emp_data = st.session_state.employees[st.session_state.employees["اسم الموظف"] == emp_f].iloc[0]
+                new_f = {"التاريخ": str(date.today()), "كود الموظف": emp_data["كود الموظف"], "اسم الموظف": emp_f, "الفرع": emp_data["الفرع"], "النوع": t_type, "المبلغ / القيمة": t_amt, "البيان / السبب": t_reas}
+                st.session_state.financial_transactions = pd.concat([st.session_state.financial_transactions, pd.DataFrame([new_f])], ignore_index=True)
+                auto_save_data()
+                st.success("تم الحفظ بنجاح!")
+                st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+elif choice == "سجل المعاملات المالية":
+    col_t1, col_t2 = st.columns([3, 1])
+    with col_t1: st.subheader("💰 سجل المعاملات المالية")
+    with col_t2: render_print_button()
+    render_printable_table(st.session_state.financial_transactions)
+
+elif choice == "كشف الرواتب والمستحقات الشامل":
+    col_t1, col_t2 = st.columns([3, 1])
+    with col_t1: st.subheader("💰 كشف الرواتب والمستحقات الشامل")
+    with col_t2: render_print_button()
+    render_printable_table(st.session_state.employees)
+
 elif choice == "إضافة موظف جديد":
-    st.subheader("👥 إضافة موظف جديد للمنصة")
+    st.subheader("👥 إضافة موظف جديد")
     st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     with st.form("new_emp"):
         c_code = st.text_input("كود الموظف")
@@ -614,14 +665,18 @@ elif choice == "سجل الموظفين والأرصدة":
     with col_t2: render_print_button()
     render_printable_table(st.session_state.employees)
 
-elif choice == "كشف الرواتب والمستحقات":
+elif choice == "إدارة المستخدمين والصلاحيات":
+    st.subheader("🔒 إدارة المستخدمين والصلاحيات")
+    render_printable_table(st.session_state.users.drop(columns=["الرسم السري"], errors="ignore"))
+
+elif choice == "طباعة التقارير العامة":
     col_t1, col_t2 = st.columns([3, 1])
-    with col_t1: st.subheader("💰 كشف الرواتب والمستحقات الشامل")
+    with col_t1: st.subheader("🖨️ طباعة التقارير العامة")
     with col_t2: render_print_button()
     render_printable_table(st.session_state.employees)
 
-elif choice == "إعدادات الشركة":
-    st.subheader("⚙️ إعدادات المنصة والشركة")
+elif choice == "إعدادات الشركة وبياناتها":
+    st.subheader("⚙️ إعدادات الشركة وبياناتها")
     info = st.session_state.company_info
     st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     with st.form("settings"):
@@ -641,7 +696,7 @@ elif choice == "تصدير وتحميل Excel":
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         st.session_state.employees.to_excel(writer, sheet_name='الموظفين', index=False)
     output.seek(0)
-    st.download_button("📥 تحميل ملف الإكسيل", data=output, file_name="cinema_system_data.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    st.download_button("📥 تحميل ملف الإكسيل", data=output, file_name="system_data.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     st.markdown('</div>', unsafe_allow_html=True)
 
 else:
