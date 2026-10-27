@@ -186,15 +186,15 @@ def render_print_button():
                 window.parent.print();
                 setTimeout(() => { if (sidebar) sidebar.style.display = 'block'; }, 1000);
             " style="
-                background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+                background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
                 color: white;
                 padding: 10px 22px;
                 border: none;
-                border-radius: 8px;
+                border-radius: 10px;
                 font-size: 13px;
                 font-weight: bold;
                 cursor: pointer;
-                box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
                 font-family: 'Tahoma', sans-serif;
                 transition: all 0.3s ease;
             ">
@@ -203,7 +203,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS المتطور مع قواعد طباعة صارمة لعزل المحتوى الرئيسي وإخفاء القائمة الجانبية
+# 🎨 تصميم CSS المتطور والانسيابي (Modern & Fluid Full-Width UI)
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -212,41 +212,43 @@ st.markdown("""
         font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
         direction: rtl !important;
         text-align: right !important;
-        color: #1E293B !important;
+        color: #0F172A !important;
     }
     
     .block-container {
-        padding-top: 1.5rem !important;
-        padding-bottom: 3rem !important;
+        padding-top: 2rem !important;
+        padding-bottom: 4rem !important;
+        padding-left: 3rem !important;
+        padding-right: 3rem !important;
         max-width: 100% !important;
-        background-color: #F8FAFC !important;
+        background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%) !important;
     }
     
-    /* 📋 القائمة الجانبية الانسيابية */
+    /* 📋 القائمة الجانبية الانسيابية العصرية */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%) !important;
+        background: linear-gradient(180deg, #090D16 0%, #1E293B 100%) !important;
         color: #F8FAFC !important;
         padding-top: 1.5rem;
         border-left: 1px solid rgba(255, 255, 255, 0.08);
-        min-width: 290px !important;
-        box-shadow: -5px 0 25px rgba(0,0,0,0.1);
+        min-width: 310px !important;
+        box-shadow: -10px 0 30px rgba(0,0,0,0.15);
     }
     
     [data-testid="stSidebar"] div, [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] h3 {
-        color: #F1F5F9 !important;
+        color: #F8FAFC !important;
         text-align: right !important;
         direction: rtl !important;
     }
     
     [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: rgba(255, 255, 255, 0.08) !important;
-        border-radius: 8px !important;
+        border-radius: 10px !important;
     }
     
     [data-testid="stSidebar"] div[data-baseweb="select"] > div {
         background-color: transparent !important;
         color: #FFFFFF !important;
-        border-color: rgba(255, 255, 255, 0.15) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
     }
     
     [data-testid="stSidebar"] div[data-baseweb="select"] span, 
@@ -265,8 +267,8 @@ st.markdown("""
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
         font-weight: bold !important;
-        border-radius: 8px !important;
-        border-color: #E2E8F0 !important;
+        border-radius: 10px !important;
+        border-color: #CBD5E1 !important;
     }
 
     div[data-baseweb="popover"],
@@ -283,45 +285,47 @@ st.markdown("""
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
         color: #334155 !important;
         font-weight: bold !important;
-        font-size: 13px !important;
+        font-size: 13.5px !important;
     }
     
     input, textarea, select {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
         -webkit-text-fill-color: #0F172A !important;
-        font-size: 13px !important;
+        font-size: 13.5px !important;
         font-weight: bold !important;
-        border-radius: 8px !important;
-        border: 1px solid #CBD5E1 !important;
+        border-radius: 10px !important;
+        border: 1.5px solid #CBD5E1 !important;
+        padding: 10px !important;
     }
     
-    /* 🏢 هيدر الشركة الاحترافي */
+    /* 🏢 هيدر الشركة الاحترافي العريض والمتطور */
     .company-header-container {
         background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%);
         color: #FFFFFF !important;
-        padding: 22px 26px;
-        border-radius: 14px;
-        margin-bottom: 20px !important;
+        padding: 26px 32px;
+        border-radius: 16px;
+        margin-bottom: 25px !important;
         width: 100%;
-        box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.25);
+        box-shadow: 0 12px 30px -8px rgba(30, 58, 138, 0.3);
         box-sizing: border-box;
     }
     .header-top-system {
         text-align: center !important;
         width: 100%;
-        margin-bottom: 10px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-        padding-bottom: 8px;
+        margin-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        padding-bottom: 10px;
     }
     .header-top-system h2 {
-        font-size: 17px !important;
+        font-size: 18px !important;
         font-weight: bold !important;
         color: #FFFFFF !important;
         -webkit-text-fill-color: #FFFFFF !important;
         margin: 0 !important;
         padding: 0 !important;
         text-align: center !important;
+        letter-spacing: 0.4px;
     }
     .header-bottom-content {
         display: flex;
@@ -329,7 +333,7 @@ st.markdown("""
         align-items: center;
         width: 100%;
     }
-    .header-right-info { text-align: right !important; flex: 3; }
+    .header-right-info { text-align: right !important; flex: 3.5; }
     .header-left-logo {
         flex: 1.2;
         text-align: left !important;
@@ -339,77 +343,82 @@ st.markdown("""
         padding-left: 5px;
     }
     .comp-name-txt {
-        font-size: 16px !important;
+        font-size: 18px !important;
         font-weight: bold !important;
-        margin-bottom: 6px !important;
+        margin-bottom: 8px !important;
         color: #FFFFFF !important;
         -webkit-text-fill-color: #FFFFFF !important;
     }
     .comp-info-txt {
-        font-size: 12px !important;
-        margin: 3px 0 !important;
+        font-size: 13px !important;
+        margin: 4px 0 !important;
         color: #E2E8F0 !important;
         -webkit-text-fill-color: #E2E8F0 !important;
-        line-height: 1.5;
+        line-height: 1.6;
     }
     
-    /* 📊 بطاقات المؤشرات */
+    /* 📊 بطاقات مؤشرات الأداء العريضة والعصرية (Dashboard Cards) */
     .dashboard-card {
         background: #FFFFFF;
-        border-right: 5px solid #2563EB;
-        padding: 18px 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        border-right: 6px solid #3B82F6;
+        padding: 22px 24px;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.05);
         text-align: right !important;
-        margin-bottom: 12px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     }
     .dashboard-card-title {
-        font-size: 12px;
+        font-size: 13px;
         color: #64748B;
         font-weight: bold;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
     }
     .dashboard-card-value {
-        font-size: 24px;
+        font-size: 28px;
         color: #1E3A8A;
         font-weight: bold;
     }
     
-    /* 📌 رؤوس الأقسام */
+    /* 📌 رؤوس الأقسام المتميزة */
     .section-header {
-        font-size: 16px !important;
+        font-size: 17px !important;
         font-weight: bold !important;
         color: #1E3A8A !important;
-        border-bottom: 2px solid #3B82F6;
-        padding-bottom: 8px;
-        margin-top: 18px !important;
-        margin-bottom: 14px !important;
+        border-bottom: 2.5px solid #3B82F6;
+        padding-bottom: 10px;
+        margin-top: 22px !important;
+        margin-bottom: 16px !important;
         text-align: right !important;
         direction: rtl !important;
     }
     
-    /* 📋 الجداول الانسيابية */
+    /* 📋 الجداول الانسيابية النظيفة واسعة النطاق */
     table.custom-table {
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
-        margin-top: 8px !important;
-        margin-bottom: 16px !important;
+        margin-top: 10px !important;
+        margin-bottom: 20px !important;
         background-color: #FFFFFF;
         color: #0F172A;
         direction: rtl !important;
         text-align: right !important;
-        border-radius: 10px;
+        border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.04);
         border: 1px solid #E2E8F0;
     }
     table.custom-table th, table.custom-table td {
         border-bottom: 1px solid #E2E8F0;
         border-left: 1px solid #F1F5F9;
-        padding: 10px 14px;
+        padding: 12px 16px;
         text-align: right !important;
-        font-size: 12.5px;
+        font-size: 13px;
         color: #1E293B !important;
         background-color: #FFFFFF !important;
     }
@@ -417,19 +426,20 @@ st.markdown("""
         background-color: #F8FAFC !important;
         font-weight: bold;
         color: #1E3A8A !important;
-        border-bottom: 2px solid #CBD5E1;
+        border-bottom: 2.5px solid #CBD5E1;
     }
     
+    /* 📝 مناطق النماذج والإدخال العريضة */
     .entry-form-area {
         background: #FFFFFF;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        padding: 26px;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.04);
         border: 1px solid #E2E8F0;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
     
-    /* 🖨️ قواعد الطباعة الصارمة لإخفاء القائمة والأزرار نهائياً */
+    /* 🖨️ قواعد الطباعة الصارمة */
     @media print {
         @page {
             size: A4 landscape;
@@ -446,7 +456,6 @@ st.markdown("""
             margin: 0 !important;
             padding: 0 !important;
         }
-        /* إخفاء القائمة الجانبية تماماً عبر الـ CSS والـ DOM */
         [data-testid="stSidebar"], 
         section[data-testid="stSidebar"],
         div[data-testid="stSidebar"] {
@@ -456,13 +465,11 @@ st.markdown("""
             max-width: 0px !important;
             flex: 0 0 0% !important;
         }
-        /* إخفاء الأزرار، الحقول، النماذج، ومكونات النظام غير المرغوبة في الطباعة */
         button, .stButton, iframe, div[data-testid="stHeader"], div[data-baseweb="select"],
         .dashboard-card, div[data-testid="stForm"], .no-print, .entry-form-area, hr {
             display: none !important;
             visibility: hidden !important;
         }
-        /* تخصيص الهيدر والجدول للطباعة بشكل احترافي */
         .company-header-container {
             background: #FFFFFF !important;
             color: #000000 !important;
@@ -513,10 +520,10 @@ def render_printable_table(df):
 
 def render_company_header():
     info = st.session_state.company_info
-    logo_html = '<div style="padding: 10px 16px; border: 1px dashed rgba(255,255,255,0.4); border-radius: 10px; font-size: 12px; color: white; background: rgba(255,255,255,0.06); font-weight: bold;">🏢 شعار الشركة</div>'
+    logo_html = '<div style="padding: 12px 18px; border: 1.5px dashed rgba(255,255,255,0.4); border-radius: 12px; font-size: 13px; color: white; background: rgba(255,255,255,0.06); font-weight: bold;">🏢 شعار الشركة</div>'
     if info.get("logo") is not None:
         try:
-            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 85px; max-width: 170px; object-fit: contain; background: white; border-radius: 8px; padding: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />'
+            logo_html = f'<img src="data:image/png;base64,{info.get("logo")}" alt="Logo" style="max-height: 95px; max-width: 190px; object-fit: contain; background: white; border-radius: 10px; padding: 6px; box-shadow: 0 6px 15px rgba(0,0,0,0.2);" />'
         except Exception:
             pass
             
@@ -544,9 +551,9 @@ def render_company_header():
 if not st.session_state.is_authenticated:
     st.markdown(
         f"""
-        <div style="max-width: 440px; margin: 70px auto; background: #FFFFFF; padding: 35px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.06); text-align: center; direction: rtl; border: 1px solid #E2E8F0;">
-            <h2 style="color: #1E3A8A; margin-bottom: 12px; font-size: 21px;">🔐 تسجيل الدخول للنظام</h2>
-            <p style="color: #64748B; font-size: 13px; margin-bottom: 22px;">{company_display_name} | رخصة التشغيل: {company_license}</p>
+        <div style="max-width: 480px; margin: 80px auto; background: #FFFFFF; padding: 40px; border-radius: 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); text-align: center; direction: rtl; border: 1px solid #E2E8F0;">
+            <h2 style="color: #1E3A8A; margin-bottom: 15px; font-size: 22px;">🔐 تسجيل الدخول للنظام</h2>
+            <p style="color: #64748B; font-size: 13.5px; margin-bottom: 25px;">{company_display_name} | رخصة التشغيل: {company_license}</p>
         </div>
         """,
         unsafe_allow_html=True
@@ -723,7 +730,7 @@ if main_menu == "🔍 صندوق البحث الشامل" or choice == "محرك
             render_printable_table(fin_df)
 
 # =========================================================
-# 🏠 الشاشة الرئيسية / لوحة المؤشرات
+# 🏠 الشاشة الرئيسية / لوحة المؤشرات (العريضة والعصرية)
 # =========================================================
 elif choice == "لوحة المؤشرات والتحكم" or choice == "الشاشة الرئيسية":
     st.markdown(f'<div class="section-header">📈 مؤشرات الأداء العامة - شركة: {company_display_name}</div>', unsafe_allow_html=True)
@@ -839,7 +846,7 @@ elif choice == "لوحة المؤشرات والتحكم" or choice == "الشا
                     color: white;
                     padding: 8px 14px;
                     border: none;
-                    border-radius: 6px;
+                    border-radius: 8px;
                     font-size: 13px;
                     font-weight: bold;
                     cursor: pointer;
@@ -876,7 +883,7 @@ elif choice == "لوحة المؤشرات والتحكم" or choice == "الشا
             )),
             tooltip=['اسم الموظف', 'نوع الرصيد', 'عدد الأيام']
         ).properties(
-            height=320,
+            height=360,
             background='white'
         ).configure_view(
             fill='white',
