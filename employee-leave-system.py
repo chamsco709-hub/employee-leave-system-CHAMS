@@ -170,15 +170,41 @@ def render_printable_table(df):
         str_lit.info("لا توجد بيانات متاحة للعرض.")
         return
     
-    # عرض الجدول بشكل احترافي ونظيف باستخدام مكونات Streamlit الأصلية
+    info = str_lit.session_state.company_info
+    c_name = info.get("name", "")
+    c_addr = info.get("address", "")
+    c_cr = info.get("cr", "")
+    c_tax = info.get("tax", "")
+    c_lic = info.get("license", "")
+    
+    logged_user = str_lit.session_state.get('current_logged_user', 'غير محدد')
+    user_role = str_lit.session_state.get('current_user_role', 'غير محدد')
+    user_branch = str_lit.session_state.get('current_user_branch', 'غير محدد')
+    
+    # عرض الهيدر الرسمي وبيانات المستخدم فوق الجدول داخل الشاشة
+    str_lit.markdown(f"""
+    <div style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(229, 9, 20, 0.4); padding: 12px; border-radius: 10px; margin-bottom: 10px; font-size: 13px; color: #F1F5F9;">
+        <h4 style="color: #F87171; margin: 0 0 5px 0;">🏢 {c_name}</h4>
+        <div><b>العنوان:</b> {c_addr} &nbsp;|&nbsp; <b>س.ت:</b> {c_cr} &nbsp;|&nbsp; <b>ب.ض:</b> {c_tax} &nbsp;|&nbsp; <b>الترخيص:</b> {c_lic}</div>
+        <div style="margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 5px; color: #94A3B8;">
+            👤 <b>المستخدم المطبع/المسؤول:</b> {logged_user} ({user_role}) &nbsp;|&nbsp; 📍 <b>الفرع:</b> {user_branch} &nbsp;|&nbsp; 📅 <b>تاريخ التقرير:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
     str_lit.dataframe(df, use_container_width=True)
     
-    # توفير زر لتحميل التقرير كملف CSV أو Excel كحل بديل ومضمون 100% للطباعة والاحتفاظ بالنسخ
-    csv_data = df.to_csv(index=False).encode('utf-8-sig')
+    # دمج ترويسة الشركة وبيانات المستخدم عند تصدير البيانات لتصبح جزءاً من الملف
+    header_info_csv = f"# شركة: {c_name} | س.ت: {c_cr} | ب.ض: {c_tax} | ترخيص: {c_lic}\n"
+    user_info_csv = f"# المسؤول: {logged_user} ({user_role}) | الفرع: {user_branch} | التاريخ: {datetime.now().strftime('%Y-%m-%d')}\n\n"
+    
+    csv_body = df.to_csv(index=False)
+    full_csv_data = (header_info_csv + user_info_csv + csv_body).encode('utf-8-sig')
+    
     str_lit.download_button(
-        label="📥 تحميل هذا الجدول كملف CSV للطباعة",
-        data=csv_data,
-        file_name="report_table.csv",
+        label="📥 تحميل هذا الجدول كملف CSV (مع الهيدر وبيانات المستخدم)",
+        data=full_csv_data,
+        file_name=f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
         mime="text/csv",
     )
 
