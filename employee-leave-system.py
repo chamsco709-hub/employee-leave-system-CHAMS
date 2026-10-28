@@ -268,23 +268,24 @@ str_lit.markdown("""
         background: rgba(30, 30, 30, 0.85);
         border: 1px solid rgba(255, 255, 255, 0.08);
         color: #FFFFFF !important;
-        padding: 6px 12px;
+        padding: 0px !important;
         border-radius: 10px;
         width: 100%;
         margin-bottom: 3px;
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        align-items: stretch;
+        overflow: hidden;
     }
     
-    .header-logo-box {
-        font-size: 20px;
+    .header-logo-box-full {
+        width: 75px;
         background: rgba(229, 9, 20, 0.2);
-        padding: 4px 8px;
-        border-radius: 8px;
-        border: 1px solid rgba(229, 9, 20, 0.4);
-        text-align: center;
-        min-width: 30px;
+        border-left: 1px solid rgba(229, 9, 20, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        padding: 4px;
     }
     
     .header-top-system h2 {
@@ -375,11 +376,11 @@ def render_company_header():
     logo_val = info.get("logo", "")
     
     if logo_val and logo_val.startswith("data:image"):
-        logo_html = f'<img src="{logo_val}" style="width: 32px; height: 32px; object-fit: contain; border-radius: 6px; background: white; padding: 2px;" />'
+        logo_html = f'<div class="header-logo-box-full"><img src="{logo_val}" style="width: 100%; height: 100%; object-fit: contain; background: white; padding: 2px;" /></div>'
     elif logo_val and (logo_val.startswith("http://") or logo_val.startswith("https://")):
-        logo_html = f'<img src="{logo_val}" style="width: 32px; height: 32px; object-fit: contain; border-radius: 6px;" />'
+        logo_html = f'<div class="header-logo-box-full"><img src="{logo_val}" style="width: 100%; height: 100%; object-fit: contain;" /></div>'
     else:
-        logo_html = '<div class="header-logo-box">🏢</div>'
+        logo_html = '<div class="header-logo-box-full">🏢</div>'
 
     contact_num = info.get("contact", "غير محدد")
     email_addr = info.get("email", "غير محدد")
@@ -389,17 +390,16 @@ def render_company_header():
     lic_num = info.get("license", "غير محدد")
     comp_name = info.get("name", "")
 
+    # الشعار في أقصى اليمين ويمتد بطول الهيدر
     str_lit.markdown(
         f"""
         <div class="glass-header">
-            <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-                {logo_html}
-                <div style="width: 100%;">
-                    <div class="header-top-system"><h2>برنامج شؤون الموظفين والإدارة</h2></div>
-                    <div class="comp-name-txt">{comp_name}</div>
-                    <div class="comp-info-txt">📍 العنوان: {address_str} &nbsp;|&nbsp; 📋 س.ت: {cr_num} &nbsp;|&nbsp; 🧾 ب.ض: {tax_num} &nbsp;|&nbsp; 📞 هاتف: {contact_num} &nbsp;|&nbsp; ✉️ بريد: {email_addr} &nbsp;|&nbsp; 🔑 ترخيص: {lic_num}</div>
-                </div>
+            <div style="padding: 6px 12px; width: 100%;">
+                <div class="header-top-system"><h2>برنامج شؤون الموظفين والإدارة</h2></div>
+                <div class="comp-name-txt">{comp_name}</div>
+                <div class="comp-info-txt">📍 العنوان: {address_str} &nbsp;|&nbsp; 📋 س.ت: {cr_num} &nbsp;|&nbsp; 🧾 ب.ض: {tax_num} &nbsp;|&nbsp; 📞 هاتف: {contact_num} &nbsp;|&nbsp; ✉️ بريد: {email_addr} &nbsp;|&nbsp; 🔑 ترخيص: {lic_num}</div>
             </div>
+            {logo_html}
         </div>
         """,
         unsafe_allow_html=True
@@ -535,7 +535,6 @@ with col4:
 
 str_lit.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 12px 0 20px 0;'>", unsafe_allow_html=True)
 
-# ----------------- توجيه الأقسام والعمليات الفرعية -----------------
 if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم والمؤشرات":
     if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم والمؤشرات":
         str_lit.markdown(f'<div class="section-header">📊 داشبورد ومخطط بيانات لكل فرع (بيانات تفصيلية)</div>', unsafe_allow_html=True)
