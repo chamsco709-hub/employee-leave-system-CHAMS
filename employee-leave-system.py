@@ -176,27 +176,27 @@ st.session_state.company_info["license"] = company_license
 
 def render_print_button():
     components.html("""
-        <div style="text-align: left; margin-bottom: 15px;" class="no-print">
+        <div style="text-align: left; margin-bottom: 12px; margin-top: 5px;" class="no-print">
             <button onclick="
                 window.parent.print();
             " style="
                 background: linear-gradient(135deg, #E50914 0%, #B20710 100%);
                 color: white;
-                padding: 10px 22px;
+                padding: 8px 18px;
                 border: none;
-                border-radius: 12px;
-                font-size: 13px;
+                border-radius: 10px;
+                font-size: 12.5px;
                 font-weight: bold;
                 cursor: pointer;
-                box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+                box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
                 font-family: 'Tahoma', sans-serif;
             ">
                 🖨️ طباعة الجدول الحالي فقط
             </button>
         </div>
-    """, height=50)
+    """, height=45)
 
-# 🎨 تصميم CSS المتطور مع إلغاء الهيدر والأقسام والبطاقات تماماً عند الطباعة وإظهار الجدول فقط
+# 🎨 تصميم CSS مع تنسيق احترافي للمسافات والهوامش
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -210,16 +210,16 @@ st.markdown("""
     }
     
     .block-container {
-        padding-top: 1rem !important;
-        padding-bottom: 4rem !important;
-        padding-left: 2rem !important;
-        padding-right: 2rem !important;
+        padding-top: 0.5rem !important;
+        padding-bottom: 3rem !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
         max-width: 100% !important;
         background: linear-gradient(135deg, #121212 0%, #1A1A1A 50%, #0B0B0B 100%) !important;
         min-height: 100vh;
     }
     
-    /* تثبيت الهيدر والأقسام العلوية تماماً في أعلى الشاشة دون أي حركة أو نزول */
+    /* 📌 تنسيق وتثبيت الهيدر والأقسام العلوية بمسافات مدمجة ومنظمة */
     .sticky-top-wrapper {
         position: fixed !important;
         top: 0 !important;
@@ -227,114 +227,116 @@ st.markdown("""
         right: 0 !important;
         z-index: 999999 !important;
         background: #121212 !important;
-        padding: 10px 20px 5px 20px !important;
-        border-bottom: 2.5px solid #E50914;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        padding: 8px 15px 4px 15px !important;
+        border-bottom: 2px solid #E50914;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.8);
     }
     
+    /* 🚀 مسافة علوية مثالية للمحتوى أسفل الشريط المثبت */
     .main-content-spacer {
-        margin-top: 180px !important;
+        margin-top: 165px !important;
     }
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
         color: #CBD5E1 !important;
         font-weight: bold !important;
-        font-size: 13.5px !important;
+        font-size: 13px !important;
+        margin-bottom: 4px !important;
     }
     
     input, textarea, select {
         background-color: rgba(30, 41, 59, 0.9) !important;
         color: #FFFFFF !important;
-        font-size: 13.5px !important;
+        font-size: 13px !important;
         font-weight: bold !important;
-        border-radius: 12px !important;
+        border-radius: 10px !important;
         border: 1.5px solid #475569 !important;
-        padding: 10px !important;
+        padding: 8px 12px !important;
     }
     
     .glass-header {
         background: rgba(30, 30, 30, 0.85);
         border: 1px solid rgba(255, 255, 255, 0.08);
         color: #FFFFFF !important;
-        padding: 8px 14px;
-        border-radius: 12px;
+        padding: 6px 12px;
+        border-radius: 10px;
         width: 100%;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
     
     .header-logo-box {
-        font-size: 22px;
+        font-size: 20px;
         background: rgba(229, 9, 20, 0.2);
-        padding: 6px 10px;
-        border-radius: 10px;
+        padding: 4px 8px;
+        border-radius: 8px;
         border: 1px solid rgba(229, 9, 20, 0.4);
         text-align: center;
-        min-width: 35px;
+        min-width: 30px;
     }
     
     .header-top-system h2 {
-        font-size: 11.5px !important;
+        font-size: 11px !important;
         font-weight: bold !important;
         color: #F87171 !important;
-        margin: 0 0 2px 0 !important;
+        margin: 0 0 1px 0 !important;
     }
     .comp-name-txt {
-        font-size: 13.5px !important;
+        font-size: 13px !important;
         font-weight: bold !important;
         color: #FFFFFF !important;
     }
     .comp-info-txt {
-        font-size: 10px !important;
+        font-size: 9.5px !important;
         color: #94A3B8 !important;
-        margin-top: 2px;
+        margin-top: 1px;
     }
     
     .user-badge-box {
         background: rgba(229, 9, 20, 0.15);
         border: 1px solid rgba(229, 9, 20, 0.4);
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 10.5px;
+        padding: 2px 6px;
+        border-radius: 5px;
+        font-size: 10px;
         color: #FCA5A5;
         font-weight: bold;
         text-align: center;
-        margin-bottom: 3px;
+        margin-bottom: 2px;
     }
     
     .glass-card {
         background: rgba(30, 30, 30, 0.75);
         backdrop-filter: blur(15px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-right: 6px solid #E50914;
-        padding: 18px 20px;
-        border-radius: 16px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        border-right: 5px solid #E50914;
+        padding: 14px 16px;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
         text-align: right !important;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
     }
     .glass-card-title {
-        font-size: 12.5px;
+        font-size: 12px;
         color: #94A3B8;
         font-weight: bold;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
     }
     .glass-card-value {
-        font-size: 24px;
+        font-size: 22px;
         color: #FFFFFF;
         font-weight: bold;
     }
     
     .section-header {
-        font-size: 17px !important;
+        font-size: 16px !important;
         font-weight: bold !important;
         color: #F87171 !important;
-        border-bottom: 2.5px solid #E50914;
-        padding-bottom: 10px;
-        margin-top: 22px !important;
-        margin-bottom: 16px !important;
+        border-bottom: 2px solid #E50914;
+        padding-bottom: 8px;
+        margin-top: 18px !important;
+        margin-bottom: 14px !important;
         text-align: right !important;
     }
     
@@ -342,41 +344,41 @@ st.markdown("""
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
-        margin-top: 10px !important;
-        margin-bottom: 20px !important;
+        margin-top: 8px !important;
+        margin-bottom: 16px !important;
         background-color: rgba(24, 24, 24, 0.9);
         color: #FFFFFF;
-        border-radius: 14px;
+        border-radius: 12px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.08);
     }
     table.custom-table th, table.custom-table td {
         border-bottom: 1px solid #333333;
-        padding: 12px 16px;
+        padding: 10px 14px;
         text-align: right !important;
-        font-size: 13px;
+        font-size: 12.5px;
         color: #E2E8F0 !important;
     }
     table.custom-table th {
         background-color: rgba(229, 9, 20, 0.2) !important;
         font-weight: bold;
         color: #FCA5A5 !important;
-        border-bottom: 2.5px solid #E50914;
+        border-bottom: 2px solid #E50914;
     }
     
     .entry-form-area {
         background: rgba(30, 30, 30, 0.85);
         backdrop-filter: blur(15px);
-        padding: 26px;
-        border-radius: 18px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        padding: 22px;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        margin-bottom: 20px;
+        margin-bottom: 16px;
     }
     
-    /* 🖨️ إلغاء تام لكل عناصر النظام والهيدر والبطاقات عند الطباعة وإظهار الجدول ورأسه فقط */
+    /* 🖨️ إخفاء تام لكل العناصر غير المرغوبة عند الطباعة */
     @media print {
-        @page { size: A4 landscape; margin: 10mm; }
+        @page { size: A4 landscape; margin: 8mm; }
         body, .stApp, .block-container {
             background-color: #FFFFFF !important;
             color: #000000 !important;
@@ -386,11 +388,9 @@ st.markdown("""
             margin: 0 !important;
             padding: 0 !important;
         }
-        /* إخفاء تام لكل من: الأقسام، الهيدر، البطاقات الإحصائية، الأزرار، وحقول الإدخال */
         button, .stButton, iframe, div[data-testid="stHeader"], .no-print, .entry-form-area, hr, .sticky-top-wrapper, .cinema-top-bar, .user-badge-box, .glass-header, .glass-card, [data-testid="column"] { 
             display: none !important; 
         }
-        /* السماح فقط بعرض الجدول المخصص والبيانات المراد طباعتها */
         .printable-right-align {
             display: block !important;
             width: 100% !important;
@@ -441,9 +441,9 @@ def render_company_header():
     logo_val = info.get("logo", "")
     
     if logo_val and logo_val.startswith("data:image"):
-        logo_html = f'<img src="{logo_val}" style="width: 35px; height: 35px; object-fit: contain; border-radius: 6px; background: white; padding: 2px;" />'
+        logo_html = f'<img src="{logo_val}" style="width: 32px; height: 32px; object-fit: contain; border-radius: 6px; background: white; padding: 2px;" />'
     elif logo_val and (logo_val.startswith("http://") or logo_val.startswith("https://")):
-        logo_html = f'<img src="{logo_val}" style="width: 35px; height: 35px; object-fit: contain; border-radius: 6px;" />'
+        logo_html = f'<img src="{logo_val}" style="width: 32px; height: 32px; object-fit: contain; border-radius: 6px;" />'
     else:
         logo_html = '<div class="header-logo-box">🏢</div>'
 
@@ -458,7 +458,7 @@ def render_company_header():
     st.markdown(
         f"""
         <div class="glass-header">
-            <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
                 {logo_html}
                 <div style="width: 100%;">
                     <div class="header-top-system"><h2>برنامج شؤون الموظفين والإدارة</h2></div>
@@ -506,7 +506,7 @@ if not st.session_state.is_authenticated:
     st.stop()
 
 # ---------------------------------------------------------
-# 📌 الشريط العلوي الثابت تماماً
+# 📌 الشريط العلوي الثابت بمسافات منظمة
 # ---------------------------------------------------------
 st.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
 
@@ -561,7 +561,7 @@ sub_options_map = {
     "أدوات النظام": ["تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"]
 }
 
-st.markdown('<div class="cinema-top-bar" style="margin-top: 3px;">', unsafe_allow_html=True)
+st.markdown('<div class="cinema-top-bar" style="margin-top: 2px;">', unsafe_allow_html=True)
 col_sub1, col_sub2 = st.columns([4, 1])
 
 with col_sub1:
@@ -604,9 +604,9 @@ with col3:
     st.markdown(f'<div class="glass-card" style="border-right-color: #10B981;"><div class="glass-card-title">✅ العروض المقبولة</div><div class="glass-card-value" style="color: #10B981;">{accepted_count}</div></div>', unsafe_allow_html=True)
 with col4:
     active_users_count = len(st.session_state.users[st.session_state.users["الحالة"] == "نشط"]) if not st.session_state.users.empty else 0
-    st.markdown(f'<div class="glass-card" style="border-right-color: #3B82F6;"><div class="glass-card-title">🛡️ المستخدمين النشطين</div><div class="glass-card-value" style="font-size: 20px; color: #3B82F6;">{active_users_count} مستخدم</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="glass-card" style="border-right-color: #3B82F6;"><div class="glass-card-title">🛡️ المستخدمين النشطين</div><div class="glass-card-value" style="font-size: 18px; color: #3B82F6;">{active_users_count} مستخدم</div></div>', unsafe_allow_html=True)
 
-st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 15px 0 25px 0;'>", unsafe_allow_html=True)
+st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 12px 0 20px 0;'>", unsafe_allow_html=True)
 
 # =========================================================
 # منطق عرض الشاشات والأقسام الشاملة والمحدثة
@@ -629,7 +629,7 @@ if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم �
         with bc1:
             st.markdown(f'<div class="glass-card"><div class="glass-card-title">👥 عدد الموظفين بالفرع</div><div class="glass-card-value">{b_count}</div></div>', unsafe_allow_html=True)
         with bc2:
-            st.markdown(f'<div class="glass-card" style="border-right-color: #3B82F6;"><div class="glass-card-title">💰 إجمالي رواتب الفرع</div><div class="glass-card-value" style="font-size: 20px; color: #3B82F6;">{b_sal_total:,.0f} ج.م</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="glass-card" style="border-right-color: #3B82F6;"><div class="glass-card-title">💰 إجمالي رواتب الفرع</div><div class="glass-card-value" style="font-size: 18px; color: #3B82F6;">{b_sal_total:,.0f} ج.م</div></div>', unsafe_allow_html=True)
         with bc3:
             st.markdown(f'<div class="glass-card" style="border-right-color: #10B981;"><div class="glass-card-title">⏱️ حركات الحضور المسجلة</div><div class="glass-card-value" style="color: #10B981;">{b_att_count}</div></div>', unsafe_allow_html=True)
         
@@ -639,10 +639,10 @@ if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم �
             render_printable_table(branch_emps[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الراتب الأساسي"]])
         else:
             st.info(f"لا توجد موظفين مسجلين في فرع {branch}.")
-        st.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 20px 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 15px 0;'>", unsafe_allow_html=True)
 
 elif choice == "تسجيل حضور وانصراف":
-    st.subheader("⏱️ تسجيل حركة الحضور والانصراف (مقارنة أوقات البداية والنهاية الرسمية والفعلية)")
+    st.subheader("⏱️ تسجيل حركة الحضور والانصراف")
     emp_names = st.session_state.employees["اسم الموظف"].tolist()
     if emp_names:
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
@@ -657,7 +657,7 @@ elif choice == "تسجيل حضور وانصراف":
             st.info(f"📍 الفرع: {c_branch} &nbsp;|&nbsp; 💼 الوظيفة: {c_job}")
             
             st.markdown("---")
-            st.markdown("🕒 **المواعيد الرسمية للعمل (البداية والنهاية):**")
+            st.markdown("🕒 **المواعيد الرسمية للعمل:**")
             col_rs1, col_rs2, col_rs3 = st.columns(3)
             with col_rs1: start_h = st.selectbox("ساعة البداية الرسمية", list(range(1, 13)), index=7)
             with col_rs2: start_m = st.selectbox("دقيقة البداية (00-59)", list(range(0, 60)), index=0)
@@ -769,7 +769,7 @@ elif choice == "سجل الحضور والانصراف":
     render_printable_table(clean_att_df)
 
 elif choice == "تعديل أو حذف حركة حضور":
-    st.subheader("✏️ تعديل أو حذف حركة حضور والانصراف (إدراج وتعديل كافة الحقول)")
+    st.subheader("✏️ تعديل أو حذف حركة حضور والانصراف")
     if not st.session_state.attendance.empty:
         att_indices = st.session_state.attendance.index.tolist()
         selected_att_idx = st.selectbox("اختر رقم السجل للتعديل أو الحذف", att_indices)
@@ -835,7 +835,7 @@ elif choice == "تعديل أو حذف حركة حضور":
         st.info("لا توجد سجلات حضور متاحة للتعديل.")
 
 elif choice == "تسجيل طلب إجازة":
-    st.subheader("📝 تقديم طلب إجازة جديد (شامل الأنواع)")
+    st.subheader("📝 تقديم طلب إجازة جديد")
     emp_names = st.session_state.employees["اسم الموظف"].tolist()
     if emp_names:
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
@@ -910,7 +910,7 @@ elif choice == "سجل الطلبات المرفوضة":
     render_printable_table(st.session_state.requests[st.session_state.requests["الحالة"] == "مرفوض"] if not st.session_state.requests.empty else pd.DataFrame())
 
 elif choice == "تعديل أو حذف طلب إجازة":
-    st.subheader("✏️ تعديل أو حذف طلب إجازة (إدراج وتعديل كافة حقول الطلب)")
+    st.subheader("✏️ تعديل أو حذف طلب إجازة")
     if not st.session_state.requests.empty:
         req_ids = st.session_state.requests["رقم الطلب"].tolist()
         sel_req_id = st.selectbox("اختر رقم الطلب", req_ids)
@@ -977,7 +977,7 @@ elif choice == "تعديل أو حذف طلب إجازة":
         st.info("لا توجد طلبات إجازة مسجلة.")
 
 elif choice == "تسجيل معاملة مالية":
-    st.subheader("💰 تسجيل معاملة مالية جديدة (مع إمكانية تحديد التاريخ)")
+    st.subheader("💰 تسجيل معاملة مالية جديدة")
     emp_names = st.session_state.employees["اسم الموظف"].tolist()
     if emp_names:
         st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
@@ -1011,7 +1011,7 @@ elif choice == "سجل المعاملات المالية":
     render_printable_table(st.session_state.financial_transactions)
 
 elif choice == "تعديل أو حذف معاملة مالية":
-    st.subheader("✏️ تعديل أو حذف معاملة مالية (مع إدراج وتعديل التاريخ وكل الحقول)")
+    st.subheader("✏️ تعديل أو حذف معاملة مالية")
     if not st.session_state.financial_transactions.empty:
         fin_indices = st.session_state.financial_transactions.index.tolist()
         sel_fin_idx = st.selectbox("اختر المعاملة المالية", fin_indices)
@@ -1194,7 +1194,7 @@ elif choice == "إضافة موظف جديد":
     st.markdown('</div>', unsafe_allow_html=True)
 
 elif choice == "سجل الموظفين والأرصدة الشاملة":
-    st.subheader("👥 سجل الموظفين والأرصدة الشاملة (فلترة حسب الفرع، الوظيفة، أو الاسم)")
+    st.subheader("👥 سجل الموظفين والأرصدة الشاملة")
     render_print_button()
     
     col_f1, col_f2, col_f3 = st.columns(3)
@@ -1216,7 +1216,7 @@ elif choice == "سجل الموظفين والأرصدة الشاملة":
     render_printable_table(filtered_emps)
 
 elif choice == "تعديل أو حذف موظف":
-    st.subheader("✏️ تعديل أو حذف بيانات موظف (مع إدراج كامل المدخلات ومسوغات التعيين)")
+    st.subheader("✏️ تعديل أو حذف بيانات موظف")
     emp_names = st.session_state.employees["اسم الموظف"].tolist()
     if emp_names:
         sel_emp_edit = st.selectbox("اختر الموظف للتعديل أو الحذف", emp_names)
@@ -1252,7 +1252,7 @@ elif choice == "تعديل أو حذف موظف":
         st.markdown('</div>', unsafe_allow_html=True)
 
 elif choice == "إضافة مستخدم جديد":
-    st.subheader("➕ إضافة مستخدم جديد للنظام والصلاحيات (مع تحديد الحالة نشط/إيقاف)")
+    st.subheader("➕ إضافة مستخدم جديد للنظام والصلاحيات")
     st.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     with st.form("add_user_form_with_status"):
         u_name = st.text_input("اسم المستخدم (Login Username)")
@@ -1282,12 +1282,12 @@ elif choice == "إضافة مستخدم جديد":
     st.markdown('</div>', unsafe_allow_html=True)
 
 elif choice == "إدارة المستخدمين والصلاحيات والسجل":
-    st.subheader("🔒 شيت سجل المستخدمين (الاسم، الفرع، القسم، الصلاحية، البريد، والحالة)")
+    st.subheader("🔒 شيت سجل المستخدمين")
     render_print_button()
     render_printable_table(st.session_state.users[["اسم المستخدم", "الاسم الكامل", "الفرع التابع", "القسم التابع", "الصلاحية", "البريد الإلكتروني", "الحالة"]])
 
 elif choice == "تعديل أو حذف مستخدم":
-    st.subheader("✏️ تعديل أو حذف مستخدم النظام (تعديل الحالة نشط/إيقاف وباقي البيانات)")
+    st.subheader("✏️ تعديل أو حذف مستخدم النظام")
     user_list = st.session_state.users["اسم المستخدم"].tolist()
     if user_list:
         sel_usr = st.selectbox("اختر اسم المستخدم", user_list)
@@ -1323,7 +1323,7 @@ elif choice == "تعديل أو حذف مستخدم":
         st.markdown('</div>', unsafe_allow_html=True)
 
 elif choice == "طباعة التقارير العامة":
-    st.subheader("🖨️ مركز التقارير الشامل والطباعة المخصصة حسب الفرع والموظف")
+    st.subheader("🖨️ مركز التقارير الشامل والطباعة المخصصة")
     render_print_button()
     
     rep_type = st.selectbox("اختر نوع التقرير للطباعة والعرض", [
@@ -1362,7 +1362,7 @@ elif choice == "طباعة التقارير العامة":
         render_printable_table(rep_df)
 
     elif "المعاملات المالية" in rep_type:
-        st.markdown("#### 💰 تقرير المعاملات المالية (سلف، جزاءات، غياب، مكافآت، بدلات)")
+        st.markdown("#### 💰 تقرير المعاملات المالية")
         col_r1, col_r2 = st.columns(2)
         with col_r1: rep_branch = st.selectbox("الفرع", ["الكل"] + st.session_state.employees["الفرع"].unique().tolist())
         with col_r2: fin_type_filter = st.selectbox("نوع المعاملة", ["الكل", "سلفة", "جزاء (خصم)", "غياب (خصم أيام)", "مكافأة (إضافي)", "بدلات"])
@@ -1381,7 +1381,7 @@ elif choice == "طباعة التقارير العامة":
         
         tot_sal = payroll_df["الراتب الأساسي"].sum()
         st.markdown(f"""
-        <div class="glass-card printable-right-align" style="margin-top: 15px;">
+        <div class="glass-card printable-right-align" style="margin-top: 12px;">
             <p><b>إجمالي عدد الموظفين:</b> {len(payroll_df)}</p>
             <p><b>إجمالي الرواتب الأساسية في التقرير:</b> <span style="color: #10B981; font-size: 18px;">{tot_sal:,.2f} ج.م</span></p>
         </div>
