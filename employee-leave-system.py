@@ -173,44 +173,43 @@ def render_printable_table(df):
     
     table_html = df.to_html(classes="custom-table", index=False, escape=False)
     
-    # 🌟 الحل الجذري: زر طباعة جافاسكريبت معزول يعرض الجدول ورأسه فقط دون أي هيدر أو قوائم
-    unique_id = abs(hash(str(df.columns.tolist()) + str(len(df))))
-    components.html(f"""
-        <div style="text-align: left; margin-bottom: 10px; margin-top: 5px;">
-            <button onclick="
-                var myWindow = window.open('', '_blank', 'width=900,height=650');
-                myWindow.document.write('<html><head><title>طباعة التقرير</title>');
-                myWindow.document.write('<style>');
-                myWindow.document.write('body {{ font-family: Tahoma, sans-serif; direction: rtl; text-align: right; padding: 20px; }}');
-                myWindow.document.write('table.custom-table {{ width: 100%; border-collapse: collapse; margin-top: 10px; }}');
-                myWindow.document.write('table.custom-table th, table.custom-table td {{ border: 1px solid #000000; padding: 10px 14px; text-align: right; font-size: 13px; color: #000000; }}');
-                myWindow.document.write('table.custom-table th {{ background-color: #E2E8F0 !important; font-weight: bold; color: #000000 !important; }}');
-                myWindow.document.write('</style>');
-                myWindow.document.write('</head><body>');
-                myWindow.document.write('<h3>{company_display_name} - تقرير / كشف</h3>');
-                myWindow.document.write({json.dumps(table_html)});
-                myWindow.document.write('</body></html>');
-                myWindow.document.close();
-                setTimeout(function() {{ myWindow.print(); }}, 300);
-            " style="
-                background: linear-gradient(135deg, #E50914 0%, #B20710 100%);
-                color: white;
-                padding: 8px 18px;
-                border: none;
-                border-radius: 10px;
-                font-size: 12px;
-                font-weight: bold;
-                cursor: pointer;
-                box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
-                font-family: 'Tahoma', sans-serif;
-            ">
-                🖨️ طباعة نظيفة للجدول فقط (بدون الهيدر أو القوائم)
-            </button>
-        </div>
-        <div style="width: 100%; overflow-x: auto;">
-            {table_html}
-        </div>
-    """, height=320)
+    html_code = f"""
+    <div style="text-align: left; margin-bottom: 10px; margin-top: 5px;">
+        <button onclick="
+            var myWindow = window.open('', '_blank', 'width=900,height=650');
+            myWindow.document.write('<html><head><title>طباعة التقرير</title>');
+            myWindow.document.write('<style>');
+            myWindow.document.write('body {{ font-family: Tahoma, sans-serif; direction: rtl; text-align: right; padding: 20px; }}');
+            myWindow.document.write('table.custom-table {{ width: 100%; border-collapse: collapse; margin-top: 10px; }}');
+            myWindow.document.write('table.custom-table th, table.custom-table td {{ border: 1px solid #000000; padding: 10px 14px; text-align: right; font-size: 13px; color: #000000; }}');
+            myWindow.document.write('table.custom-table th {{ background-color: #E2E8F0 !important; font-weight: bold; color: #000000 !important; }}');
+            myWindow.document.write('</style>');
+            myWindow.document.write('</head><body>');
+            myWindow.document.write('<h3>{company_display_name} - تقرير / كشف</h3>');
+            myWindow.document.write({json.dumps(table_html)});
+            myWindow.document.write('</body></html>');
+            myWindow.document.close();
+            setTimeout(function() {{ myWindow.print(); }}, 300);
+        " style="
+            background: linear-gradient(135deg, #E50914 0%, #B20710 100%);
+            color: white;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+            font-family: 'Tahoma', sans-serif;
+        ">
+            🖨️ طباعة نظيفة للجدول فقط (بدون الهيدر أو القوائم)
+        </button>
+    </div>
+    <div style="width: 100%; overflow-x: auto;">
+        {table_html}
+    </div>
+    """
+    components.html(html_code, height=320)
 
 str_lit.markdown("""
     <style>
