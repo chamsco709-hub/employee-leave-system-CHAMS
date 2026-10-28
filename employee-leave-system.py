@@ -5,6 +5,7 @@ import json
 import os
 import io
 import base64
+import uuid
 
 str_lit.set_page_config(
     page_title="النظام المتكامل لإدارة الموارد البشرية",
@@ -181,7 +182,6 @@ def render_printable_table(df):
     user_role = str_lit.session_state.get('current_user_role', 'غير محدد')
     user_branch = str_lit.session_state.get('current_user_branch', 'غير محدد')
     
-    # عرض الهيدر الرسمي وبيانات المستخدم فوق الجدول داخل الشاشة
     str_lit.markdown(f"""
     <div style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(229, 9, 20, 0.4); padding: 12px; border-radius: 10px; margin-bottom: 10px; font-size: 13px; color: #F1F5F9;">
         <h4 style="color: #F87171; margin: 0 0 5px 0;">🏢 {c_name}</h4>
@@ -194,18 +194,20 @@ def render_printable_table(df):
     
     str_lit.dataframe(df, use_container_width=True)
     
-    # دمج ترويسة الشركة وبيانات المستخدم عند تصدير البيانات لتصبح جزءاً من الملف
     header_info_csv = f"# شركة: {c_name} | س.ت: {c_cr} | ب.ض: {c_tax} | ترخيص: {c_lic}\n"
     user_info_csv = f"# المسؤول: {logged_user} ({user_role}) | الفرع: {user_branch} | التاريخ: {datetime.now().strftime('%Y-%m-%d')}\n\n"
     
     csv_body = df.to_csv(index=False)
     full_csv_data = (header_info_csv + user_info_csv + csv_body).encode('utf-8-sig')
     
+    # استخدام مفتاح فريد وعشوائي لمنع حدوث خطأ التكرار في Streamlit
+    unique_btn_key = f"dl_btn_{uuid.uuid4()}"
     str_lit.download_button(
         label="📥 تحميل هذا الجدول كملف CSV (مع الهيدر وبيانات المستخدم)",
         data=full_csv_data,
         file_name=f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
         mime="text/csv",
+        key=unique_btn_key
     )
 
 str_lit.markdown("""
