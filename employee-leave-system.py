@@ -180,27 +180,27 @@ def render_printable_table(df):
     logo_val = info.get("logo", "")
     
     if logo_val and logo_val.startswith("data:image"):
-        logo_sheet_html = f'<div style="width: 55px; height: 55px; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; padding: 2px;"><img src="{logo_val}" style="max-width: 100%; max-height: 100%; object-fit: contain;" /></div>'
+        logo_sheet_html = f'<div style="width: 75px; height: 100%; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; padding: 2px;"><img src="{logo_val}" style="max-width: 100%; max-height: 100%; object-fit: contain;" /></div>'
     elif logo_val and (logo_val.startswith("http://") or logo_val.startswith("https://")):
-        logo_sheet_html = f'<div style="width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;"><img src="{logo_val}" style="max-width: 100%; max-height: 100%; object-fit: contain;" /></div>'
+        logo_sheet_html = f'<div style="width: 75px; height: 100%; display: flex; align-items: center; justify-content: center;"><img src="{logo_val}" style="max-width: 100%; max-height: 100%; object-fit: contain;" /></div>'
     else:
-        logo_sheet_html = '<div style="font-size: 24px; background: rgba(229,9,20,0.2); padding: 8px; border-radius: 8px;">🏢</div>'
+        logo_sheet_html = '<div style="font-size: 26px; background: rgba(229,9,20,0.2); padding: 8px; border-radius: 8px;">🏢</div>'
 
     logged_user = str_lit.session_state.get('current_logged_user', 'غير محدد')
     user_role = str_lit.session_state.get('current_user_role', 'غير محدد')
     user_branch = str_lit.session_state.get('current_user_branch', 'غير محدد')
     
-    # الهيدر يظهر هنا حصرياً داخل الشيت والتقارير والجداول المطبوعة
+    # الهيدر يظهر هنا فقط داخل الشيتات وجداول التقارير والطباعة
     str_lit.markdown(f"""
-    <div style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(229, 9, 20, 0.4); padding: 12px; border-radius: 10px; margin-bottom: 10px; font-size: 13px; color: #F1F5F9; display: flex; align-items: center; justify-content: space-between;">
-        <div style="width: 100%;">
+    <div style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(229, 9, 20, 0.4); border-radius: 10px; margin-bottom: 10px; font-size: 13px; color: #F1F5F9; display: flex; align-items: stretch; overflow: hidden;">
+        <div style="padding: 12px; width: 100%;">
             <h4 style="color: #F87171; margin: 0 0 5px 0;">🏢 {c_name}</h4>
             <div><b>العنوان:</b> {c_addr} &nbsp;|&nbsp; <b>س.ت:</b> {c_cr} &nbsp;|&nbsp; <b>ب.ض:</b> {c_tax} &nbsp;|&nbsp; <b>الترخيص:</b> {c_lic}</div>
             <div style="margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 5px; color: #94A3B8;">
                 👤 <b>المسؤول:</b> {logged_user} ({user_role}) &nbsp;|&nbsp; 📍 <b>الفرع:</b> {user_branch} &nbsp;|&nbsp; 📅 <b>التاريخ:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}
             </div>
         </div>
-        <div style="margin-right: 15px;">
+        <div style="background: rgba(229, 9, 20, 0.2); border-left: 1px solid rgba(229, 9, 20, 0.4); display: flex; align-items: center; justify-content: center; padding: 4px;">
             {logo_sheet_html}
         </div>
     </div>
@@ -278,47 +278,6 @@ str_lit.markdown("""
         padding: 8px 12px !important;
     }
     
-    .glass-header {
-        background: rgba(30, 30, 30, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        color: #FFFFFF !important;
-        padding: 0px !important;
-        border-radius: 10px;
-        width: 100%;
-        margin-bottom: 3px;
-        display: flex;
-        align-items: stretch;
-        overflow: hidden;
-    }
-    
-    .header-logo-box-full {
-        width: 75px;
-        background: rgba(229, 9, 20, 0.2);
-        border-left: 1px solid rgba(229, 9, 20, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 26px;
-        padding: 4px;
-    }
-    
-    .header-top-system h2 {
-        font-size: 11px !important;
-        font-weight: bold !important;
-        color: #F87171 !important;
-        margin: 0 0 1px 0 !important;
-    }
-    .comp-name-txt {
-        font-size: 13px !important;
-        font-weight: bold !important;
-        color: #FFFFFF !important;
-    }
-    .comp-info-txt {
-        font-size: 9.5px !important;
-        color: #94A3B8 !important;
-        margin-top: 1px;
-    }
-    
     .user-badge-box {
         background: rgba(229, 9, 20, 0.15);
         border: 1px solid rgba(229, 9, 20, 0.4);
@@ -385,39 +344,6 @@ if 'current_user_role' not in str_lit.session_state: str_lit.session_state.curre
 
 if 'active_main_section' not in str_lit.session_state: str_lit.session_state.active_main_section = "الرئيسية"
 
-def render_company_header():
-    info = str_lit.session_state.company_info
-    logo_val = info.get("logo", "")
-    
-    if logo_val and logo_val.startswith("data:image"):
-        logo_html = f'<div class="header-logo-box-full"><img src="{logo_val}" style="width: 100%; height: 100%; object-fit: contain; background: white; padding: 2px;" /></div>'
-    elif logo_val and (logo_val.startswith("http://") or logo_val.startswith("https://")):
-        logo_html = f'<div class="header-logo-box-full"><img src="{logo_val}" style="width: 100%; height: 100%; object-fit: contain;" /></div>'
-    else:
-        logo_html = '<div class="header-logo-box-full">🏢</div>'
-
-    contact_num = info.get("contact", "غير محدد")
-    email_addr = info.get("email", "غير محدد")
-    address_str = info.get("address", "غير محدد")
-    cr_num = info.get("cr", "غير محدد")
-    tax_num = info.get("tax", "غير محدد")
-    lic_num = info.get("license", "غير محدد")
-    comp_name = info.get("name", "")
-
-    str_lit.markdown(
-        f"""
-        <div class="glass-header">
-            <div style="padding: 6px 12px; width: 100%;">
-                <div class="header-top-system"><h2>برنامج شؤون الموظفين والإدارة</h2></div>
-                <div class="comp-name-txt">{comp_name}</div>
-                <div class="comp-info-txt">📍 العنوان: {address_str} &nbsp;|&nbsp; 📋 س.ت: {cr_num} &nbsp;|&nbsp; 🧾 ب.ض: {tax_num} &nbsp;|&nbsp; 📞 هاتف: {contact_num} &nbsp;|&nbsp; ✉️ بريد: {email_addr} &nbsp;|&nbsp; 🔑 ترخيص: {lic_num}</div>
-            </div>
-            {logo_html}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
 if not str_lit.session_state.is_authenticated:
     lic_info = get_client_license()
     str_lit.markdown(
@@ -452,8 +378,8 @@ if not str_lit.session_state.is_authenticated:
                     str_lit.error("❌ الرسم السري غير صحيح!")
     str_lit.stop()
 
+# تم إزالة الهيدر العلوي هنا نهائياً ليصبح البرنامج نظيفاً ويظهر الهيدر داخل الشيتات فقط
 str_lit.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
-render_company_header()
 
 logged_username = str_lit.session_state.current_logged_user
 user_role = str_lit.session_state.current_user_role
@@ -1316,7 +1242,7 @@ elif choice == "نسخة احتياطية واستعادة":
         with open(COMPANY_FILE, "r", encoding="utf-8") as f:
             json_str = f.read()
         str_lit.download_button("📥 تحميل النسخة الاحتياطية (JSON)", data=json_str, file_name="backup_company_data.json", mime="application/json")
-    str_lit.markdown('</div>', unsafe_allow_html=True)
+    str_lit.markdown('</div>', unsafe_allow_html=Time)
 
 elif choice == "مسح البيانات":
     str_lit.subheader("⚠️ مسح وتصفير البيانات")
