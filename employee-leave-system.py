@@ -173,7 +173,7 @@ def render_printable_table(df):
     
     table_html = df.to_html(classes="custom-table", index=False, escape=False)
     
-    html_code = f"""
+    clean_html_code = f"""
     <div style="text-align: left; margin-bottom: 10px; margin-top: 5px;">
         <button onclick="
             var myWindow = window.open('', '_blank', 'width=900,height=650');
@@ -209,7 +209,7 @@ def render_printable_table(df):
         {table_html}
     </div>
     """
-    components.html(html_code, height=320)
+    components.html(clean_html_code, height=320)
 
 str_lit.markdown("""
     <style>
