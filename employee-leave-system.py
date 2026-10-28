@@ -166,10 +166,6 @@ load_company_data()
 str_lit.session_state.company_info["name"] = company_display_name
 str_lit.session_state.company_info["license"] = company_license
 
-# إدارة حالة الثيم (Dark / Light)
-if 'theme_mode' not in str_lit.session_state:
-    str_lit.session_state.theme_mode = "Dark"
-
 def render_printable_table(df):
     if df.empty:
         str_lit.info("لا توجد بيانات متاحة للعرض.")
@@ -202,79 +198,66 @@ def render_printable_table(df):
         key=unique_btn_key
     )
 
-# تطبيق الألوان والدوال بناءً على الثيم المختار (Dark أو Light)
-is_dark = str_lit.session_state.theme_mode == "Dark"
-
-bg_color = "linear-gradient(135deg, #121212 0%, #1A1A1A 50%, #0B0B0B 100%)" if is_dark else "linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 50%, #E2E8F0 100%)"
-text_color = "#F1F5F9" if is_dark else "#0F172A"
-card_bg = "rgba(30, 30, 30, 0.75)" if is_dark else "rgba(255, 255, 255, 0.9)"
-card_value_color = "#FFFFFF" if is_dark else "#0F172A"
-wrapper_bg = "#121212" if is_dark else "#FFFFFF"
-input_bg = "rgba(30, 41, 59, 0.9)" if is_dark else "#FFFFFF"
-input_text = "#FFFFFF" if is_dark else "#0F172A"
-input_border = "#475569" if is_dark else "#CBD5E1"
-header_bg = "rgba(30, 30, 30, 0.85)" if is_dark else "rgba(255, 255, 255, 0.95)"
-header_text = "#FFFFFF" if is_dark else "#0F172A"
-
-str_lit.markdown(f"""
+str_lit.markdown("""
     <style>
-    header[data-testid="stHeader"] {{ visibility: hidden; height: 0px; }}
-    [data-testid="stSidebar"] {{ display: none !important; width: 0px !important; }}
+    header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
+    [data-testid="stSidebar"] { display: none !important; width: 0px !important; }
     
-    html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6, label {{
+    html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6, label {
         font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
         direction: rtl !important;
         text-align: right !important;
-        color: {text_color} !important;
-    }}
+        color: #F1F5F9 !important;
+    }
     
-    .block-container {{
+    .block-container {
         padding-top: 0.5rem !important;
         padding-bottom: 3rem !important;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
         max-width: 100% !important;
-        background: {bg_color} !important;
+        background: linear-gradient(135deg, #121212 0%, #1A1A1A 50%, #0B0B0B 100%) !important;
         min-height: 100vh;
-    }}
+    }
     
-    .sticky-top-wrapper {{
+    .sticky-top-wrapper {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
         z-index: 999999 !important;
-        background: {wrapper_bg} !important;
-        padding: 6px 15px 4px 15px !important;
+        background: #121212 !important;
+        padding: 8px 15px 4px 15px !important;
         border-bottom: 2px solid #E50914;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    }}
+        box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+    }
     
-    .main-content-spacer {{
-        margin-top: 130px !important;
-    }}
+    /* تم تقليل المسافة العلوية للمحتوى هنا لتكون متناسقة وقريبة من الهيدر */
+    .main-content-spacer {
+        margin-top: 115px !important;
+    }
     
-    label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {{
-        color: {text_color} !important;
+    label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
+        color: #CBD5E1 !important;
         font-weight: bold !important;
         font-size: 13px !important;
         margin-bottom: 4px !important;
-    }}
+    }
     
-    input, textarea, select {{
-        background-color: {input_bg} !important;
-        color: {input_text} !important;
+    input, textarea, select {
+        background-color: rgba(30, 41, 59, 0.9) !important;
+        color: #FFFFFF !important;
         font-size: 13px !important;
         font-weight: bold !important;
         border-radius: 10px !important;
-        border: 1.5px solid {input_border} !important;
+        border: 1.5px solid #475569 !important;
         padding: 8px 12px !important;
-    }}
+    }
     
-    .glass-header {{
-        background: {header_bg};
-        border: 1px solid rgba(229, 9, 20, 0.3);
-        color: {header_text} !important;
+    .glass-header {
+        background: rgba(30, 30, 30, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #FFFFFF !important;
         padding: 0px !important;
         border-radius: 10px;
         width: 100%;
@@ -282,9 +265,9 @@ str_lit.markdown(f"""
         display: flex;
         align-items: stretch;
         overflow: hidden;
-    }}
+    }
     
-    .header-logo-box-full {{
+    .header-logo-box-full {
         width: 75px;
         background: rgba(229, 9, 20, 0.2);
         border-left: 1px solid rgba(229, 9, 20, 0.4);
@@ -293,26 +276,26 @@ str_lit.markdown(f"""
         justify-content: center;
         font-size: 26px;
         padding: 4px;
-    }}
+    }
     
-    .header-top-system h2 {{
+    .header-top-system h2 {
         font-size: 11px !important;
         font-weight: bold !important;
         color: #F87171 !important;
         margin: 0 0 1px 0 !important;
-    }}
-    .comp-name-txt {{
+    }
+    .comp-name-txt {
         font-size: 13px !important;
         font-weight: bold !important;
-        color: {header_text} !important;
-    }}
-    .comp-info-txt {{
+        color: #FFFFFF !important;
+    }
+    .comp-info-txt {
         font-size: 9.5px !important;
         color: #94A3B8 !important;
         margin-top: 1px;
-    }}
+    }
     
-    .user-badge-box {{
+    .user-badge-box {
         background: rgba(229, 9, 20, 0.15);
         border: 1px solid rgba(229, 9, 20, 0.4);
         padding: 2px 6px;
@@ -322,32 +305,32 @@ str_lit.markdown(f"""
         font-weight: bold;
         text-align: center;
         margin-bottom: 2px;
-    }}
+    }
     
-    .glass-card {{
-        background: {card_bg};
+    .glass-card {
+        background: rgba(30, 30, 30, 0.75);
         backdrop-filter: blur(15px);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-right: 5px solid #E50914;
         padding: 14px 16px;
         border-radius: 14px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
         text-align: right !important;
         margin-bottom: 12px;
-    }}
-    .glass-card-title {{
+    }
+    .glass-card-title {
         font-size: 12px;
         color: #94A3B8;
         font-weight: bold;
         margin-bottom: 4px;
-    }}
-    .glass-card-value {{
+    }
+    .glass-card-value {
         font-size: 22px;
-        color: {card_value_color};
+        color: #FFFFFF;
         font-weight: bold;
-    }}
+    }
     
-    .section-header {{
+    .section-header {
         font-size: 16px !important;
         font-weight: bold !important;
         color: #F87171 !important;
@@ -356,17 +339,17 @@ str_lit.markdown(f"""
         margin-top: 18px !important;
         margin-bottom: 14px !important;
         text-align: right !important;
-    }}
+    }
     
-    .entry-form-area {{
-        background: {card_bg};
+    .entry-form-area {
+        background: rgba(30, 30, 30, 0.85);
         backdrop-filter: blur(15px);
         padding: 22px;
         border-radius: 16px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         border: 1px solid rgba(255, 255, 255, 0.08);
         margin-bottom: 16px;
-    }}
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -413,22 +396,11 @@ def render_company_header():
 
 if not str_lit.session_state.is_authenticated:
     lic_info = get_client_license()
-    
-    # زر تبديل الثيم في شاشة تسجيل الدخول
-    col_t_l1, col_t_l2, col_t_l3 = str_lit.columns([3, 1, 3])
-    with col_t_l2:
-        current_theme_idx = 0 if str_lit.session_state.theme_mode == "Dark" else 1
-        new_theme = str_lit.radio("مظهر الشاشة", ["🌙 دارك (Dark)", "☀️ لايت (Light)"], index=current_theme_idx, horizontal=True)
-        selected_mode = "Dark" if "دارك" in new_theme else "Light"
-        if selected_mode != str_lit.session_state.theme_mode:
-            str_lit.session_state.theme_mode = selected_mode
-            str_lit.rerun()
-
     str_lit.markdown(
         f"""
-        <div style="max-width: 480px; margin: 20px auto 40px auto; background: {card_bg}; backdrop-filter: blur(20px); padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); text-align: center; border: 1px solid rgba(255,255,255,0.08);">
+        <div style="max-width: 480px; margin: 60px auto; background: rgba(30, 30, 30, 0.9); backdrop-filter: blur(20px); padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); text-align: center; border: 1px solid rgba(255,255,255,0.08);">
             <h2 style="color: #F87171; margin-bottom: 8px; font-size: 22px;">النظام المتكامل لشؤون الموظفين</h2>
-            <p style="font-size: 15px; font-weight: bold; margin-bottom: 4px;">{lic_info.get('name', '')}</p>
+            <p style="color: #FFFFFF; font-size: 15px; font-weight: bold; margin-bottom: 4px;">{lic_info.get('name', '')}</p>
             <p style="color: #94A3B8; font-size: 12.5px;">رقم الترخيص: {lic_info.get('license', '')}</p>
         </div>
         """,
@@ -459,30 +431,19 @@ if not str_lit.session_state.is_authenticated:
 str_lit.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
 render_company_header()
 
-# شريط معلومات المستخدم وزر تبديل الثيم العلوي
-col_ub1, col_ub2 = str_lit.columns([4, 1])
-with col_ub1:
-    logged_username = str_lit.session_state.current_logged_user
-    user_role = str_lit.session_state.current_user_role
-    user_branch = str_lit.session_state.current_user_branch
-    user_dept = str_lit.session_state.current_user_dept
+logged_username = str_lit.session_state.current_logged_user
+user_role = str_lit.session_state.current_user_role
+user_branch = str_lit.session_state.current_user_branch
+user_dept = str_lit.session_state.current_user_dept
 
-    str_lit.markdown(
-        f"""
-        <div class="user-badge-box">
-            👤 المستخدم الحالي: <b>{logged_username}</b> &nbsp;|&nbsp; 🛡️ الصلاحية: <b>{user_role}</b> &nbsp;|&nbsp; 📍 الفرع: <b>{user_branch}</b> &nbsp;|&nbsp; 🏢 القسم: <b>{user_dept}</b>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with col_ub2:
-    current_theme_idx = 0 if str_lit.session_state.theme_mode == "Dark" else 1
-    new_theme_main = str_lit.selectbox("المظهر", ["🌙 دارك", "☀️ لايت"], index=current_theme_idx, key="theme_selector_main")
-    main_selected_mode = "Dark" if "دارك" in new_theme_main else "Light"
-    if main_selected_mode != str_lit.session_state.theme_mode:
-        str_lit.session_state.theme_mode = main_selected_mode
-        str_lit.rerun()
+str_lit.markdown(
+    f"""
+    <div class="user-badge-box">
+        👤 المستخدم الحالي: <b>{logged_username}</b> &nbsp;|&nbsp; 🛡️ الصلاحية: <b>{user_role}</b> &nbsp;|&nbsp; 📍 الفرع: <b>{user_branch}</b> &nbsp;|&nbsp; 🏢 القسم: <b>{user_dept}</b>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 main_sections = [
     "الرئيسية", 
