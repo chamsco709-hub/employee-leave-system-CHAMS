@@ -1,5 +1,4 @@
 import streamlit as str_lit
-import streamlit.components.v1 as components
 import pandas as pd
 from datetime import datetime, date, time, timedelta
 import json
@@ -171,45 +170,17 @@ def render_printable_table(df):
         str_lit.info("لا توجد بيانات متاحة للعرض.")
         return
     
-    table_html = df.to_html(classes="custom-table", index=False, escape=False)
+    # عرض الجدول بشكل احترافي ونظيف باستخدام مكونات Streamlit الأصلية
+    str_lit.dataframe(df, use_container_width=True)
     
-    clean_html_code = f"""
-    <div style="text-align: left; margin-bottom: 10px; margin-top: 5px;">
-        <button onclick="
-            var myWindow = window.open('', '_blank', 'width=900,height=650');
-            myWindow.document.write('<html><head><title>طباعة التقرير</title>');
-            myWindow.document.write('<style>');
-            myWindow.document.write('body {{ font-family: Tahoma, sans-serif; direction: rtl; text-align: right; padding: 20px; }}');
-            myWindow.document.write('table.custom-table {{ width: 100%; border-collapse: collapse; margin-top: 10px; }}');
-            myWindow.document.write('table.custom-table th, table.custom-table td {{ border: 1px solid #000000; padding: 10px 14px; text-align: right; font-size: 13px; color: #000000; }}');
-            myWindow.document.write('table.custom-table th {{ background-color: #E2E8F0 !important; font-weight: bold; color: #000000 !important; }}');
-            myWindow.document.write('</style>');
-            myWindow.document.write('</head><body>');
-            myWindow.document.write('<h3>{company_display_name} - تقرير / كشف</h3>');
-            myWindow.document.write({json.dumps(table_html)});
-            myWindow.document.write('</body></html>');
-            myWindow.document.close();
-            setTimeout(function() {{ myWindow.print(); }}, 300);
-        " style="
-            background: linear-gradient(135deg, #E50914 0%, #B20710 100%);
-            color: white;
-            padding: 8px 18px;
-            border: none;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
-            font-family: 'Tahoma', sans-serif;
-        ">
-            🖨️ طباعة نظيفة للجدول فقط (بدون الهيدر أو القوائم)
-        </button>
-    </div>
-    <div style="width: 100%; overflow-x: auto;">
-        {table_html}
-    </div>
-    """
-    components.html(clean_html_code, height=320)
+    # توفير زر لتحميل التقرير كملف CSV أو Excel كحل بديل ومضمون 100% للطباعة والاحتفاظ بالنسخ
+    csv_data = df.to_csv(index=False).encode('utf-8-sig')
+    str_lit.download_button(
+        label="📥 تحميل هذا الجدول كملف CSV للطباعة",
+        data=csv_data,
+        file_name="report_table.csv",
+        mime="text/csv",
+    )
 
 str_lit.markdown("""
     <style>
@@ -350,32 +321,6 @@ str_lit.markdown("""
         margin-top: 18px !important;
         margin-bottom: 14px !important;
         text-align: right !important;
-    }
-    
-    table.custom-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin-top: 8px !important;
-        margin-bottom: 16px !important;
-        background-color: rgba(24, 24, 24, 0.9);
-        color: #FFFFFF;
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    table.custom-table th, table.custom-table td {
-        border-bottom: 1px solid #333333;
-        padding: 10px 14px;
-        text-align: right !important;
-        font-size: 12.5px;
-        color: #E2E8F0 !important;
-    }
-    table.custom-table th {
-        background-color: rgba(229, 9, 20, 0.2) !important;
-        font-weight: bold;
-        color: #FCA5A5 !important;
-        border-bottom: 2px solid #E50914;
     }
     
     .entry-form-area {
@@ -1011,7 +956,7 @@ elif choice == "كشف الرواتب والمستحقات الشامل":
         "صافي الراتب"
     ]
 
-    str_lit.markdown("### 🏢 1. ملخص الرواتب حسب الفروع (مستقل للطباعة)")
+    str_lit.markdown("### 🏢 1. ملخص الرواتب حسب الفروع")
     branch_summary = payroll_df.groupby("الفرع").agg({
         "الراتب الأساسي": "sum",
         "إجمالي المستحقات": "sum",
@@ -1021,12 +966,12 @@ elif choice == "كشف الرواتب والمستحقات الشامل":
     render_printable_table(branch_summary)
 
     str_lit.markdown("---")
-    str_lit.markdown("### 👥 2. الكشف التفصيلي للرواتب لكافة الموظفين (مستقل للطباعة)")
+    str_lit.markdown("### 👥 2. الكشف التفصيلي للرواتب لكافة الموظفين")
     render_printable_table(payroll_df[display_payroll_cols])
 
     str_lit.markdown("---")
-    str_lit.markdown("### 🧾 3. كشف حساب تفصيلي لموظف محدد (على حدة للطباعة)")
-    selected_emp_acc = str_lit.selectbox("اختر الموظف لطباعة كشف حسابه التفصيلي", payroll_df["اسم الموظف"].tolist())
+    str_lit.markdown("### 🧾 3. كشف حساب تفصيلي لموظف محدد")
+    selected_emp_acc = str_lit.selectbox("اختر الموظف لعرض كشف حسابه التفصيلي", payroll_df["اسم الموظف"].tolist())
     if selected_emp_acc:
         emp_acc_row = payroll_df[payroll_df["اسم الموظف"] == selected_emp_acc].iloc[0]
         emp_acc_df = pd.DataFrame([
