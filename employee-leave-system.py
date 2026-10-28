@@ -200,7 +200,6 @@ def render_printable_table(df):
     csv_body = df.to_csv(index=False)
     full_csv_data = (header_info_csv + user_info_csv + csv_body).encode('utf-8-sig')
     
-    # استخدام مفتاح فريد وعشوائي لمنع حدوث خطأ التكرار في Streamlit
     unique_btn_key = f"dl_btn_{uuid.uuid4()}"
     str_lit.download_button(
         label="📥 تحميل هذا الجدول كملف CSV (مع الهيدر وبيانات المستخدم)",
@@ -536,33 +535,35 @@ with col4:
 
 str_lit.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 12px 0 20px 0;'>", unsafe_allow_html=True)
 
+# ----------------- توجيه الأقسام والعمليات الفرعية -----------------
 if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم والمؤشرات":
-    str_lit.markdown(f'<div class="section-header">📊 داشبورد ومخطط بيانات لكل فرع (بيانات تفصيلية)</div>', unsafe_allow_html=True)
-    all_branches = str_lit.session_state.employees["الفرع"].unique().tolist() if not str_lit.session_state.employees.empty else ["المركز الرئيسي"]
-    for branch in all_branches:
-        str_lit.markdown(f"### 📍 فرع: {branch}")
-        branch_emps = str_lit.session_state.employees[str_lit.session_state.employees["الفرع"] == branch]
-        b_count = len(branch_emps)
-        b_sal_total = float(branch_emps["الراتب الأساسي"].sum()) if not branch_emps.empty else 0.0
-        b_att = str_lit.session_state.attendance[str_lit.session_state.attendance["الفرع"] == branch] if not str_lit.session_state.attendance.empty else pd.DataFrame()
-        b_att_count = len(b_att)
-        
-        bc1, bc2, bc3 = str_lit.columns(3)
-        with bc1:
-            str_lit.markdown(f'<div class="glass-card"><div class="glass-card-title">👥 عدد الموظفين بالفرع</div><div class="glass-card-value">{b_count}</div></div>', unsafe_allow_html=True)
-        with bc2:
-            str_lit.markdown(f'<div class="glass-card" style="border-right-color: #3B82F6;"><div class="glass-card-title">💰 إجمالي رواتب الفرع</div><div class="glass-card-value" style="font-size: 18px; color: #3B82F6;">{b_sal_total:,.0f} ج.م</div></div>', unsafe_allow_html=True)
-        with bc3:
-            str_lit.markdown(f'<div class="glass-card" style="border-right-color: #10B981;"><div class="glass-card-title">⏱️ حركات الحضور المسجلة</div><div class="glass-card-value" style="color: #10B981;">{b_att_count}</div></div>', unsafe_allow_html=True)
-        
-        if not branch_emps.empty:
-            str_lit.markdown(f"**📋 جدول موظفي فرع ({branch}):**")
-            render_printable_table(branch_emps[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الراتب الأساسي"]])
-        else:
-            str_lit.info(f"لا توجد موظفين مسجلين في فرع {branch}.")
-        str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 15px 0;'>", unsafe_allow_html=True)
+    if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم والمؤشرات":
+        str_lit.markdown(f'<div class="section-header">📊 داشبورد ومخطط بيانات لكل فرع (بيانات تفصيلية)</div>', unsafe_allow_html=True)
+        all_branches = str_lit.session_state.employees["الفرع"].unique().tolist() if not str_lit.session_state.employees.empty else ["المركز الرئيسي"]
+        for branch in all_branches:
+            str_lit.markdown(f"### 📍 فرع: {branch}")
+            branch_emps = str_lit.session_state.employees[str_lit.session_state.employees["الفرع"] == branch]
+            b_count = len(branch_emps)
+            b_sal_total = float(branch_emps["الراتب الأساسي"].sum()) if not branch_emps.empty else 0.0
+            b_att = str_lit.session_state.attendance[str_lit.session_state.attendance["الفرع"] == branch] if not str_lit.session_state.attendance.empty else pd.DataFrame()
+            b_att_count = len(b_att)
+            
+            bc1, bc2, bc3 = str_lit.columns(3)
+            with bc1:
+                str_lit.markdown(f'<div class="glass-card"><div class="glass-card-title">👥 عدد الموظفين بالفرع</div><div class="glass-card-value">{b_count}</div></div>', unsafe_allow_html=True)
+            with bc2:
+                str_lit.markdown(f'<div class="glass-card" style="border-right-color: #3B82F6;"><div class="glass-card-title">💰 إجمالي رواتب الفرع</div><div class="glass-card-value" style="font-size: 18px; color: #3B82F6;">{b_sal_total:,.0f} ج.م</div></div>', unsafe_allow_html=True)
+            with bc3:
+                str_lit.markdown(f'<div class="glass-card" style="border-right-color: #10B981;"><div class="glass-card-title">⏱️ حركات الحضور المسجلة</div><div class="glass-card-value" style="color: #10B981;">{b_att_count}</div></div>', unsafe_allow_html=True)
+            
+            if not branch_emps.empty:
+                str_lit.markdown(f"**📋 جدول موظفي فرع ({branch}):**")
+                render_printable_table(branch_emps[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الراتب الأساسي"]])
+            else:
+                str_lit.info(f"لا توجد موظفين مسجلين في فرع {branch}.")
+            str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 15px 0;'>", unsafe_allow_html=True)
 
-elif choice == "تسجيل حضور وانصراف":
+if choice == "تسجيل حضور وانصراف":
     str_lit.subheader("⏱️ تسجيل حركة الحضور والانصراف")
     emp_names = str_lit.session_state.employees["اسم الموظف"].tolist()
     if emp_names:
@@ -1250,7 +1251,7 @@ elif choice == "طباعة التقارير العامة":
         str_lit.markdown("#### 🔒 تقرير شيت المستخدمين")
         render_printable_table(str_lit.session_state.users[["اسم المستخدم", "الاسم الكامل", "الفرع التابع", "القسم التابع", "الصلاحية", "البريد الإلكتروني", "الحالة"]])
 
-elif choice == "اعدادات الشركة وبياناتها الشاملة":
+elif choice == "إعدادات الشركة وبياناتها الشاملة":
     str_lit.subheader("⚙️ إعدادات الشركة وبياناتها الشاملة")
     info = str_lit.session_state.company_info
     str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
