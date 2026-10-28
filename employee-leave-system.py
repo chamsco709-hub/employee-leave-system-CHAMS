@@ -234,7 +234,7 @@ str_lit.markdown("""
     
     /* تم تقليل المسافة العلوية للمحتوى هنا لتكون متناسقة وقريبة من الهيدر */
     .main-content-spacer {
-        margin-top:5px !important;
+        margin-top:2px !important;
     }
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
