@@ -234,7 +234,7 @@ str_lit.markdown("""
     
     /* تم تقليل المسافة العلوية للمحتوى هنا لتكون متناسقة وقريبة من الهيدر */
     .main-content-spacer {
-        margin-top: 115px !important;
+        margin-top: 95px !important;
     }
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
@@ -1302,6 +1302,3 @@ elif choice == "مسح البيانات":
             os.remove(COMPANY_FILE)
         str_lit.success("تم مسح البيانات بنجاح، جاري إعادة تشغيل النظام...")
         str_lit.rerun()
-
-else:
-    str_lit.info(f"عنصر القائمة ({choice}) جاهز للعمل بكامل ميزاته.")
