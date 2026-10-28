@@ -196,7 +196,7 @@ def render_print_button():
         </div>
     """, height=50)
 
-# 🎨 تصميم CSS السينمائي مع دعم الطباعة البيضاء النظيفة وتثبيت الهيدر والأقسام
+# 🎨 تصميم CSS مع تثبيت الهيدر والأقسام وإخفائها تماماً عند الطباعة
 st.markdown("""
     <style>
     header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
@@ -219,11 +219,12 @@ st.markdown("""
         min-height: 100vh;
     }
     
+    /* تثبيت حاوية الأقسام العلوية تماماً في أعلى الشاشة دون نزول للخلف */
     .sticky-top-wrapper {
-        position: sticky;
-        top: 0rem;
-        z-index: 99999;
-        background: rgba(18, 18, 18, 0.96);
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 999999 !important;
+        background: rgba(18, 18, 18, 0.98) !important;
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         padding-top: 10px;
@@ -371,7 +372,7 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    /* تنسيق الطباعة النظيف بخلفية بيضاء ونصوص سوداء وتكرار الهيدر ورأس الجدول */
+    /* تنسيق الطباعة النظيف: إلغاء الأقسام، ظهور الهيدر واسم المستخدم في الصفحة الأولى فقط، وتكرار رأس الجدول */
     @media print {
         @page { size: A4 landscape; margin: 10mm; }
         body, .stApp, .block-container {
@@ -383,21 +384,18 @@ st.markdown("""
             margin: 0 !important;
             padding: 0 !important;
         }
-        button, .stButton, iframe, div[data-testid="stHeader"], .no-print, .entry-form-area, hr, .cinema-top-bar { 
+        /* إخفاء الأقسام الرئيسية، الأزرار، الحقول، وأدوات التنقل تماماً */
+        button, .stButton, iframe, div[data-testid="stHeader"], .no-print, .entry-form-area, hr, .sticky-top-wrapper, .cinema-top-bar { 
             display: none !important; 
         }
-        .sticky-top-wrapper {
-            position: relative !important;
-            background: #FFFFFF !important;
-            box-shadow: none !important;
-            border-bottom: 2px solid #000000 !important;
-            page-break-after: avoid;
-        }
+        /* إظهار الهيدر واسم المستخدم في أول صفحة فقط */
         .glass-header, .user-badge-box { 
             background: #FFFFFF !important; 
             border: 1px solid #000000 !important; 
             color: #000000 !important;
             box-shadow: none !important;
+            display: block !important;
+            page-break-after: avoid;
         }
         .header-top-system h2, .comp-name-txt, .comp-info-txt, .user-badge-box {
             color: #000000 !important;
@@ -465,7 +463,7 @@ def render_company_header():
             <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
                 {logo_html}
                 <div style="width: 100%;">
-                    <div class="header-top-system"><h2>🍿 منصة عرض شؤون الموظفين والإدارة</h2></div>
+                    <div class="header-top-system"><h2>🍿 برنامج شؤون الموظفين والإدارة</h2></div>
                     <div class="comp-name-txt">{comp_name}</div>
                     <div class="comp-info-txt">📍 العنوان: {address_str} &nbsp;|&nbsp; 📋 س.ت: {cr_num} &nbsp;|&nbsp; 🧾 ب.ض: {tax_num} &nbsp;|&nbsp; 📞 هاتف: {contact_num} &nbsp;|&nbsp; ✉️ بريد: {email_addr} &nbsp;|&nbsp; 🔑 ترخيص: {lic_num}</div>
                 </div>
@@ -476,10 +474,13 @@ def render_company_header():
     )
 
 if not st.session_state.is_authenticated:
+    lic_info = get_client_license()
     st.markdown(
         f"""
-        <div style="max-width: 480px; margin: 80px auto; background: rgba(30, 30, 30, 0.9); backdrop-filter: blur(20px); padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); text-align: center; border: 1px solid rgba(255,255,255,0.08);">
-            <h2 style="color: #F87171; margin-bottom: 15px; font-size: 22px;">🎬 تسجيل الدخول للمنصة</h2>
+        <div style="max-width: 480px; margin: 60px auto; background: rgba(30, 30, 30, 0.9); backdrop-filter: blur(20px); padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); text-align: center; border: 1px solid rgba(255,255,255,0.08);">
+            <h2 style="color: #F87171; margin-bottom: 8px; font-size: 22px;">🎬 النظام المتكامل لشؤون الموظفين</h2>
+            <p style="color: #FFFFFF; font-size: 15px; font-weight: bold; margin-bottom: 4px;">{lic_info.get('name', '')}</p>
+            <p style="color: #94A3B8; font-size: 12.5px;">رقم الترخيص: {lic_info.get('license', '')}</p>
         </div>
         """,
         unsafe_allow_html=True
@@ -507,7 +508,7 @@ if not st.session_state.is_authenticated:
     st.stop()
 
 # ---------------------------------------------------------
-# 📌 الحاوية المثبتة العلوية وأزرار الأقسام (الثابتة دائماً)
+# 📌 الحاوية المثبتة العلوية وأزرار الأقسام (الثابتة تماماً)
 # ---------------------------------------------------------
 st.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
 
@@ -1068,7 +1069,7 @@ elif choice == "تعديل أو حذف معاملة مالية":
 
 elif choice == "كشف الرواتب والمستحقات الشامل":
     col_t1, col_t2 = st.columns([3, 1])
-    with col_t1: st.subheader("💰 كشف الرواتب والتفصيل الشامل لكل فرع وللموظفين")
+    with col_t1: st.subheader("💰 كشف الرواتب والتفصيل الشامل (مستقل ومخصص للطباعة)")
     with col_t2: render_print_button()
     
     payroll_df = st.session_state.employees[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "الراتب الأساسي"]].copy()
@@ -1107,8 +1108,8 @@ elif choice == "كشف الرواتب والمستحقات الشامل":
         "التأخير (دقيقة)", "قيمة التأخير والاستقطاع", "سلف وجزاءات وغياب", "إجمالي الاستقطاعات",
         "صافي الراتب"
     ]
-    
-    st.markdown("### 🏢 ملخص الرواتب حسب الفروع:")
+
+    st.markdown("### 🏢 1. ملخص الرواتب حسب الفروع (مستقل للطباعة)")
     branch_summary = payroll_df.groupby("الفرع").agg({
         "الراتب الأساسي": "sum",
         "إجمالي المستحقات": "sum",
@@ -1117,12 +1118,13 @@ elif choice == "كشف الرواتب والمستحقات الشامل":
     }).reset_index()
     render_printable_table(branch_summary)
 
-    st.markdown("### 👥 الكشف التفصيلي للرواتب لكل الموظفين:")
+    st.markdown("---")
+    st.markdown("### 👥 2. الكشف التفصيلي للرواتب لكافة الموظفين (مستقل للطباعة)")
     render_printable_table(payroll_df[display_payroll_cols])
 
     st.markdown("---")
-    st.markdown("### 🧾 كشف حساب تفصيلي لموظف محدد:")
-    selected_emp_acc = st.selectbox("اختر الموظف لطباعة كشف حسابه", payroll_df["اسم الموظف"].tolist())
+    st.markdown("### 🧾 3. كشف حساب تفصيلي لموظف محدد (على حدة)")
+    selected_emp_acc = st.selectbox("اختر الموظف لطباعة كشف حسابه التفصيلي", payroll_df["اسم الموظف"].tolist())
     if selected_emp_acc:
         emp_acc_row = payroll_df[payroll_df["اسم الموظف"] == selected_emp_acc].iloc[0]
         st.markdown(f"""
@@ -1330,7 +1332,7 @@ elif choice == "طباعة التقارير العامة":
         "سجل الحضور والانصراف (حسب الفرع أو الموظف)",
         "سجل الإجازات والطلبات (حسب الفرع أو الموظف)",
         "سجل المعاملات المالية (سلف، جزاءات، غياب، مكافآت، بدلات)",
-        "كشف الرواتب الشامل وملخص الفروع",
+        "تقرير كشف الرواتب والتفصيل الشامل (مع الإجماليات)",
         "سجل الموظفين الشامل",
         "شيت أسماء المستخدمين وحالتهم"
     ])
@@ -1374,10 +1376,18 @@ elif choice == "طباعة التقارير العامة":
             rep_df = rep_df[rep_df["النوع"] == fin_type_filter]
         render_printable_table(rep_df)
 
-    elif "كشف الرواتب" in rep_type:
-        st.markdown("#### 💵 كشف الرواتب الشامل وملخص الفروع")
+    elif "تقرير كشف الرواتب" in rep_type:
+        st.markdown("#### 💵 تقرير كشف الرواتب التفصيلي (مع الإجماليات)")
         payroll_df = st.session_state.employees[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "الراتب الأساسي"]].copy()
         render_printable_table(payroll_df)
+        
+        tot_sal = payroll_df["الراتب الأساسي"].sum()
+        st.markdown(f"""
+        <div class="glass-card" style="margin-top: 15px;">
+            <p><b>إجمالي عدد الموظفين:</b> {len(payroll_df)}</p>
+            <p><b>إجمالي الرواتب الأساسية في التقرير:</b> <span style="color: #10B981; font-size: 18px;">{tot_sal:,.2f} ج.م</span></p>
+        </div>
+        """, unsafe_allow_html=True)
 
     elif "سجل الموظفين الشامل" in rep_type:
         st.markdown("#### 👥 تقرير سجل الموظفين")
