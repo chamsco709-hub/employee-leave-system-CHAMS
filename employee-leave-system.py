@@ -177,17 +177,31 @@ def render_printable_table(df):
     c_cr = info.get("cr", "")
     c_tax = info.get("tax", "")
     c_lic = info.get("license", "")
+    logo_val = info.get("logo", "")
     
+    if logo_val and logo_val.startswith("data:image"):
+        logo_sheet_html = f'<div style="width: 55px; height: 55px; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; padding: 2px;"><img src="{logo_val}" style="max-width: 100%; max-height: 100%; object-fit: contain;" /></div>'
+    elif logo_val and (logo_val.startswith("http://") or logo_val.startswith("https://")):
+        logo_sheet_html = f'<div style="width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;"><img src="{logo_val}" style="max-width: 100%; max-height: 100%; object-fit: contain;" /></div>'
+    else:
+        logo_sheet_html = '<div style="font-size: 24px; background: rgba(229,9,20,0.2); padding: 8px; border-radius: 8px;">🏢</div>'
+
     logged_user = str_lit.session_state.get('current_logged_user', 'غير محدد')
     user_role = str_lit.session_state.get('current_user_role', 'غير محدد')
     user_branch = str_lit.session_state.get('current_user_branch', 'غير محدد')
     
+    # الهيدر يظهر هنا حصرياً داخل الشيت والتقارير والجداول المطبوعة
     str_lit.markdown(f"""
-    <div style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(229, 9, 20, 0.4); padding: 12px; border-radius: 10px; margin-bottom: 10px; font-size: 13px; color: #F1F5F9;">
-        <h4 style="color: #F87171; margin: 0 0 5px 0;">🏢 {c_name}</h4>
-        <div><b>العنوان:</b> {c_addr} &nbsp;|&nbsp; <b>س.ت:</b> {c_cr} &nbsp;|&nbsp; <b>ب.ض:</b> {c_tax} &nbsp;|&nbsp; <b>الترخيص:</b> {c_lic}</div>
-        <div style="margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 5px; color: #94A3B8;">
-            👤 <b>المستخدم المطبع/المسؤول:</b> {logged_user} ({user_role}) &nbsp;|&nbsp; 📍 <b>الفرع:</b> {user_branch} &nbsp;|&nbsp; 📅 <b>تاريخ التقرير:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}
+    <div style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(229, 9, 20, 0.4); padding: 12px; border-radius: 10px; margin-bottom: 10px; font-size: 13px; color: #F1F5F9; display: flex; align-items: center; justify-content: space-between;">
+        <div style="width: 100%;">
+            <h4 style="color: #F87171; margin: 0 0 5px 0;">🏢 {c_name}</h4>
+            <div><b>العنوان:</b> {c_addr} &nbsp;|&nbsp; <b>س.ت:</b> {c_cr} &nbsp;|&nbsp; <b>ب.ض:</b> {c_tax} &nbsp;|&nbsp; <b>الترخيص:</b> {c_lic}</div>
+            <div style="margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 5px; color: #94A3B8;">
+                👤 <b>المسؤول:</b> {logged_user} ({user_role}) &nbsp;|&nbsp; 📍 <b>الفرع:</b> {user_branch} &nbsp;|&nbsp; 📅 <b>التاريخ:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}
+            </div>
+        </div>
+        <div style="margin-right: 15px;">
+            {logo_sheet_html}
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -244,7 +258,7 @@ str_lit.markdown("""
     }
     
     .main-content-spacer {
-        margin-top: 165px !important;
+        margin-top: 110px !important;
     }
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
@@ -390,7 +404,6 @@ def render_company_header():
     lic_num = info.get("license", "غير محدد")
     comp_name = info.get("name", "")
 
-    # الشعار في أقصى اليمين ويمتد بطول الهيدر
     str_lit.markdown(
         f"""
         <div class="glass-header">
