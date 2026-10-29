@@ -249,7 +249,7 @@ str_lit.markdown(f"""
     }}
     
     .main-content-spacer {{
-        margin-top: 220px !important;
+        margin-top: 1px !important;
     }}
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {{
