@@ -249,7 +249,7 @@ str_lit.markdown(f"""
     }}
     
     .main-content-spacer {{
-        margin-top: 30px !important;
+        margin-top: 220px !important;
     }}
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {{
@@ -267,6 +267,47 @@ str_lit.markdown(f"""
         border-radius: 8px !important;
         border: 1.5px solid {input_border} !important;
         padding: 6px 10px !important;
+    }}
+    
+    .glass-header {{
+        background: {header_bg};
+        border: 1px solid rgba(229, 9, 20, 0.3);
+        color: {header_text} !important;
+        padding: 0px !important;
+        border-radius: 8px;
+        width: 100%;
+        margin-bottom: 3px;
+        display: flex;
+        align-items: stretch;
+        overflow: hidden;
+    }}
+    
+    .header-logo-box-full {{
+        width: 65px;
+        background: rgba(229, 9, 20, 0.2);
+        border-left: 1px solid rgba(229, 9, 20, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        padding: 4px;
+    }}
+    
+    .header-top-system h2 {{
+        font-size: 10.5px !important;
+        font-weight: bold !important;
+        color: #F87171 !important;
+        margin: 0 0 1px 0 !important;
+    }}
+    .comp-name-txt {{
+        font-size: 12.5px !important;
+        font-weight: bold !important;
+        color: {header_text} !important;
+    }}
+    .comp-info-txt {{
+        font-size: 9px !important;
+        color: #94A3B8 !important;
+        margin-top: 1px;
     }}
     
     .user-badge-box {{
@@ -335,6 +376,39 @@ if 'current_user_role' not in str_lit.session_state: str_lit.session_state.curre
 
 if 'active_main_section' not in str_lit.session_state: str_lit.session_state.active_main_section = "الرئيسية"
 
+def render_company_header():
+    info = str_lit.session_state.company_info
+    logo_val = info.get("logo", "")
+    
+    if logo_val and logo_val.startswith("data:image"):
+        logo_html = f'<div class="header-logo-box-full"><img src="{logo_val}" style="width: 100%; height: 100%; object-fit: contain; background: white; padding: 2px;" /></div>'
+    elif logo_val and (logo_val.startswith("http://") or logo_val.startswith("https://")):
+        logo_html = f'<div class="header-logo-box-full"><img src="{logo_val}" style="width: 100%; height: 100%; object-fit: contain;" /></div>'
+    else:
+        logo_html = '<div class="header-logo-box-full">🏢</div>'
+
+    contact_num = info.get("contact", "غير محدد")
+    email_addr = info.get("email", "غير محدد")
+    address_str = info.get("address", "غير محدد")
+    cr_num = info.get("cr", "غير محدد")
+    tax_num = info.get("tax", "غير محدد")
+    lic_num = info.get("license", "غير محدد")
+    comp_name = info.get("name", "")
+
+    str_lit.markdown(
+        f"""
+        <div class="glass-header">
+            <div style="padding: 4px 10px; width: 100%;">
+                <div class="header-top-system"><h2>برنامج شؤون الموظفين والإدارة</h2></div>
+                <div class="comp-name-txt">{comp_name}</div>
+                <div class="comp-info-txt">📍 العنوان: {address_str} &nbsp;|&nbsp; 📋 س.ت: {cr_num} &nbsp;|&nbsp; 🧾 ب.ض: {tax_num} &nbsp;|&nbsp; 📞 هاتف: {contact_num} &nbsp;|&nbsp; ✉️ بريد: {email_addr} &nbsp;|&nbsp; 🔑 ترخيص: {lic_num}</div>
+            </div>
+            {logo_html}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 if not str_lit.session_state.is_authenticated:
     lic_info = get_client_license()
     
@@ -380,6 +454,7 @@ if not str_lit.session_state.is_authenticated:
     str_lit.stop()
 
 str_lit.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
+render_company_header()
 
 col_ub1, col_ub2 = str_lit.columns([4, 1])
 with col_ub1:
@@ -859,7 +934,6 @@ elif choice == "تسجيل إذن (انصراف / تأخير)":
             perm_minutes = str_lit.number_input("مدة الإذن (بالدقائق)", min_value=1, value=60)
             perm_reason = str_lit.text_input("سبب الإذن")
 
-            # حساب عدد الأذونات السابقة لنفس الموظف في نفس الشهر
             current_month_str = perm_date.strftime("%Y-%m")
             existing_perms = pd.DataFrame()
             if not str_lit.session_state.financial_transactions.empty:
@@ -887,7 +961,7 @@ elif choice == "تسجيل إذن (انصراف / تأخير)":
                 
                 if next_perm_num > 4:
                     monthly_sal = float(emp_data["الراتب الأساسي"])
-                    minute_rate = monthly_sal / 10000  # معادلة احتساب الدقيقة
+                    minute_rate = monthly_sal / 10000
                     fin_amount = perm_minutes * minute_rate
                     trans_type_label = f"جزاء إذن تجاوز المسموح {next_perm_num} ({perm_type})"
 
@@ -905,9 +979,9 @@ elif choice == "تسجيل إذن (انصراف / تأخير)":
                 auto_save_data()
                 
                 if next_perm_num > 4:
-                    str_lit.success(f"تم تسجيل الإذن بنجاح وتم خصم مبلغ {fin_amount:,.2f} ج.م لتجاوز الحد المسموح (المرَّة رقم {next_perm_num})!")
+                    str_lit.success(f"تم تسجيل الإذن بنجاح وتم خصم مبلغ {fin_amount:,.2f} ج.م لتجاوز الحد المسموح!")
                 else:
-                    str_lit.success(f"تم تسجيل الإذن المجاني بنجاح (المرَّة رقم {next_perm_num} بالشهر - بدون خصم)!")
+                    str_lit.success(f"تم تسجيل الإذن المجاني بنجاح (بدون خصم)!")
                 str_lit.rerun()
         str_lit.markdown('</div>', unsafe_allow_html=True)
 
@@ -916,7 +990,7 @@ elif choice == "سجل المعاملات المالية":
     render_printable_table(str_lit.session_state.financial_transactions)
 
 elif choice == "تعديل أو حذف معاملة مالية":
-    str_lit.subheader("✏️ تعديل أو حذف معاملة مالية أو إذن")
+    str_lit.subheader("✏️ تعديل أو حذف معاملة مالية أو إذن (مع تعديل وقت الدقائق)")
     if not str_lit.session_state.financial_transactions.empty:
         fin_indices = str_lit.session_state.financial_transactions.index.tolist()
         sel_fin_idx = str_lit.selectbox("اختر المعاملة المالية / الإذن", fin_indices)
@@ -941,22 +1015,44 @@ elif choice == "تعديل أو حذف معاملة مالية":
                     break
 
             new_type = str_lit.selectbox("نوع المعاملة", fin_types, index=cur_fin_type)
-            new_amt = str_lit.number_input("المبلغ / القيمة", value=float(f_rec["المبلغ / القيمة"]))
-            new_reas = str_lit.text_input("البيان / السبب", value=str(f_rec["البيان / السبب"]))
+            
+            old_reas_text = str(f_rec["البيان / السبب"])
+            default_mins_edit = 60
+            if "دقائق الإذن:" in old_reas_text:
+                try:
+                    part_str = old_reas_text.split("دقائق الإذن:")[1].split("دقيقة")[0].strip()
+                    default_mins_edit = int(part_str)
+                except:
+                    pass
+
+            new_edit_minutes = str_lit.number_input("تعديل مدة الإذن (بالدقائق)", min_value=1, value=default_mins_edit)
+            new_amt = str_lit.number_input("المبلغ / القيمة (يمكن تعديله يدوياً أو حسابه تلقائياً)", value=float(f_rec["المبلغ / القيمة"]))
+            new_reas = str_lit.text_input("البيان / السبب الأساسي", value=old_reas_text.split("(")[0].strip())
             
             col_ef1, col_ef2 = str_lit.columns(2)
             with col_ef1:
                 if str_lit.form_submit_button("💾 حفظ كافة تعديلات المعاملة", use_container_width=True):
                     emp_row_f = str_lit.session_state.employees[str_lit.session_state.employees["اسم الموظف"] == edit_fin_emp].iloc[0]
+                    
+                    final_amt_to_save = new_amt
+                    if "إذن" in new_type or "تجاوز المسموح" in new_type:
+                        monthly_sal_ed = float(emp_row_f["الراتب الأساسي"])
+                        minute_rate_ed = monthly_sal_ed / 10000
+                        if "تجاوز المسموح" in new_type:
+                            final_amt_to_save = new_edit_minutes * minute_rate_ed
+                        else:
+                            final_amt_to_save = 0.0
+
                     str_lit.session_state.financial_transactions.at[sel_fin_idx, "اسم الموظف"] = edit_fin_emp
                     str_lit.session_state.financial_transactions.at[sel_fin_idx, "كود الموظف"] = emp_row_f["كود الموظف"]
                     str_lit.session_state.financial_transactions.at[sel_fin_idx, "الفرع"] = emp_row_f["الفرع"]
                     str_lit.session_state.financial_transactions.at[sel_fin_idx, "التاريخ"] = str(edit_fin_date)
                     str_lit.session_state.financial_transactions.at[sel_fin_idx, "النوع"] = new_type
-                    str_lit.session_state.financial_transactions.at[sel_fin_idx, "المبلغ / القيمة"] = new_amt
-                    str_lit.session_state.financial_transactions.at[sel_fin_idx, "البيان / السبب"] = new_reas
+                    str_lit.session_state.financial_transactions.at[sel_fin_idx, "المبلغ / القيمة"] = final_amt_to_save
+                    str_lit.session_state.financial_transactions.at[sel_fin_idx, "البيان / السبب"] = f"{new_reas} (دقائق الإذن: {new_edit_minutes} دقيقة)"
+                    
                     auto_save_data()
-                    str_lit.success("تم تحديث المعاملة المالية أو الإذن بنجاح!")
+                    str_lit.success("تم تحديث المعاملة أو الإذن ووقت الدقائق بنجاح!")
                     str_lit.rerun()
             with col_ef2:
                 if str_lit.form_submit_button("🗑️ حذف المعاملة", use_container_width=True):
@@ -1333,6 +1429,3 @@ elif choice == "مسح البيانات":
             os.remove(COMPANY_FILE)
         str_lit.success("تم مسح البيانات بنجاح، جاري إعادة تشغيل النظام...")
         str_lit.rerun()
-
-else:
-    str_lit.info(f"عنصر القائمة ({choice}) جاهز للعمل بكامل ميزاته.")
