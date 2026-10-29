@@ -166,6 +166,9 @@ load_company_data()
 str_lit.session_state.company_info["name"] = company_display_name
 str_lit.session_state.company_info["license"] = company_license
 
+if 'theme_mode' not in str_lit.session_state:
+    str_lit.session_state.theme_mode = "Light"
+
 def render_printable_table(df):
     if df.empty:
         str_lit.info("لا توجد بيانات متاحة للعرض.")
@@ -198,104 +201,75 @@ def render_printable_table(df):
         key=unique_btn_key
     )
 
-str_lit.markdown("""
+is_dark = str_lit.session_state.theme_mode == "Dark"
+
+bg_color = "linear-gradient(135deg, #121212 0%, #1A1A1A 50%, #0B0B0B 100%)" if is_dark else "linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 50%, #E2E8F0 100%)"
+text_color = "#F1F5F9" if is_dark else "#0F172A"
+card_bg = "rgba(30, 30, 30, 0.75)" if is_dark else "rgba(255, 255, 255, 0.9)"
+card_value_color = "#FFFFFF" if is_dark else "#0F172A"
+wrapper_bg = "#121212" if is_dark else "#FFFFFF"
+input_bg = "rgba(30, 41, 59, 0.9)" if is_dark else "#FFFFFF"
+input_text = "#FFFFFF" if is_dark else "#0F172A"
+input_border = "#475569" if is_dark else "#CBD5E1"
+header_bg = "rgba(30, 30, 30, 0.85)" if is_dark else "rgba(255, 255, 255, 0.95)"
+header_text = "#FFFFFF" if is_dark else "#0F172A"
+
+str_lit.markdown(f"""
     <style>
-    header[data-testid="stHeader"] { visibility: hidden; height: 0px; }
-    [data-testid="stSidebar"] { display: none !important; width: 0px !important; }
+    header[data-testid="stHeader"] {{ visibility: hidden; height: 0px; }}
+    [data-testid="stSidebar"] {{ display: none !important; width: 0px !important; }}
     
-    html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6, label {
+    html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6, label {{
         font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
         direction: rtl !important;
         text-align: right !important;
-        color: #F1F5F9 !important;
-    }
+        color: {text_color} !important;
+    }}
     
-    .block-container {
-        padding-top: 0.5rem !important;
+    .block-container {{
+        padding-top: 0.2rem !important;
         padding-bottom: 3rem !important;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
         max-width: 100% !important;
-        background: linear-gradient(135deg, #121212 0%, #1A1A1A 50%, #0B0B0B 100%) !important;
+        background: {bg_color} !important;
         min-height: 100vh;
-    }
+    }}
     
-    .sticky-top-wrapper {
+    .sticky-top-wrapper {{
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
         z-index: 999999 !important;
-        background: #121212 !important;
-        padding: 8px 15px 4px 15px !important;
+        background: {wrapper_bg} !important;
+        padding: 4px 15px 2px 15px !important;
         border-bottom: 2px solid #E50914;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.8);
-    }
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }}
     
-    /* تم تقليل المسافة العلوية للمحتوى هنا لتكون متناسقة وقريبة من الهيدر */
-    .main-content-spacer {
-        margin-top:2px !important;
-    }
+    .main-content-spacer {{
+        margin-top: 30px !important;
+    }}
     
-    label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {
-        color: #CBD5E1 !important;
+    label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {{
+        color: {text_color} !important;
         font-weight: bold !important;
         font-size: 13px !important;
-        margin-bottom: 4px !important;
-    }
+        margin-bottom: 2px !important;
+    }}
     
-    input, textarea, select {
-        background-color: rgba(30, 41, 59, 0.9) !important;
-        color: #FFFFFF !important;
+    input, textarea, select {{
+        background-color: {input_bg} !important;
+        color: {input_text} !important;
         font-size: 13px !important;
         font-weight: bold !important;
-        border-radius: 10px !important;
-        border: 1.5px solid #475569 !important;
-        padding: 8px 12px !important;
-    }
+        border-radius: 8px !important;
+        border: 1.5px solid {input_border} !important;
+        padding: 6px 10px !important;
+    }}
     
-    .glass-header {
-        background: rgba(30, 30, 30, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        color: #FFFFFF !important;
-        padding: 0px !important;
-        border-radius: 10px;
-        width: 100%;
-        margin-bottom: 3px;
-        display: flex;
-        align-items: stretch;
-        overflow: hidden;
-    }
-    
-    .header-logo-box-full {
-        width: 75px;
-        background: rgba(229, 9, 20, 0.2);
-        border-left: 1px solid rgba(229, 9, 20, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 26px;
-        padding: 4px;
-    }
-    
-    .header-top-system h2 {
-        font-size: 11px !important;
-        font-weight: bold !important;
-        color: #F87171 !important;
-        margin: 0 0 1px 0 !important;
-    }
-    .comp-name-txt {
-        font-size: 13px !important;
-        font-weight: bold !important;
-        color: #FFFFFF !important;
-    }
-    .comp-info-txt {
-        font-size: 9.5px !important;
-        color: #94A3B8 !important;
-        margin-top: 1px;
-    }
-    
-    .user-badge-box {
+    .user-badge-box {{
         background: rgba(229, 9, 20, 0.15);
         border: 1px solid rgba(229, 9, 20, 0.4);
         padding: 2px 6px;
@@ -305,51 +279,51 @@ str_lit.markdown("""
         font-weight: bold;
         text-align: center;
         margin-bottom: 2px;
-    }
+    }}
     
-    .glass-card {
-        background: rgba(30, 30, 30, 0.75);
+    .glass-card {{
+        background: {card_bg};
         backdrop-filter: blur(15px);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-right: 5px solid #E50914;
-        padding: 14px 16px;
-        border-radius: 14px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        padding: 10px 14px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         text-align: right !important;
-        margin-bottom: 12px;
-    }
-    .glass-card-title {
-        font-size: 12px;
+        margin-bottom: 8px;
+    }}
+    .glass-card-title {{
+        font-size: 11.5px;
         color: #94A3B8;
         font-weight: bold;
-        margin-bottom: 4px;
-    }
-    .glass-card-value {
-        font-size: 22px;
-        color: #FFFFFF;
+        margin-bottom: 2px;
+    }}
+    .glass-card-value {{
+        font-size: 20px;
+        color: {card_value_color};
         font-weight: bold;
-    }
+    }}
     
-    .section-header {
-        font-size: 16px !important;
+    .section-header {{
+        font-size: 15px !important;
         font-weight: bold !important;
         color: #F87171 !important;
         border-bottom: 2px solid #E50914;
-        padding-bottom: 8px;
-        margin-top: 18px !important;
-        margin-bottom: 14px !important;
+        padding-bottom: 6px;
+        margin-top: 10px !important;
+        margin-bottom: 10px !important;
         text-align: right !important;
-    }
+    }}
     
-    .entry-form-area {
-        background: rgba(30, 30, 30, 0.85);
+    .entry-form-area {{
+        background: {card_bg};
         backdrop-filter: blur(15px);
-        padding: 22px;
-        border-radius: 16px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        padding: 16px;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        margin-bottom: 16px;
-    }
+        margin-bottom: 12px;
+    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -361,47 +335,24 @@ if 'current_user_role' not in str_lit.session_state: str_lit.session_state.curre
 
 if 'active_main_section' not in str_lit.session_state: str_lit.session_state.active_main_section = "الرئيسية"
 
-def render_company_header():
-    info = str_lit.session_state.company_info
-    logo_val = info.get("logo", "")
-    
-    if logo_val and logo_val.startswith("data:image"):
-        logo_html = f'<div class="header-logo-box-full"><img src="{logo_val}" style="width: 100%; height: 100%; object-fit: contain; background: white; padding: 2px;" /></div>'
-    elif logo_val and (logo_val.startswith("http://") or logo_val.startswith("https://")):
-        logo_html = f'<div class="header-logo-box-full"><img src="{logo_val}" style="width: 100%; height: 100%; object-fit: contain;" /></div>'
-    else:
-        logo_html = '<div class="header-logo-box-full">🏢</div>'
-
-    contact_num = info.get("contact", "غير محدد")
-    email_addr = info.get("email", "غير محدد")
-    address_str = info.get("address", "غير محدد")
-    cr_num = info.get("cr", "غير محدد")
-    tax_num = info.get("tax", "غير محدد")
-    lic_num = info.get("license", "غير محدد")
-    comp_name = info.get("name", "")
-
-    str_lit.markdown(
-        f"""
-        <div class="glass-header">
-            <div style="padding: 6px 12px; width: 100%;">
-                <div class="header-top-system"><h2>برنامج شؤون الموظفين والإدارة</h2></div>
-                <div class="comp-name-txt">{comp_name}</div>
-                <div class="comp-info-txt">📍 العنوان: {address_str} &nbsp;|&nbsp; 📋 س.ت: {cr_num} &nbsp;|&nbsp; 🧾 ب.ض: {tax_num} &nbsp;|&nbsp; 📞 هاتف: {contact_num} &nbsp;|&nbsp; ✉️ بريد: {email_addr} &nbsp;|&nbsp; 🔑 ترخيص: {lic_num}</div>
-            </div>
-            {logo_html}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
 if not str_lit.session_state.is_authenticated:
     lic_info = get_client_license()
+    
+    col_t_l1, col_t_l2, col_t_l3 = str_lit.columns([3, 1, 3])
+    with col_t_l2:
+        current_theme_idx = 0 if str_lit.session_state.theme_mode == "Dark" else 1
+        new_theme = str_lit.radio("مظهر الشاشة", ["🌙 دارك (Dark)", "☀️ لايت (Light)"], index=current_theme_idx, horizontal=True)
+        selected_mode = "Dark" if "دارك" in new_theme else "Light"
+        if selected_mode != str_lit.session_state.theme_mode:
+            str_lit.session_state.theme_mode = selected_mode
+            str_lit.rerun()
+
     str_lit.markdown(
         f"""
-        <div style="max-width: 480px; margin: 60px auto; background: rgba(30, 30, 30, 0.9); backdrop-filter: blur(20px); padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); text-align: center; border: 1px solid rgba(255,255,255,0.08);">
-            <h2 style="color: #F87171; margin-bottom: 8px; font-size: 22px;">النظام المتكامل لشؤون الموظفين</h2>
-            <p style="color: #FFFFFF; font-size: 15px; font-weight: bold; margin-bottom: 4px;">{lic_info.get('name', '')}</p>
-            <p style="color: #94A3B8; font-size: 12.5px;">رقم الترخيص: {lic_info.get('license', '')}</p>
+        <div style="max-width: 480px; margin: 10px auto 20px auto; background: {card_bg}; backdrop-filter: blur(20px); padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; border: 1px solid rgba(255,255,255,0.08);">
+            <h2 style="color: #F87171; margin-bottom: 6px; font-size: 20px;">النظام المتكامل لشؤون الموظفين</h2>
+            <p style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">{lic_info.get('name', '')}</p>
+            <p style="color: #94A3B8; font-size: 12px;">رقم الترخيص: {lic_info.get('license', '')}</p>
         </div>
         """,
         unsafe_allow_html=True
@@ -429,21 +380,30 @@ if not str_lit.session_state.is_authenticated:
     str_lit.stop()
 
 str_lit.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
-render_company_header()
 
-logged_username = str_lit.session_state.current_logged_user
-user_role = str_lit.session_state.current_user_role
-user_branch = str_lit.session_state.current_user_branch
-user_dept = str_lit.session_state.current_user_dept
+col_ub1, col_ub2 = str_lit.columns([4, 1])
+with col_ub1:
+    logged_username = str_lit.session_state.current_logged_user
+    user_role = str_lit.session_state.current_user_role
+    user_branch = str_lit.session_state.current_user_branch
+    user_dept = str_lit.session_state.current_user_dept
 
-str_lit.markdown(
-    f"""
-    <div class="user-badge-box">
-        👤 المستخدم الحالي: <b>{logged_username}</b> &nbsp;|&nbsp; 🛡️ الصلاحية: <b>{user_role}</b> &nbsp;|&nbsp; 📍 الفرع: <b>{user_branch}</b> &nbsp;|&nbsp; 🏢 القسم: <b>{user_dept}</b>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+    str_lit.markdown(
+        f"""
+        <div class="user-badge-box">
+            👤 المستخدم الحالي: <b>{logged_username}</b> &nbsp;|&nbsp; 🛡️ الصلاحية: <b>{user_role}</b> &nbsp;|&nbsp; 📍 الفرع: <b>{user_branch}</b> &nbsp;|&nbsp; 🏢 القسم: <b>{user_dept}</b>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+with col_ub2:
+    current_theme_idx = 0 if str_lit.session_state.theme_mode == "Dark" else 1
+    new_theme_main = str_lit.selectbox("المظهر", ["🌙 دارك", "☀️ لايت"], index=current_theme_idx, key="theme_selector_main")
+    main_selected_mode = "Dark" if "دارك" in new_theme_main else "Light"
+    if main_selected_mode != str_lit.session_state.theme_mode:
+        str_lit.session_state.theme_mode = main_selected_mode
+        str_lit.rerun()
 
 main_sections = [
     "الرئيسية", 
@@ -471,7 +431,7 @@ sub_options_map = {
     "الرئيسية": ["لوحة التحكم والمؤشرات"],
     "الحضور والانصراف": ["تسجيل حضور وانصراف", "سجل الحضور والانصراف", "تعديل أو حذف حركة حضور"],
     "طلبات الاجازة": ["تسجيل طلب إجازة", "سجل طلبات قيد الانتظار", "سجل الطلبات المقبولة", "سجل الطلبات المرفوضة", "تعديل أو حذف طلب إجازة"],
-    "المعاملات المالية": ["تسجيل معاملة مالية", "سجل المعاملات المالية", "تعديل أو حذف معاملة مالية"],
+    "المعاملات المالية": ["تسجيل معاملة مالية", "تسجيل إذن (انصراف / تأخير)", "سجل المعاملات المالية", "تعديل أو حذف معاملة مالية"],
     "كشف الرواتب": ["كشف الرواتب والمستحقات الشامل"],
     "شؤون الموظفين": ["إضافة موظف جديد", "سجل الموظفين والأرصدة الشاملة", "تعديل أو حذف موظف"],
     "المستخدمين": ["إضافة مستخدم جديد", "إدارة المستخدمين والصلاحيات والسجل", "تعديل أو حذف مستخدم"],
@@ -480,7 +440,7 @@ sub_options_map = {
     "أدوات النظام": ["تصدير وتحميل Excel", "نسخة احتياطية واستعادة", "مسح البيانات"]
 }
 
-str_lit.markdown('<div class="cinema-top-bar" style="margin-top: 2px;">', unsafe_allow_html=True)
+str_lit.markdown('<div class="cinema-top-bar" style="margin-top: 1px;">', unsafe_allow_html=True)
 col_sub1, col_sub2 = str_lit.columns([4, 1])
 
 with col_sub1:
@@ -522,7 +482,7 @@ with col4:
     active_users_count = len(str_lit.session_state.users[str_lit.session_state.users["الحالة"] == "نشط"]) if not str_lit.session_state.users.empty else 0
     str_lit.markdown(f'<div class="glass-card" style="border-right-color: #3B82F6;"><div class="glass-card-title">🛡️ المستخدمين النشطين</div><div class="glass-card-value" style="font-size: 18px; color: #3B82F6;">{active_users_count} مستخدم</div></div>', unsafe_allow_html=True)
 
-str_lit.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 12px 0 20px 0;'>", unsafe_allow_html=True)
+str_lit.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 8px 0 12px 0;'>", unsafe_allow_html=True)
 
 if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم والمؤشرات":
     if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم والمؤشرات":
@@ -549,7 +509,7 @@ if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم �
                 render_printable_table(branch_emps[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الراتب الأساسي"]])
             else:
                 str_lit.info(f"لا توجد موظفين مسجلين في فرع {branch}.")
-            str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 15px 0;'>", unsafe_allow_html=True)
+            str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 10px 0;'>", unsafe_allow_html=True)
 
 if choice == "تسجيل حضور وانصراف":
     str_lit.subheader("⏱️ تسجيل حركة الحضور والانصراف")
@@ -887,15 +847,79 @@ elif choice == "تسجيل معاملة مالية":
                 str_lit.rerun()
         str_lit.markdown('</div>', unsafe_allow_html=True)
 
+elif choice == "تسجيل إذن (انصراف / تأخير)":
+    str_lit.subheader("🚪 تسجيل إذن انصراف أو تأخير (يُحتسب الخصم بدءاً من المرة الخامسة بالشهر)")
+    emp_names = str_lit.session_state.employees["اسم الموظف"].tolist()
+    if emp_names:
+        str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
+        with str_lit.form("permission_form"):
+            emp_p = str_lit.selectbox("اختر الموظف", emp_names)
+            perm_date = str_lit.date_input("تاريخ الإذن", value=date.today())
+            perm_type = str_lit.selectbox("نوع الإذن", ["إذن تأخير حضور", "إذن انصراف مبكر"])
+            perm_minutes = str_lit.number_input("مدة الإذن (بالدقائق)", min_value=1, value=60)
+            perm_reason = str_lit.text_input("سبب الإذن")
+
+            # حساب عدد الأذونات السابقة لنفس الموظف في نفس الشهر
+            current_month_str = perm_date.strftime("%Y-%m")
+            existing_perms = pd.DataFrame()
+            if not str_lit.session_state.financial_transactions.empty:
+                ft_df = str_lit.session_state.financial_transactions
+                existing_perms = ft_df[
+                    (ft_df["اسم الموظف"] == emp_p) & 
+                    (ft_df["النوع"].str.contains("إذن")) & 
+                    (ft_df["التاريخ"].str.startswith(current_month_str))
+                ]
+            
+            current_perm_count = len(existing_perms)
+            next_perm_num = current_perm_count + 1
+
+            str_lit.info(f"📊 إجمالي أذونات الموظف المسجلة خلال شهر {current_month_str} حتى الآن: **{current_perm_count} أذونات**.")
+            if next_perm_num <= 4:
+                str_lit.success(f"✅ هذا هو الإذن رقم ({next_perm_num}) -> **مجاني تماماً وبدون أي خصم** (المسموح حتى 4 أذونات).")
+            else:
+                str_lit.warning(f"⚠️ هذا هو الإذن رقم ({next_perm_num}) -> **تجاوز الحد المسموح (4 أذونات)، سيتم احتساب الخصم تلقائياً كجزاء**.")
+
+            if str_lit.form_submit_button("💾 حفظ وتسجيل الإذن", use_container_width=True):
+                emp_data = str_lit.session_state.employees[str_lit.session_state.employees["اسم الموظف"] == emp_p].iloc[0]
+                
+                fin_amount = 0.0
+                trans_type_label = f"إذن مرخص ({perm_type})"
+                
+                if next_perm_num > 4:
+                    monthly_sal = float(emp_data["الراتب الأساسي"])
+                    minute_rate = monthly_sal / 10000  # معادلة احتساب الدقيقة
+                    fin_amount = perm_minutes * minute_rate
+                    trans_type_label = f"جزاء إذن تجاوز المسموح {next_perm_num} ({perm_type})"
+
+                new_perm_trans = {
+                    "التاريخ": str(perm_date),
+                    "كود الموظف": emp_data["كود الموظف"],
+                    "اسم الموظف": emp_p,
+                    "الفرع": emp_data["الفرع"],
+                    "النوع": trans_type_label,
+                    "المبلغ / القيمة": fin_amount,
+                    "البيان / السبب": f"{perm_reason} (دقائق الإذن: {perm_minutes} دقيقة - إذن رقم {next_perm_num} بالشهر)"
+                }
+
+                str_lit.session_state.financial_transactions = pd.concat([str_lit.session_state.financial_transactions, pd.DataFrame([new_perm_trans])], ignore_index=True)
+                auto_save_data()
+                
+                if next_perm_num > 4:
+                    str_lit.success(f"تم تسجيل الإذن بنجاح وتم خصم مبلغ {fin_amount:,.2f} ج.م لتجاوز الحد المسموح (المرَّة رقم {next_perm_num})!")
+                else:
+                    str_lit.success(f"تم تسجيل الإذن المجاني بنجاح (المرَّة رقم {next_perm_num} بالشهر - بدون خصم)!")
+                str_lit.rerun()
+        str_lit.markdown('</div>', unsafe_allow_html=True)
+
 elif choice == "سجل المعاملات المالية":
-    str_lit.subheader("💰 سجل المعاملات المالية")
+    str_lit.subheader("💰 سجل المعاملات المالية والأذونات")
     render_printable_table(str_lit.session_state.financial_transactions)
 
 elif choice == "تعديل أو حذف معاملة مالية":
-    str_lit.subheader("✏️ تعديل أو حذف معاملة مالية")
+    str_lit.subheader("✏️ تعديل أو حذف معاملة مالية أو إذن")
     if not str_lit.session_state.financial_transactions.empty:
         fin_indices = str_lit.session_state.financial_transactions.index.tolist()
-        sel_fin_idx = str_lit.selectbox("اختر المعاملة المالية", fin_indices)
+        sel_fin_idx = str_lit.selectbox("اختر المعاملة المالية / الإذن", fin_indices)
         f_rec = str_lit.session_state.financial_transactions.loc[sel_fin_idx]
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with str_lit.form("edit_fin_form_comprehensive"):
@@ -906,9 +930,16 @@ elif choice == "تعديل أو حذف معاملة مالية":
                 trans_date_def = datetime.strptime(str(f_rec["التاريخ"]), "%Y-%m-%d").date()
             except:
                 trans_date_def = date.today()
-            edit_fin_date = str_lit.date_input("تاريخ المعاملة المالية", value=trans_date_def)
-            fin_types = ["سلفة", "جزاء (خصم)", "غياب (خصم أيام)", "مكافأة (إضافي)", "بدلات"]
-            cur_fin_type = fin_types.index(f_rec["النوع"]) if f_rec["النوع"] in fin_types else 0
+            edit_fin_date = str_lit.date_input("تاريخ المعاملة", value=trans_date_def)
+            
+            fin_types = ["سلفة", "جزاء (خصم)", "غياب (خصم أيام)", "مكافأة (إضافي)", "بدلات", "إذن مرخص (إذن تأخير حضور)", "إذن مرخص (إذن انصراف مبكر)", "جزاء إذن تجاوز المسموح"]
+            cur_t_str = f_rec["النوع"]
+            cur_fin_type = 0
+            for idx_ft, t_val in enumerate(fin_types):
+                if t_val in cur_t_str:
+                    cur_fin_type = idx_ft
+                    break
+
             new_type = str_lit.selectbox("نوع المعاملة", fin_types, index=cur_fin_type)
             new_amt = str_lit.number_input("المبلغ / القيمة", value=float(f_rec["المبلغ / القيمة"]))
             new_reas = str_lit.text_input("البيان / السبب", value=str(f_rec["البيان / السبب"]))
@@ -925,7 +956,7 @@ elif choice == "تعديل أو حذف معاملة مالية":
                     str_lit.session_state.financial_transactions.at[sel_fin_idx, "المبلغ / القيمة"] = new_amt
                     str_lit.session_state.financial_transactions.at[sel_fin_idx, "البيان / السبب"] = new_reas
                     auto_save_data()
-                    str_lit.success("تم تحديث المعاملة المالية بكامل مدخلاتها وتاريخها بنجاح!")
+                    str_lit.success("تم تحديث المعاملة المالية أو الإذن بنجاح!")
                     str_lit.rerun()
             with col_ef2:
                 if str_lit.form_submit_button("🗑️ حذف المعاملة", use_container_width=True):
@@ -935,7 +966,7 @@ elif choice == "تعديل أو حذف معاملة مالية":
                     str_lit.rerun()
         str_lit.markdown('</div>', unsafe_allow_html=True)
     else:
-        str_lit.info("لا توجد معاملات مالية مسجلة.")
+        str_lit.info("لا توجد معاملات مالية أو أذونات مسجلة.")
 
 elif choice == "كشف الرواتب والمستحقات الشامل":
     str_lit.subheader("💰 إدارة كشف الرواتب والطباعة المستقلة لكل جزء على حدة")
@@ -943,13 +974,13 @@ elif choice == "كشف الرواتب والمستحقات الشامل":
     
     if not str_lit.session_state.financial_transactions.empty:
         fin_df = str_lit.session_state.financial_transactions.copy()
-        fin_df["مكافآت وبدلات"] = fin_df.apply(lambda r: r["المبلغ / القيمة"] if r["النوع"] in ["مكافأة (إضافي)", "بدلات"] else 0, axis=1)
-        fin_df["سلف وجزاءات وغياب"] = fin_df.apply(lambda r: r["المبلغ / القيمة"] if r["النوع"] in ["سلفة", "جزاء (خصم)", "غياب (خصم أيام)"] else 0, axis=1)
-        fin_grouped = fin_df.groupby("كود الموظف")[["مكافآت وبدلات", "سلف وجزاءات وغياب"]].sum().reset_index()
+        fin_df["مكافآت وبدلات"] = fin_df.apply(lambda r: r["المبلغ / القيمة"] if any(k in str(r["النوع"]) for k in ["مكافأة", "بدلات"]) else 0, axis=1)
+        fin_df["سلف وجزاءات وغياب وأذونات"] = fin_df.apply(lambda r: r["المبلغ / القيمة"] if any(k in str(r["النوع"]) for k in ["سلفة", "جزاء", "غياب", "تجاوز المسموح"]) else 0, axis=1)
+        fin_grouped = fin_df.groupby("كود الموظف")[["مكافآت وبدلات", "سلف وجزاءات وغياب وأذونات"]].sum().reset_index()
         payroll_df = payroll_df.merge(fin_grouped, on="كود الموظف", how="left")
     else:
         payroll_df["مكافآت وبدلات"] = 0.0
-        payroll_df["سلف وجزاءات وغياب"] = 0.0
+        payroll_df["سلف وجزاءات وغياب وأذونات"] = 0.0
 
     if not str_lit.session_state.attendance.empty:
         att_agg = str_lit.session_state.attendance.groupby("كود الموظف")[["التأخير (دقيقة)", "إضافي (دقيقة)"]].sum().reset_index()
@@ -963,13 +994,13 @@ elif choice == "كشف الرواتب والمستحقات الشامل":
     payroll_df["قيمة الإضافي"] = payroll_df["إضافي (دقيقة)"] * minute_rate
     payroll_df["قيمة التأخير والاستقطاع"] = payroll_df["التأخير (دقيقة)"] * minute_rate
     payroll_df["إجمالي المستحقات"] = payroll_df["الراتب الأساسي"] + payroll_df["قيمة الإضافي"] + payroll_df["مكافآت وبدلات"]
-    payroll_df["إجمالي الاستقطاعات"] = payroll_df["سلف وجزاءات وغياب"] + payroll_df["قيمة التأخير والاستقطاع"]
+    payroll_df["إجمالي الاستقطاعات"] = payroll_df["سلف وجزاءات وغياب وأذونات"] + payroll_df["قيمة التأخير والاستقطاع"]
     payroll_df["صافي الراتب"] = payroll_df["إجمالي المستحقات"] - payroll_df["إجمالي الاستقطاعات"]
 
     display_payroll_cols = [
         "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", "الراتب الأساسي",
         "إضافي (دقيقة)", "قيمة الإضافي", "مكافآت وبدلات", "إجمالي المستحقات",
-        "التأخير (دقيقة)", "قيمة التأخير والاستقطاع", "سلف وجزاءات وغياب", "إجمالي الاستقطاعات",
+        "التأخير (دقيقة)", "قيمة التأخير والاستقطاع", "سلف وجزاءات وغياب وأذونات", "إجمالي الاستقطاعات",
         "صافي الراتب"
     ]
 
@@ -1302,3 +1333,6 @@ elif choice == "مسح البيانات":
             os.remove(COMPANY_FILE)
         str_lit.success("تم مسح البيانات بنجاح، جاري إعادة تشغيل النظام...")
         str_lit.rerun()
+
+else:
+    str_lit.info(f"عنصر القائمة ({choice}) جاهز للعمل بكامل ميزاته.")
