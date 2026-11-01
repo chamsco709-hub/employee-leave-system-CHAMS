@@ -54,11 +54,15 @@ def load_company_data():
                     df_emp = pd.DataFrame(data["employees"])
                     if "مسوغات التعيين" not in df_emp.columns:
                         df_emp["مسوغات التعيين"] = ""
+                    if "تاريخ بداية العقد" not in df_emp.columns:
+                        df_emp["تاريخ بداية العقد"] = str(date.today())
+                    if "تاريخ نهاية العقد" not in df_emp.columns:
+                        df_emp["تاريخ نهاية العقد"] = str(date.today() + timedelta(days=365))
                     str_lit.session_state.employees = df_emp
                 else:
                     str_lit.session_state.employees = pd.DataFrame(columns=[
                         "كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "صلاحية الموظف",
-                        "الراتب الأساسي", "مسوغات التعيين",
+                        "الراتب الأساسي", "مسوغات التعيين", "تاريخ بداية العقد", "تاريخ نهاية العقد",
                         "رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي",
                         "رصيد أسبوعي (إجمالي)", "أسبوعي مستهلك", "أسبوعي متبقي",
                         "رصيد رسمي (إجمالي)", "رسمي مستهلك", "رسمي متبقي",
@@ -116,6 +120,7 @@ def load_company_data():
             {
                 "كود الموظف": "EMP001", "اسم الموظف": "أحمد محمود", "الوظيفة": "محاسب أول", "القسم": "الإدارة المالية", "الفرع": "المركز الرئيسي",
                 "صلاحية الموظف": "اعتماد الطلبات", "الراتب الأساسي": 5000, "مسوغات التعيين": "",
+                "تاريخ بداية العقد": "2025-11-01", "تاريخ نهاية العقد": "2026-11-25",
                 "رصيد سنوي (إجمالي)": 21, "سنوي مستهلك": 3, "سنوي متبقي": 18,
                 "رصيد أسبوعي (إجمالي)": 4, "أسبوعي مستهلك": 1, "أسبوعي متبقي": 3,
                 "رصيد رسمي (إجمالي)": 10, "رسمي مستهلك": 2, "رسمي متبقي": 8,
@@ -559,41 +564,39 @@ with col4:
 
 str_lit.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 8px 0 12px 0;'>", unsafe_allow_html=True)
 
-# نظام التنبيهات والرسائل التحذيرية الذكية (قبلها بشهر) في الشاشة الرئيسية
+# نظام التنبيهات والرسائل التحذيرية الذكية للعقود والمستندات (قبلها بشهر)
 if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم والمؤشرات":
-    str_lit.markdown(f'<div class="section-header">🔔 التنبيهات والإنذارات المبكرة (قبل انتهاء المدة بشهر)</div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="section-header">🔔 التنبيهات والإنذارات المبكرة لعقود الموظفين (قبل انتهاء العقد بشهر)</div>', unsafe_allow_html=True)
     
-    alerts_data = [
-        {"الموظف / البند": "أحمد محمود", "نوع المستند": "عقد العمل", "تاريخ الانتهاء": "2026-11-25"},
-        {"الموظف / البند": "فرع الإسكندرية", "نوع المستند": "رخصة النشاط", "تاريخ الانتهاء": "2026-12-05"},
-    ]
-    df_alerts = pd.DataFrame(alerts_data)
     today = datetime.now()
     warning_flag = False
 
-    if not df_alerts.empty:
-        for index, row in df_alerts.iterrows():
-            try:
-                exp_date = datetime.strptime(row["تاريخ الانتهاء"], "%Y-%m-%d")
-                days_remaining = (exp_date - today).days
+    if not str_lit.session_state.employees.empty:
+        for idx, emp_row in str_lit.session_state.employees.iterrows():
+            emp_name = emp_row.get("اسم الموظف", "غير معروف")
+            end_contract_str = emp_row.get("تاريخ نهاية العقد", "")
+            if end_contract_str:
+                try:
+                    exp_date = datetime.strptime(str(end_contract_str).strip(), "%Y-%m-%d")
+                    days_remaining = (exp_date - today).days
 
-                if 0 <= days_remaining <= 30:
-                    warning_flag = True
-                    str_lit.warning(
-                        f"⚠️ **تنبيه هام:** {row['نوع المستند']} الخاص بـ ({row['الموظف / البند']}) متبقي على انتهائه **{days_remaining} يوم فقط** (تاريخ الانتهاء: {row['تاريخ الانتهاء']}).",
-                        icon="🚨"
-                    )
-                elif days_remaining < 0:
-                    warning_flag = True
-                    str_lit.error(
-                        f"❌ **تجاوز موعد الانتهاء:** {row['نوع المستند']} الخاص بـ ({row['الموظف / البند']}) انتهى منذ {-days_remaining} يوم!",
-                        icon="🚫"
-                    )
-            except Exception:
-                pass
+                    if 0 <= days_remaining <= 30:
+                        warning_flag = True
+                        str_lit.warning(
+                            f"⚠️ **تنبيه انتهاء عقد:** عقد الموظف (**{emp_name}**) متبقي على انتهائه **{days_remaining} يوم فقط** (تاريخ الانتهاء: {end_contract_str}).",
+                            icon="🚨"
+                        )
+                    elif days_remaining < 0:
+                        warning_flag = True
+                        str_lit.error(
+                            f"❌ **تجاوز موعد العقد:** عقد الموظف (**{emp_name}**) انتهى منذ {-days_remaining} يوم!",
+                            icon="🚫"
+                        )
+                except Exception:
+                    pass
 
     if not warning_flag:
-        str_lit.success("✅ جميع التواريخ والمستندات سارية ولا توجد أي تحذيرات قريبة خلال الشهر القادم.")
+        str_lit.success("✅ جميع عقود ومستندات الموظفين سارية ولا توجد أي تحذيرات قريبة خلال الشهر القادم.")
     
     str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 10px 0;'>", unsafe_allow_html=True)
 
@@ -619,7 +622,7 @@ if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم �
             
             if not branch_emps.empty:
                 str_lit.markdown(f"**📋 جدول موظفي فرع ({branch}):**")
-                default_cols = ["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الراتب الأساسي"]
+                default_cols = ["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الراتب الأساسي", "تاريخ بداية العقد", "تاريخ نهاية العقد"]
                 available_cols = [col for col in default_cols if col in branch_emps.columns]
                 render_printable_table(branch_emps[available_cols])
             else:
@@ -724,7 +727,7 @@ if choice == "سجل الحضور والانصراف":
     render_printable_table(str_lit.session_state.attendance)
 
 if choice == "إضافة موظف جديد":
-    str_lit.subheader("➕ إضافة موظف جديد إلى المنظومة")
+    str_lit.subheader("➕ إضافة موظف جديد إلى المنظومة وتحديد مدة العقد")
     str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
     with str_lit.form("add_new_emp_form_full"):
         col_e1, col_e2 = str_lit.columns(2)
@@ -733,11 +736,13 @@ if choice == "إضافة موظف جديد":
             emp_name_in = str_lit.text_input("اسم الموظف الرباعي")
             emp_job_in = str_lit.text_input("الوظيفة / المسمى الوظيفي")
             emp_dept_in = str_lit.text_input("القسم التابع")
-        with col_e2:
             emp_branch_in = str_lit.selectbox("الفرع التابع", ["المركز الرئيسي", "فرع الإسكندرية", "فرع الشرم"])
+        with col_e2:
             emp_role_in = str_lit.selectbox("صلاحية الموظف بالنظام", ["مستخدم عادي", "اعتماد الطلبات", "مدير الفرع"])
             emp_salary_in = str_lit.number_input("الراتب الأساسي (ج.م)", min_value=0.0, value=5000.0, step=100.0)
             emp_docs_in = str_lit.text_input("مسوغات التعيين (مستندات مكتملة/ناقصة)")
+            contract_start_in = str_lit.date_input("تاريخ بداية العقد", value=date.today())
+            contract_end_in = str_lit.date_input("تاريخ نهاية العقد", value=date.today() + timedelta(days=365))
 
         str_lit.markdown("---")
         str_lit.markdown("📌 **أرصدة الإجازات السنوية والأسبوعية والرسمية:**")
@@ -754,7 +759,7 @@ if choice == "إضافة موظف جديد":
         with col_b4:
             sick_days = str_lit.number_input("إجازات مرضية (أيام)", value=0)
 
-        if str_lit.form_submit_button("💾 حفظ بيانات الموظف الجديد", use_container_width=True):
+        if str_lit.form_submit_button("💾 حفظ بيانات الموظف الجديد والعقد", use_container_width=True):
             if emp_name_in.strip() == "":
                 str_lit.error("❌ يرجى إدخال اسم الموظف!")
             else:
@@ -767,6 +772,8 @@ if choice == "إضافة موظف جديد":
                     "صلاحية الموظف": emp_role_in,
                     "الراتب الأساسي": float(emp_salary_in),
                     "مسوغات التعيين": emp_docs_in,
+                    "تاريخ بداية العقد": contract_start_in.strftime("%Y-%m-%d"),
+                    "تاريخ نهاية العقد": contract_end_in.strftime("%Y-%m-%d"),
                     "رصيد سنوي (إجمالي)": int(ann_total),
                     "سنوي مستهلك": int(ann_used),
                     "سنوي متبقي": int(ann_total - ann_used),
@@ -780,12 +787,71 @@ if choice == "إضافة موظف جديد":
                 }
                 str_lit.session_state.employees = pd.concat([str_lit.session_state.employees, pd.DataFrame([new_emp_data])], ignore_index=True)
                 auto_save_data()
-                str_lit.success(f"✅ تم إضافة الموظف ({emp_name_in}) بنجاح!")
+                str_lit.success(f"✅ تم إضافة الموظف ({emp_name_in}) وتحديد فترة عقده بنجاح!")
     str_lit.markdown('</div>', unsafe_allow_html=True)
 
 if choice == "سجل الموظفين والأرصدة الشاملة":
-    str_lit.subheader("👥 سجل الموظفين والأرصدة الشاملة")
+    str_lit.subheader("👥 سجل الموظفين وتواريخ العقود والأرصدة الشاملة")
     render_printable_table(str_lit.session_state.employees)
+
+if choice == "تعديل أو حذف موظف":
+    str_lit.subheader("✏️ تعديل بيانات وتواريخ عقود الموظفين أو حذف موظف")
+    if not str_lit.session_state.employees.empty:
+        emp_names_edit = str_lit.session_state.employees["اسم الموظف"].tolist()
+        selected_emp_edit = str_lit.selectbox("اختر الموظف للتعديل أو الحذف", emp_names_edit)
+        
+        emp_row_data = str_lit.session_state.employees[str_lit.session_state.employees["اسم الموظف"] == selected_emp_edit].iloc[0]
+        emp_idx = str_lit.session_state.employees[str_lit.session_state.employees["اسم الموظف"] == selected_emp_edit].index[0]
+
+        str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
+        with str_lit.form("edit_emp_contract_form"):
+            str_lit.markdown(f"### تعديل بيانات الموظف: {selected_emp_edit}")
+            
+            e_name = str_lit.text_input("اسم الموظف", value=str(emp_row_data["اسم الموظف"]))
+            e_job = str_lit.text_input("الوظيفة", value=str(emp_row_data["الوظيفة"]))
+            e_dept = str_lit.text_input("القسم", value=str(emp_row_data["القسم"]))
+            e_salary = str_lit.number_input("الراتب الأساسي", min_value=0.0, value=float(emp_row_data["الراتب الأساسي"]))
+            
+            # استخراج تواريخ البداية والنهاية للعقد الحالي لتعبئتها افتراضياً
+            try:
+                default_start = datetime.strptime(str(emp_row_data.get("تاريخ بداية العقد", date.today())), "%Y-%m-%d").date()
+            except Exception:
+                default_start = date.today()
+                
+            try:
+                default_end = datetime.strptime(str(emp_row_data.get("تاريخ نهاية العقد", date.today())), "%Y-%m-%d").date()
+            except Exception:
+                default_end = date.today() + timedelta(days=365)
+
+            e_contract_start = str_lit.date_input("تاريخ بداية العقد", value=default_start)
+            e_contract_end = str_lit.date_input("تاريخ نهاية العقد", value=default_end)
+
+            col_sub_ed1, col_sub_ed2 = str_lit.columns(2)
+            with col_sub_ed1:
+                update_btn = str_lit.form_submit_button("💾 حفظ التعديلات وتحديث العقد", use_container_width=True)
+            with col_sub_ed2:
+                delete_btn = str_lit.form_submit_button("🗑️ حذف هذا الموظف نهائياً", use_container_width=True)
+
+            if update_btn:
+                str_lit.session_state.employees.at[emp_idx, "اسم الموظف"] = e_name
+                str_lit.session_state.employees.at[emp_idx, "الوظيفة"] = e_job
+                str_lit.session_state.employees.at[emp_idx, "القسم"] = e_dept
+                str_lit.session_state.employees.at[emp_idx, "الراتب الأساسي"] = float(e_salary)
+                str_lit.session_state.employees.at[emp_idx, "تاريخ بداية العقد"] = e_contract_start.strftime("%Y-%m-%d")
+                str_lit.session_state.employees.at[emp_idx, "تاريخ نهاية العقد"] = e_contract_end.strftime("%Y-%m-%d")
+                auto_save_data()
+                str_lit.success("✅ تم تحديث بيانات الموظف وتاريخ العقد بنجاح!")
+                str_lit.rerun()
+
+            if delete_btn:
+                str_lit.session_state.employees = str_lit.session_state.employees.drop(emp_idx).reset_index(drop=True)
+                auto_save_data()
+                str_lit.warning("🗑️ تم حذف الموظف بنجاح من النظام!")
+                str_lit.rerun()
+
+        str_lit.markdown('</div>', unsafe_allow_html=True)
+    else:
+        str_lit.info("لا توجد مسجلات موظفين حالياً.")
 
 if choice == "إعدادات الشركة وبياناتها الشاملة":
     str_lit.subheader("⚙️ إعدادات وبيانات الشركة الرسمية")
@@ -931,7 +997,7 @@ if choice == "مسح البيانات":
     if str_lit.button("🚨 تأكيد مسح كافة البيانات", type="primary"):
         str_lit.session_state.employees = pd.DataFrame(columns=[
             "كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "صلاحية الموظف",
-            "الراتب الأساسي", "مسوغات التعيين",
+            "الراتب الأساسي", "مسوغات التعيين", "تاريخ بداية العقد", "تاريخ نهاية العقد",
             "رصيد سنوي (إجمالي)", "سنوي مستهلك", "سنوي متبقي",
             "رصيد أسبوعي (إجمالي)", "أسبوعي مستهلك", "أسبوعي متبقي",
             "رصيد رسمي (إجمالي)", "رسمي مستهلك", "رسمي متبقي",
