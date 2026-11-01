@@ -8,7 +8,7 @@ import base64
 import uuid
 
 str_lit.set_page_config(
-    page_title="النظام المتكامل لإدارة الموارد البشرية - Foodics ERP",
+    page_title="النظام المتكامل لإدارة الموارد البشرية ",
     page_icon="🍔",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -294,7 +294,7 @@ str_lit.markdown(f"""
     }}
     
     .main-content-spacer {{
-        margin-top: 220px !important;
+        margin-top: 1px !important;
     }}
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {{
@@ -889,45 +889,68 @@ if choice == "سجل الحضور والانصراف":
     str_lit.subheader("📋 سجل الحضور والانصراف (حسب الفلتر النشط)")
     render_printable_table(filtered_attendance, "سجل الحضور والانصراف المفلتر")
 
-if choice == "تعديل أو حذف حركة حضور":
-    str_lit.subheader("✏️ تعديل أو حذف حركة حضور وانصراف مسجلة")
-    if not filtered_attendance.empty:
-        att_options = [f"{row['التاريخ']} - {row['اسم الموظف']} ({row['الحالة']})" for idx, row in filtered_attendance.iterrows()]
-        selected_att_str = str_lit.selectbox("اختر حركة الحضور للتعديل أو الحذف", att_options)
-        selected_att_idx = filtered_attendance[filtered_attendance.apply(lambda r: f"{r['التاريخ']} - {r['اسم الموظف']} ({r['الحالة']})" == selected_att_str, axis=1)].index[0]
-        att_row = str_lit.session_state.attendance.iloc[selected_att_idx]
-
+elif choice == "تعديل أو حذف حركة حضور":
+    str_lit.subheader("✏️ تعديل أو حذف حركة حضور والانصراف")
+    if not str_lit.session_state.attendance.empty:
+        att_indices = str_lit.session_state.attendance.index.tolist()
+        selected_att_idx = str_lit.selectbox("اختر رقم السجل للتعديل أو الحذف", att_indices)
+        record = str_lit.session_state.attendance.loc[selected_att_idx]
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with str_lit.form("edit_att_form_full"):
-            new_att_status = str_lit.selectbox("تعديل حالة الحضور", ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"], index=["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"].index(att_row["الحالة"]) if att_row["الحالة"] in ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"] else 0)
+        with str_lit.form("edit_att_form_comprehensive"):
+            emp_names = str_lit.session_state.employees["اسم الموظف"].tolist()
+            current_emp_idx = emp_names.index(record["اسم الموظف"]) if record["اسم الموظف"] in emp_names else 0
+            edit_emp = str_lit.selectbox("اسم الموظف", emp_names, index=current_emp_idx)
+            try:
+                default_date = datetime.strptime(str(record["التاريخ"]), "%Y-%m-%d").date()
+            except:
+                default_date = date.today()
+            edit_date = str_lit.date_input("تاريخ الحركة", value=default_date)
             
-            default_tardy = int(att_row.get("التأخير (دقيقة)", 0))
-            new_tardy = str_lit.number_input("تعديل دقائق التأخير", value=default_tardy)
+            str_lit.markdown("---")
+            edit_start_work = str_lit.text_input("بداية العمل الرسمية", value=str(record["بداية العمل الرسمية"]))
+            edit_end_work = str_lit.text_input("نهاية العمل الرسمية", value=str(record["نهاية العمل الرسمية"]))
+            edit_grace = str_lit.number_input("فترة السماح (دقيقة)", value=int(record.get("فترة السماح (دقيقة)", 15)))
+
+            str_lit.markdown("---")
+            edit_act_in = str_lit.text_input("وقت الحضور الفعلي", value=str(record["وقت الحضور الفعلي"]))
+            edit_act_out = str_lit.text_input("وقت الانصراف الفعلي", value=str(record["وقت الانصراف الفعلي"]))
+            status_list = ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"]
+            current_stat_idx = status_list.index(record["الحالة"]) if record["الحالة"] in status_list else 0
+            edit_status = str_lit.selectbox("حالة الحضور", status_list, index=current_stat_idx)
             
-            default_overtime = int(att_row.get("إضافي (دقيقة)", 0))
-            new_overtime = str_lit.number_input("تعديل دقائق الإضافي", value=default_overtime)
-
-            col_a1, col_a2 = str_lit.columns(2)
-            with col_a1: up_att_btn = str_lit.form_submit_button("💾 حفظ تعديل حركة الحضور", use_container_width=True)
-            with col_a2: del_att_btn = str_lit.form_submit_button("🗑️ حذف هذه الحركة نهائياً", use_container_width=True)
-
-            if up_att_btn:
-                str_lit.session_state.attendance.at[selected_att_idx, "الحالة"] = new_att_status
-                str_lit.session_state.attendance.at[selected_att_idx, "التأخير (دقيقة)"] = int(new_tardy)
-                str_lit.session_state.attendance.at[selected_att_idx, "إضافي (دقيقة)"] = int(new_overtime)
-                auto_save_data()
-                str_lit.success("✅ تم تحديث حركة الحضور بنجاح!")
-                str_lit.rerun()
-
-            if del_att_btn:
-                str_lit.session_state.attendance = str_lit.session_state.attendance.drop(selected_att_idx).reset_index(drop=True)
-                auto_save_data()
-                str_lit.warning("🗑️ تم حذف حركة الحضور بنجاح!")
-                str_lit.rerun()
+            edit_tardy = str_lit.number_input("التأخير (دقيقة)", value=int(record["التأخير (دقيقة)"]))
+            edit_over = str_lit.number_input("إضافي (دقيقة)", value=int(record["إضافي (دقيقة)"]))
+            
+            col_eb1, col_eb2 = str_lit.columns(2)
+            with col_eb1:
+                if str_lit.form_submit_button("💾 حفظ كافة التعديلات", use_container_width=True):
+                    emp_row = str_lit.session_state.employees[str_lit.session_state.employees["اسم الموظف"] == edit_emp].iloc[0]
+                    str_lit.session_state.attendance.at[selected_att_idx, "اسم الموظف"] = edit_emp
+                    str_lit.session_state.attendance.at[selected_att_idx, "كود الموظف"] = emp_row["كود الموظف"]
+                    str_lit.session_state.attendance.at[selected_att_idx, "الوظيفة"] = emp_row["الوظيفة"]
+                    str_lit.session_state.attendance.at[selected_att_idx, "الفرع"] = emp_row["الفرع"]
+                    str_lit.session_state.attendance.at[selected_att_idx, "التاريخ"] = str(edit_date)
+                    str_lit.session_state.attendance.at[selected_att_idx, "بداية العمل الرسمية"] = edit_start_work
+                    str_lit.session_state.attendance.at[selected_att_idx, "نهاية العمل الرسمية"] = edit_end_work
+                    str_lit.session_state.attendance.at[selected_att_idx, "فترة السماح (دقيقة)"] = edit_grace
+                    str_lit.session_state.attendance.at[selected_att_idx, "وقت الحضور الفعلي"] = edit_act_in
+                    str_lit.session_state.attendance.at[selected_att_idx, "وقت الانصراف الفعلي"] = edit_act_out
+                    str_lit.session_state.attendance.at[selected_att_idx, "الحالة"] = edit_status
+                    str_lit.session_state.attendance.at[selected_att_idx, "التأخير (دقيقة)"] = edit_tardy
+                    str_lit.session_state.attendance.at[selected_att_idx, "إضافي (دقيقة)"] = edit_over
+                    auto_save_data()
+                    str_lit.success("تم تحديث كافة حقول سجل الحضور والانصراف بنجاح!")
+                    str_lit.rerun()
+            with col_eb2:
+                if str_lit.form_submit_button("🗑️ حذف السجل", use_container_width=True):
+                    str_lit.session_state.attendance = str_lit.session_state.attendance.drop(selected_att_idx).reset_index(drop=True)
+                    auto_save_data()
+                    str_lit.success("تم حذف السجل بنجاح!")
+                    str_lit.rerun()
         str_lit.markdown('</div>', unsafe_allow_html=True)
     else:
-        str_lit.info("لا توجد حركات حضور مطابقة للفلتر النشط.")
-
+        str_lit.info("لا توجد سجلات حضور متاحة للتعديل.")
+        
 if choice == "تسجيل طلب إجازة":
     str_lit.subheader("📝 تسجيل طلب إجازة جديد للموظف")
     emp_names = str_lit.session_state.employees["اسم الموظف"].tolist()
