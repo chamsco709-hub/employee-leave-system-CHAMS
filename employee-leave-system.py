@@ -739,7 +739,7 @@ if choice == "تعديل أو حذف حركة حضور":
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with str_lit.form("edit_att_form_full"):
             new_att_status = str_lit.selectbox("تعديل حالة الحضور", ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"], index=["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"].index(att_row["الحالة"]) if att_row["الحالة"] in ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"] else 0)
-            new_tardy = str_lit.number_input("تعديل دقائق التأخير", value=int(att_row.get("الت التأخير (دقيقة)" if "الت التأخير (دقيقة)" in att_row else att_row.get("التأخير (دقيقة)", 0)))
+            new_tardy = str_lit.number_input("تعديل دقائق التأخير", value=int(att_row.get("الت التأخير (دقيقة)" if "الت التأخير (دقيقة)" in att_row else att_row.get("التأخير (دقيقة)", 0))))
             new_overtime = str_lit.number_input("تعديل دقائق الإضافي", value=int(att_row.get("إضافي (دقيقة)", 0)))
 
             col_a1, col_a2 = str_lit.columns(2)
