@@ -202,24 +202,27 @@ def render_printable_table(df, table_title="جدول البيانات"):
     user_branch = str_lit.session_state.get('current_user_branch', 'غير محدد')
     
     try:
+        # فرض محاذاة المنتصف التامة (Center) لكافة الخلايا، العناوين، الأرقام والتواريخ
         styled_df = display_df.style.set_properties(**{
-            'text-align': 'center',
-            'vertical-align': 'middle'
+            'text-align': 'center !important',
+            'vertical-align': 'middle !important'
         }).set_table_styles([
             {
                 'selector': 'th', 
                 'props': [
-                    ('text-align', 'center'), 
-                    ('background-color', '#E50914'), 
+                    ('text-align', 'center !important'), 
+                    ('background-color', '#0284C7'), 
                     ('color', 'white'),
-                    ('vertical-align', 'middle')
+                    ('vertical-align', 'middle !important'),
+                    ('direction', 'rtl')
                 ]
             },
             {
                 'selector': 'td', 
                 'props': [
-                    ('text-align', 'center'),
-                    ('vertical-align', 'middle')
+                    ('text-align', 'center !important'),
+                    ('vertical-align', 'middle !important'),
+                    ('direction', 'rtl')
                 ]
             }
         ])
