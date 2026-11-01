@@ -52,14 +52,14 @@ def load_company_data():
                 
                 if "employees" in data and len(data["employees"]) > 0:
                     df_emp = pd.DataFrame(data["employees"])
-                    if "مسوغات التعيين" not in df_emp.columns:
-                        df_emp["مسوغات التعيين"] = "مكتملة"
-                    if "ملف المستندات" not in df_emp.columns:
-                        df_emp["ملف المستندات"] = ""
-                    if "تاريخ بداية العقد" not in df_emp.columns:
-                        df_emp["تاريخ بداية العقد"] = str(date.today())
-                    if "تاريخ نهاية العقد" not in df_emp.columns:
-                        df_emp["تاريخ نهاية العقد"] = str(date.today() + timedelta(days=365))
+                    if "مسوغات التعيين" not in df_emp.columns: df_emp["مسوغات التعيين"] = "مكتملة"
+                    if "ملف المستندات" not in df_emp.columns: df_emp["ملف المستندات"] = ""
+                    if "تاريخ بداية العقد" not in df_emp.columns: df_emp["تاريخ بداية العقد"] = str(date.today())
+                    if "تاريخ نهاية العقد" not in df_emp.columns: df_emp["تاريخ نهاية العقد"] = str(date.today() + timedelta(days=365))
+                    if "رصيد سنوي (إجمالي)" not in df_emp.columns: df_emp["رصيد سنوي (إجمالي)"] = 21
+                    if "رصيد أسبوعي (إجمالي)" not in df_emp.columns: df_emp["رصيد أسبوعي (إجمالي)"] = 4
+                    if "رصيد رسمي (إجمالي)" not in df_emp.columns: df_emp["رصيد رسمي (إجمالي)"] = 10
+                    if "إجازات مرضية (أيام)" not in df_emp.columns: df_emp["إجازات مرضية (أيام)"] = 0
                     str_lit.session_state.employees = df_emp
                 else:
                     str_lit.session_state.employees = pd.DataFrame(columns=[
@@ -83,8 +83,7 @@ def load_company_data():
                         "فترة السماح (دقيقة)", "الحالة", "التأخير (دقيقة)", "إضافي (دقيقة)"
                     ]
                     for col in expected_att_cols:
-                        if col not in df_att.columns:
-                            df_att[col] = 0 if "(دقيقة)" in col else ""
+                        if col not in df_att.columns: df_att[col] = 0 if "(دقيقة)" in col else ""
                     str_lit.session_state.attendance = df_att[expected_att_cols]
                 else:
                     str_lit.session_state.attendance = pd.DataFrame(columns=[
@@ -95,8 +94,7 @@ def load_company_data():
 
                 if "financial_transactions" in data and len(data["financial_transactions"]) > 0:
                     df_fin = pd.DataFrame(data["financial_transactions"])
-                    if "الحالة" not in df_fin.columns:
-                        df_fin["الحالة"] = "معتمد"
+                    if "الحالة" not in df_fin.columns: df_fin["الحالة"] = "معتمد"
                     str_lit.session_state.financial_transactions = df_fin
                 else:
                     str_lit.session_state.financial_transactions = pd.DataFrame(columns=[
@@ -105,8 +103,7 @@ def load_company_data():
 
                 if "users" in data and len(data["users"]) > 0:
                     df_users = pd.DataFrame(data["users"])
-                    if "الحالة" not in df_users.columns:
-                        df_users["الحالة"] = "نشط"
+                    if "الحالة" not in df_users.columns: df_users["الحالة"] = "نشط"
                     str_lit.session_state.users = df_users
                 else:
                     str_lit.session_state.users = pd.DataFrame([
@@ -535,8 +532,8 @@ selected_main_cat = str_lit.session_state.active_main_section
 sub_options_map = {
     "الرئيسية": ["لوحة التحكم والمؤشرات"],
     "الحضور والانصراف": ["تسجيل حضور وانصراف", "سجل الحضور والانصراف", "تعديل أو حذف حركة حضور"],
-    "طلبات الاجازة": ["تسجيل طلب إجازة", "سجل طلبات قيد الانتظار", "سجل الطلبات المقبولة", "سجل الطلبات المرفوضة", "قبول أو رفض طلب إجازة"],
-    "المعاملات المالية": ["تسجيل معاملة مالية", "تسجيل إذن (انصراف / تأخير)", "سجل المعاملات المالية", "اعتماد أو رفض المعاملات والأذونات"],
+    "طلبات الاجازة": ["تسجيل طلب إجازة", "سجل طلبات قيد الانتظار", "سجل الطلبات المقبولة", "سجل الطلبات المرفوضة", "إدارة واعتماد طلبات الإجازة"],
+    "المعاملات المالية": ["تسجيل معاملة مالية", "تسجيل إذن (انصراف / تأخير)", "سجل المعاملات المالية والأذونات", "إدارة واعتماد المعاملات والأذونات"],
     "كشف الرواتب": ["كشف الرواتب والمستحقات الشامل"],
     "شؤون الموظفين": ["إضافة موظف جديد", "سجل الموظفين والأرصدة الشاملة", "تعديل أو حذف موظف", "رفع نموذج بيانات الموظفين"],
     "المستخدمين": ["إضافة مستخدم جديد", "إدارة المستخدمين والصلاحيات والسجل", "تعديل أو حذف مستخدم"],
@@ -624,6 +621,76 @@ if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم 
     
     str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 10px 0;'>", unsafe_allow_html=True)
 
+    # ----------------------------------------------------
+    # قسم طلبات الإجازات المعلقة وإدارتها من لوحة التحكم
+    # ----------------------------------------------------
+    str_lit.markdown(f'<div class="section-header">⏳ طلبات الإجازات قيد الانتظار (إدارة سريعة وقبول / رفض)</div>', unsafe_allow_html=True)
+    if not str_lit.session_state.requests.empty:
+        pending_dash_reqs = str_lit.session_state.requests[str_lit.session_state.requests["الحالة"] == "قيد الانتظار"]
+        if not pending_dash_reqs.empty:
+            for p_idx, p_row in pending_dash_reqs.iterrows():
+                with str_lit.container():
+                    str_lit.markdown(f"""
+                    <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 6px;">
+                        <b>طلب رقم:</b> {p_row['رقم الطلب']} &nbsp;|&nbsp; <b>الموظف:</b> {p_row['اسم الموظف']} &nbsp;|&nbsp; <b>النوع:</b> {p_row['نوع الإجازة']} ({p_row['عدد الأيام']} أيام)<br>
+                        <b>من:</b> {p_row['من تاريخ']} <b>إلى:</b> {p_row['إلى تاريخ']} &nbsp;|&nbsp; <b>السبب:</b> {p_row['السبب']}
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    c_btn1, c_btn2, c_btn3 = str_lit.columns([1, 1, 2])
+                    with c_btn1:
+                        if str_lit.button("✅ قبول", key=f"dash_acc_req_{p_row['رقم الطلب']}_{p_idx}"):
+                            str_lit.session_state.requests.at[p_idx, "الحالة"] = "مقبول"
+                            auto_save_data()
+                            str_lit.success(f"✅ تم قبول طلب الإجازة للموظف {p_row['اسم الموظف']} بنجاح!")
+                            str_lit.rerun()
+                    with c_btn2:
+                        if str_lit.button("❌ رفض", key=f"dash_rej_req_{p_row['رقم الطلب']}_{p_idx}"):
+                            str_lit.session_state.requests.at[p_idx, "الحالة"] = "مرفوض"
+                            auto_save_data()
+                            str_lit.warning(f"❌ تم رفض طلب الإجازة للموظف {p_row['اسم الموظف']}.")
+                            str_lit.rerun()
+        else:
+            str_lit.info("لا توجد طلبات إجازة قيد الانتظار حالياً.")
+    else:
+        str_lit.info("لا توجد طلبات إجازة مسجلة.")
+
+    str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 10px 0;'>", unsafe_allow_html=True)
+
+    # ----------------------------------------------------
+    # قسم المعاملات المالية والأذونات المعلقة وإدارتها من لوحة التحكم
+    # ----------------------------------------------------
+    str_lit.markdown(f'<div class="section-header">💵 المعاملات المالية والأذونات قيد الانتظار (إدارة سريعة وقبول / رفض)</div>', unsafe_allow_html=True)
+    if not str_lit.session_state.financial_transactions.empty:
+        pending_dash_fins = str_lit.session_state.financial_transactions[str_lit.session_state.financial_transactions["الحالة"] == "قيد الانتظار"]
+        if not pending_dash_fins.empty:
+            for f_idx, f_row in pending_dash_fins.iterrows():
+                with str_lit.container():
+                    str_lit.markdown(f"""
+                    <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 6px;">
+                        <b>التاريخ:</b> {f_row['التاريخ']} &nbsp;|&nbsp; <b>الموظف:</b> {f_row['اسم الموظف']} &nbsp;|&nbsp; <b>النوع:</b> {f_row['النوع']} ({f_row['المبلغ / القيمة']} ج.م)<br>
+                        <b>البيان/السبب:</b> {f_row['البيان / السبب']}
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    cf_btn1, cf_btn2, cf_btn3 = str_lit.columns([1, 1, 2])
+                    with cf_btn1:
+                        if str_lit.button("✅ اعتماد", key=f"dash_acc_fin_{f_idx}"):
+                            str_lit.session_state.financial_transactions.at[f_idx, "الحالة"] = "معتمد"
+                            auto_save_data()
+                            str_lit.success(f"✅ تم اعتماد المعاملة للموظف {f_row['اسم الموظف']} بنجاح!")
+                            str_lit.rerun()
+                    with cf_btn2:
+                        if str_lit.button("❌ رفض", key=f"dash_rej_fin_{f_idx}"):
+                            str_lit.session_state.financial_transactions.at[f_idx, "الحالة"] = "مرفوض"
+                            auto_save_data()
+                            str_lit.warning(f"❌ تم رفض المعاملة للموظف {f_row['اسم الموظف']}.")
+                            str_lit.rerun()
+        else:
+            str_lit.info("لا توجد معاملات مالية أو أذونات قيد الانتظار حالياً.")
+    else:
+        str_lit.info("لا توجد معاملات مالية مسجلة.")
+
 if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم والمؤشرات":
     if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم والمؤشرات":
         str_lit.markdown(f'<div class="section-header">📊 داشبورد ومخطط بياني ومؤشرات لكل فرع</div>', unsafe_allow_html=True)
@@ -702,8 +769,7 @@ if choice == "تسجيل حضور وانصراف":
             if str_lit.form_submit_button("💾 حساب تلقائي وحفظ الحركة", use_container_width=True):
                 def to_minutes(h, m, ampm):
                     hour_24 = h % 12
-                    if ampm == "PM":
-                        hour_24 += 12
+                    if ampm == "PM": hour_24 += 12
                     return hour_24 * 60 + m
 
                 start_total_min = to_minutes(start_h, start_m, start_ampm)
@@ -712,23 +778,19 @@ if choice == "تسجيل حضور وانصراف":
                 act_out_total_min = to_minutes(act_out_h, act_out_m, act_out_ampm)
 
                 worked_minutes = act_out_total_min - act_in_total_min
-                if worked_minutes < 0:
-                    worked_minutes += 24 * 60
+                if worked_minutes < 0: worked_minutes += 24 * 60
 
                 standard_minutes = end_total_min - start_total_min
-                if standard_minutes < 0:
-                    standard_minutes += 24 * 60
+                if standard_minutes < 0: standard_minutes += 24 * 60
 
                 overtime_min = 0
                 tardy_min = 0
 
                 in_diff = act_in_total_min - start_total_min
-                if in_diff > grace_period_min:
-                    tardy_min += (in_diff - grace_period_min)
+                if in_diff > grace_period_min: tardy_min += (in_diff - grace_period_min)
 
                 diff_total = worked_minutes - standard_minutes
-                if diff_total > 0:
-                    overtime_min = int(diff_total)
+                if diff_total > 0: overtime_min = int(diff_total)
 
                 new_att_row = {
                     "التاريخ": att_date.strftime("%Y-%m-%d"),
@@ -774,10 +836,8 @@ if choice == "تعديل أو حذف حركة حضور":
             new_overtime = str_lit.number_input("تعديل دقائق الإضافي", value=default_overtime)
 
             col_a1, col_a2 = str_lit.columns(2)
-            with col_a1:
-                up_att_btn = str_lit.form_submit_button("💾 حفظ تعديل حركة الحضور", use_container_width=True)
-            with col_a2:
-                del_att_btn = str_lit.form_submit_button("🗑️ حذف هذه الحركة نهائياً", use_container_width=True)
+            with col_a1: up_att_btn = str_lit.form_submit_button("💾 حفظ تعديل حركة الحضور", use_container_width=True)
+            with col_a2: del_att_btn = str_lit.form_submit_button("🗑️ حذف هذه الحركة نهائياً", use_container_width=True)
 
             if up_att_btn:
                 str_lit.session_state.attendance.at[selected_att_idx, "الحالة"] = new_att_status
@@ -857,30 +917,53 @@ if choice == "سجل الطلبات المرفوضة":
     else:
         str_lit.info("لا توجد طلبات مرفوضة.")
 
-if choice == "قبول أو رفض طلب إجازة":
-    str_lit.subheader("⚖️ قبول أو رفض أو تعديل طلب إجازة")
+if choice == "إدارة واعتماد طلبات الإجازة":
+    str_lit.subheader("⚖️ إدارة واعتماد أو تعديل أو حذف طلبات الإجازة (من داخل السجل)")
     if not str_lit.session_state.requests.empty:
         req_ids = str_lit.session_state.requests["رقم الطلب"].tolist()
-        sel_req_id = str_lit.selectbox("اختر رقم الطلب للقبول أو الرفض", req_ids)
+        sel_req_id = str_lit.selectbox("اختر رقم الطلب للإدارة والاعتماد", req_ids)
         req_idx = str_lit.session_state.requests[str_lit.session_state.requests["رقم الطلب"] == sel_req_id].index[0]
         req_row = str_lit.session_state.requests.loc[req_idx]
 
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with str_lit.form("approve_reject_request_form"):
-            str_lit.markdown(f"**الموظف:** {req_row['اسم الموظف']} | **نوع الإجازة:** {req_row['نوع الإجازة']} ({req_row['عدد الأيام']} أيام)")
-            str_lit.markdown(f"**السبب:** {req_row['السبب']} | **من:** {req_row['من تاريخ']} **إلى:** {req_row['إلى تاريخ']}")
+        with str_lit.form("manage_req_form_integrated"):
+            str_lit.markdown(f"**الموظف:** {req_row['اسم الموظف']} ({req_row['كود الموظف']}) | **الفرع:** {req_row['الفرع']}")
             
-            new_req_status = str_lit.selectbox("قرار الإدارة", ["مقبول", "مرفوض", "قيد الانتظار"], index=["مقبول", "مرفوض", "قيد الانتظار"].index(req_row["الحالة"]) if req_row["الحالة"] in ["مقبول", "مرفوض", "قيد الانتظار"] else 0)
+            edit_req_type = str_lit.selectbox("نوع الإجازة", ["إجازة سنوية", "إجازة أسبوعية", "إجازة رسمية", "إجازة مرضية", "إجازة بدون أجر"], index=["إجازة سنوية", "إجازة أسبوعية", "إجازة رسمية", "إجازة مرضية", "إجازة بدون أجر"].index(req_row["نوع الإجازة"]) if req_row["نوع الإجازة"] in ["إجازة سنوية", "إجازة أسبوعية", "إجازة رسمية", "إجازة مرضية", "إجازة بدون أجر"] else 0)
             
-            col_ar1, col_ar2 = str_lit.columns(2)
-            with col_ar1: app_btn = str_lit.form_submit_button("💾 حفظ القرار (قبول / رفض)", use_container_width=True)
-            with col_ar2: del_req_btn = str_lit.form_submit_button("🗑️ حذف هذا الطلب نهائياً", use_container_width=True)
+            try: default_r_start = datetime.strptime(str(req_row["من تاريخ"]), "%Y-%m-%d").date()
+            except Exception: default_r_start = date.today()
+            try: default_r_end = datetime.strptime(str(req_row["إلى تاريخ"]), "%Y-%m-%d").date()
+            except Exception: default_r_end = date.today() + timedelta(days=1)
 
-            if app_btn:
-                str_lit.session_state.requests.at[req_idx, "الحالة"] = new_req_status
-                auto_save_data()
-                str_lit.success(f"✅ تم تحديث حالة الطلب إلى ({new_req_status}) بنجاح!")
-                str_lit.rerun()
+            col_dr1, col_dr2 = str_lit.columns(2)
+            with col_dr1: edit_r_start = str_lit.date_input("من تاريخ", value=default_r_start)
+            with col_dr2: edit_r_end = str_lit.date_input("إلى تاريخ", value=default_r_end)
+            
+            edit_r_reason = str_lit.text_input("سبب طلب الإجازة", value=str(req_row["السبب"]))
+            
+            status_options = ["قيد الانتظار", "مقبول", "مرفوض"]
+            current_st_idx = status_options.index(req_row["الحالة"]) if req_row["الحالة"] in status_options else 0
+            edit_r_status = str_lit.selectbox("حالة الاعتماد والقرار", status_options, index=current_st_idx)
+
+            col_rq1, col_rq2 = str_lit.columns(2)
+            with col_rq1: up_req_btn = str_lit.form_submit_button("💾 حفظ الاعتماد وتعديل الطلب", use_container_width=True)
+            with col_rq2: del_req_btn = str_lit.form_submit_button("🗑️ حذف هذا الطلب نهائياً", use_container_width=True)
+
+            if up_req_btn:
+                delta_days = (edit_r_end - edit_r_start).days + 1
+                if delta_days <= 0:
+                    str_lit.error("❌ تاريخ النهاية يجب أن يكون بعد تاريخ البداية!")
+                else:
+                    str_lit.session_state.requests.at[req_idx, "نوع الإجازة"] = edit_req_type
+                    str_lit.session_state.requests.at[req_idx, "من تاريخ"] = edit_r_start.strftime("%Y-%m-%d")
+                    str_lit.session_state.requests.at[req_idx, "إلى تاريخ"] = edit_r_end.strftime("%Y-%m-%d")
+                    str_lit.session_state.requests.at[req_idx, "عدد الأيام"] = int(delta_days)
+                    str_lit.session_state.requests.at[req_idx, "السبب"] = edit_r_reason
+                    str_lit.session_state.requests.at[req_idx, "الحالة"] = edit_r_status
+                    auto_save_data()
+                    str_lit.success(f"✅ تم تحديث الطلب واعتماده بنجاح كـ ({edit_r_status})!")
+                    str_lit.rerun()
 
             if del_req_btn:
                 str_lit.session_state.requests = str_lit.session_state.requests.drop(req_idx).reset_index(drop=True)
@@ -913,11 +996,11 @@ if choice == "تسجيل معاملة مالية":
                     "النوع": f_type,
                     "المبلغ / القيمة": float(f_amount),
                     "البيان / السبب": f_reason,
-                    "الحالة": "معتمد"
+                    "الحالة": "قيد الانتظار"
                 }
                 str_lit.session_state.financial_transactions = pd.concat([str_lit.session_state.financial_transactions, pd.DataFrame([new_fin_row])], ignore_index=True)
                 auto_save_data()
-                str_lit.success("✅ تم تسجيل المعاملة المالية وحفظها بنجاح!")
+                str_lit.success("✅ تم تسجيل المعاملة المالية بنجاح وهي قيد الانتظار للإعتماد!")
         str_lit.markdown('</div>', unsafe_allow_html=True)
 
 if choice == "تسجيل إذن (انصراف / تأخير)":
@@ -942,43 +1025,54 @@ if choice == "تسجيل إذن (انصراف / تأخير)":
                     "النوع": f"إذن: {p_type} ({p_hours} ساعات)",
                     "المبلغ / القيمة": 0.0,
                     "البيان / السبب": p_reason,
-                    "الحالة": "معتمد"
+                    "الحالة": "قيد الانتظار"
                 }
                 str_lit.session_state.financial_transactions = pd.concat([str_lit.session_state.financial_transactions, pd.DataFrame([new_perm_row])], ignore_index=True)
                 auto_save_data()
-                str_lit.success("✅ تم تسجيل وحفظ الإذن الرسمي بنجاح!")
+                str_lit.success("✅ تم تسجيل وحفظ الإذن الرسمي بنجاح وهو قيد الانتظار للإعتماد!")
         str_lit.markdown('</div>', unsafe_allow_html=True)
 
-if choice == "سجل المعاملات المالية":
+if choice == "سجل المعاملات المالية والأذونات":
     str_lit.subheader("📋 سجل المعاملات المالية والأذونات الشامل")
     render_printable_table(str_lit.session_state.financial_transactions, "سجل المعاملات المالية والأذونات")
 
-if choice == "اعتماد أو رفض المعاملات والأذونات":
-    str_lit.subheader("⚖️ قبول أو رفض أو تعديل معاملة مالية أو إذن مسجل")
+if choice == "إدارة واعتماد المعاملات والأذونات":
+    str_lit.subheader("⚖️ إدارة واعتماد أو تعديل أو حذف المعاملات المالية والأذونات (من داخل السجل)")
     if not str_lit.session_state.financial_transactions.empty:
         fin_options = [f"{row['التاريخ']} - {row['اسم الموظف']} ({row['النوع']}: {row['المبلغ / القيمة']})" for idx, row in str_lit.session_state.financial_transactions.iterrows()]
-        sel_fin = str_lit.selectbox("اختر المعاملة للاعتماد أو الرفض", fin_options)
+        sel_fin = str_lit.selectbox("اختر المعاملة للاعتماد والتعديل", fin_options)
         fin_idx = fin_options.index(sel_fin)
         fin_row = str_lit.session_state.financial_transactions.iloc[fin_idx]
 
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with str_lit.form("edit_fin_form_full"):
-            str_lit.markdown(f"**الموظف:** {fin_row['اسم الموظف']} | **النوع:** {fin_row['النوع']} | **المبلغ:** {fin_row['المبلغ / القيمة']} ج.م")
-            new_f_amt = str_lit.number_input("تعديل المبلغ / القيمة", value=float(fin_row["المبلغ / القيمة"]))
-            new_f_reason = str_lit.text_input("تعديل البيان / السبب", value=str(fin_row["البيان / السبب"]))
-            current_fin_status = fin_row.get("الحالة", "معتمد")
-            new_f_status = str_lit.selectbox("حالة المعاملة / الإذن", ["معتمد", "مرفوض", "قيد الانتظار"], index=["معتمد", "مرفوض", "قيد الانتظار"].index(current_fin_status) if current_fin_status in ["معتمد", "مرفوض", "قيد الانتظار"] else 0)
+        with str_lit.form("manage_fin_form_integrated"):
+            str_lit.markdown(f"**الموظف:** {fin_row['اسم الموظف']} | **الفرع:** {fin_row['الفرع']}")
+            
+            edit_fin_type = str_lit.selectbox("نوع المعاملة / الإذن", ["سلفة", "حافز / مكافأة", "خصم غياب أو جزاء", "إذن انصراف مبكر", "إذن تأخير عن الحضور", "إذن طارئ خلال العمل"], index=0)
+            edit_fin_amount = str_lit.number_input("المبلغ / القيمة", value=float(fin_row["المبلغ / القيمة"]))
+            edit_fin_reason = str_lit.text_input("البيان / السبب", value=str(fin_row["البيان / السبب"]))
+            
+            try: default_f_date = datetime.strptime(str(fin_row["التاريخ"]), "%Y-%m-%d").date()
+            except Exception: default_f_date = date.today()
+            edit_fin_date = str_lit.date_input("تاريخ المعاملة", value=default_f_date)
+            
+            fin_status_options = ["معتمد", "قيد الانتظار", "مرفوض"]
+            current_f_st = fin_row.get("الحالة", "معتمد")
+            current_f_idx = fin_status_options.index(current_f_st) if current_f_st in fin_status_options else 0
+            edit_fin_status = str_lit.selectbox("حالة الاعتماد والقرار", fin_status_options, index=current_f_idx)
 
             col_f1, col_f2 = str_lit.columns(2)
-            with col_f1: up_f_btn = str_lit.form_submit_button("💾 حفظ تعديل وحالة المعاملة", use_container_width=True)
-            with col_f2: del_f_btn = str_lit.form_submit_button("🗑️ حذف هذه المعاملة", use_container_width=True)
+            with col_f1: up_f_btn = str_lit.form_submit_button("💾 حفظ الاعتماد وتعديل المعاملة", use_container_width=True)
+            with col_f2: del_f_btn = str_lit.form_submit_button("🗑️ حذف هذه المعاملة نهائياً", use_container_width=True)
 
             if up_f_btn:
-                str_lit.session_state.financial_transactions.at[fin_idx, "المبلغ / القيمة"] = float(new_f_amt)
-                str_lit.session_state.financial_transactions.at[fin_idx, "البيان / السبب"] = new_f_reason
-                str_lit.session_state.financial_transactions.at[fin_idx, "الحالة"] = new_f_status
+                str_lit.session_state.financial_transactions.at[fin_idx, "النوع"] = edit_fin_type
+                str_lit.session_state.financial_transactions.at[fin_idx, "المبلغ / القيمة"] = float(edit_fin_amount)
+                str_lit.session_state.financial_transactions.at[fin_idx, "البيان / السبب"] = edit_fin_reason
+                str_lit.session_state.financial_transactions.at[fin_idx, "التاريخ"] = edit_fin_date.strftime("%Y-%m-%d")
+                str_lit.session_state.financial_transactions.at[fin_idx, "الحالة"] = edit_fin_status
                 auto_save_data()
-                str_lit.success("✅ تم تحديث حالة المعاملة المالية أو الإذن بنجاح!")
+                str_lit.success(f"✅ تم تحديث المعاملة واعتمادها بنجاح كـ ({edit_fin_status})!")
                 str_lit.rerun()
 
             if del_f_btn:
@@ -1079,45 +1173,73 @@ if choice == "سجل الموظفين والأرصدة الشاملة":
     render_printable_table(str_lit.session_state.employees, "سجل الموظفين الشامل")
 
 if choice == "تعديل أو حذف موظف":
-    str_lit.subheader("✏️ تعديل بيانات موظف وعقوده ومسوغاته أو حذفه")
+    str_lit.subheader("✏️ تعديل كافة حقول بيانات موظف وعقوده ومسوغاته أو حذفه")
     if not str_lit.session_state.employees.empty:
         emp_names_edit = str_lit.session_state.employees["اسم الموظف"].tolist()
-        selected_emp_edit = str_lit.selectbox("اختر الموظف للتعديل أو الحذف", emp_names_edit)
+        selected_emp_edit = str_lit.selectbox("اختر الموظف للتعديل الشامل أو الحذف", emp_names_edit)
         
         emp_row_data = str_lit.session_state.employees[str_lit.session_state.employees["اسم الموظف"] == selected_emp_edit].iloc[0]
         emp_idx = str_lit.session_state.employees[str_lit.session_state.employees["اسم الموظف"] == selected_emp_edit].index[0]
 
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        e_name = str_lit.text_input("اسم الموظف", value=str(emp_row_data["اسم الموظف"]))
-        e_job = str_lit.text_input("الوظيفة", value=str(emp_row_data["الوظيفة"]))
-        e_dept = str_lit.text_input("القسم", value=str(emp_row_data["القسم"]))
-        e_salary = str_lit.number_input("الراتب الأساسي", min_value=0.0, value=float(emp_row_data["الراتب الأساسي"]))
-        e_docs = str_lit.selectbox("حالة مسوغات التعيين", ["مكتملة", "ناقصة مستندات"], index=0 if emp_row_data.get("مسوغات التعيين") == "مكتملة" else 1)
-        
-        try: default_start = datetime.strptime(str(emp_row_data.get("تاريخ بداية العقد", date.today())), "%Y-%m-%d").date()
-        except Exception: default_start = date.today()
-        try: default_end = datetime.strptime(str(emp_row_data.get("تاريخ نهاية العقد", date.today())), "%Y-%m-%d").date()
-        except Exception: default_end = date.today() + timedelta(days=365)
+        with str_lit.form("edit_all_emp_form"):
+            e_name = str_lit.text_input("اسم الموظف الرباعي", value=str(emp_row_data["اسم الموظف"]))
+            col_ed1, col_ed2 = str_lit.columns(2)
+            with col_ed1:
+                e_job = str_lit.text_input("الوظيفة", value=str(emp_row_data["الوظيفة"]))
+                e_dept = str_lit.text_input("القسم", value=str(emp_row_data["القسم"]))
+                branches_list = ["المركز الرئيسي", "فرع الإسكندرية", "فرع الشرم"]
+                current_b_idx = branches_list.index(emp_row_data["الفرع"]) if emp_row_data["الفرع"] in branches_list else 0
+                e_branch = str_lit.selectbox("الفرع التابع", branches_list, index=current_b_idx)
+                e_salary = str_lit.number_input("الراتب الأساسي (ج.م)", min_value=0.0, value=float(emp_row_data["الراتب الأساسي"]))
+            with col_ed2:
+                roles_list = ["مستخدم عادي", "اعتماد الطلبات", "مدير الفرع"]
+                current_r_idx = roles_list.index(emp_row_data["صلاحية الموظف"]) if emp_row_data["صلاحية الموظف"] in roles_list else 0
+                e_role = str_lit.selectbox("صلاحية الموظف بالنظام", roles_list, index=current_r_idx)
+                
+                docs_list = ["مكتملة", "ناقصة مستندات"]
+                current_d_idx = docs_list.index(emp_row_data["مسوغات التعيين"]) if emp_row_data["مسوغات التعيين"] in docs_list else 0
+                e_docs = str_lit.selectbox("حالة مسوغات التعيين", docs_list, index=current_d_idx)
+                
+                try: default_start = datetime.strptime(str(emp_row_data.get("تاريخ بداية العقد", date.today())), "%Y-%m-%d").date()
+                except Exception: default_start = date.today()
+                try: default_end = datetime.strptime(str(emp_row_data.get("تاريخ نهاية العقد", date.today())), "%Y-%m-%d").date()
+                except Exception: default_end = date.today() + timedelta(days=365)
 
-        e_contract_start = str_lit.date_input("تاريخ بداية العقد", value=default_start)
-        e_contract_end = str_lit.date_input("تاريخ نهاية العقد", value=default_end)
+                e_contract_start = str_lit.date_input("تاريخ بداية العقد", value=default_start)
+                e_contract_end = str_lit.date_input("تاريخ نهاية العقد", value=default_end)
 
-        col_sub_ed1, col_sub_ed2 = str_lit.columns(2)
-        with col_sub_ed1:
-            if str_lit.button("💾 حفظ التعديلات", use_container_width=True):
+            str_lit.markdown("---")
+            str_lit.markdown("📌 **تعديل أرصدة الإجازات الإجمالية:**")
+            col_eb1, col_eb2, col_eb3, col_eb4 = str_lit.columns(4)
+            with col_eb1: e_ann = str_lit.number_input("رصيد سنوي", value=int(emp_row_data.get("رصيد سنوي (إجمالي)", 21)))
+            with col_eb2: e_week = str_lit.number_input("رصيد أسبوعي", value=int(emp_row_data.get("رصيد أسبوعي (إجمالي)", 4)))
+            with col_eb3: e_off = str_lit.number_input("رصيد رسمي", value=int(emp_row_data.get("رصيد رسمي (إجمالي)", 10)))
+            with col_eb4: e_sick = str_lit.number_input("إجازات مرضية", value=int(emp_row_data.get("إجازات مرضية (أيام)", 0)))
+
+            col_sub_ed1, col_sub_ed2 = str_lit.columns(2)
+            with col_sub_ed1: up_emp_btn = str_lit.form_submit_button("💾 حفظ كافة التعديلات للموظف", use_container_width=True)
+            with col_sub_ed2: del_emp_btn = str_lit.form_submit_button("🗑️ حذف هذا الموظف نهائياً", use_container_width=True, type="primary")
+
+            if up_emp_btn:
                 str_lit.session_state.employees.at[emp_idx, "اسم الموظف"] = e_name
                 str_lit.session_state.employees.at[emp_idx, "الوظيفة"] = e_job
                 str_lit.session_state.employees.at[emp_idx, "القسم"] = e_dept
+                str_lit.session_state.employees.at[emp_idx, "الفرع"] = e_branch
+                str_lit.session_state.employees.at[emp_idx, "صلاحية الموظف"] = e_role
                 str_lit.session_state.employees.at[emp_idx, "الراتب الأساسي"] = float(e_salary)
                 str_lit.session_state.employees.at[emp_idx, "مسوغات التعيين"] = e_docs
                 str_lit.session_state.employees.at[emp_idx, "تاريخ بداية العقد"] = e_contract_start.strftime("%Y-%m-%d")
                 str_lit.session_state.employees.at[emp_idx, "تاريخ نهاية العقد"] = e_contract_end.strftime("%Y-%m-%d")
+                str_lit.session_state.employees.at[emp_idx, "رصيد سنوي (إجمالي)"] = int(e_ann)
+                str_lit.session_state.employees.at[emp_idx, "رصيد أسبوعي (إجمالي)"] = int(e_week)
+                str_lit.session_state.employees.at[emp_idx, "رصيد رسمي (إجمالي)"] = int(e_off)
+                str_lit.session_state.employees.at[emp_idx, "إجازات مرضية (أيام)"] = int(e_sick)
                 auto_save_data()
-                str_lit.success("✅ تم تحديث بيانات الموظف بنجاح!")
+                str_lit.success("✅ تم تحديث كافة بيانات الموظف بنجاح تام!")
                 str_lit.rerun()
 
-        with col_sub_ed2:
-            if str_lit.button("🗑️ حذف هذا الموظف", use_container_width=True, type="primary"):
+            if del_emp_btn:
                 str_lit.session_state.employees = str_lit.session_state.employees.drop(emp_idx).reset_index(drop=True)
                 auto_save_data()
                 str_lit.warning("🗑️ تم حذف الموظف بنجاح!")
@@ -1165,31 +1287,45 @@ if choice == "إدارة المستخدمين والصلاحيات والسجل"
     render_printable_table(str_lit.session_state.users, "سجل مستخدمي النظام")
 
 if choice == "تعديل أو حذف مستخدم":
-    str_lit.subheader("✏️ تعديل صلاحيات مستخدم أو حالته أو حذفه")
+    str_lit.subheader("✏️ تعديل كافة حقول مستخدم أو حالته أو حذفه")
     if not str_lit.session_state.users.empty:
         user_usernames = str_lit.session_state.users["اسم المستخدم"].tolist()
-        sel_usr = str_lit.selectbox("اختر اسم المستخدم للتعديل أو الحذف", user_usernames)
+        sel_usr = str_lit.selectbox("اختر اسم المستخدم للتعديل الشامل أو الحذف", user_usernames)
         usr_idx = str_lit.session_state.users[str_lit.session_state.users["اسم المستخدم"] == sel_usr].index[0]
         usr_row = str_lit.session_state.users.loc[usr_idx]
 
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with str_lit.form("edit_user_form_full"):
+        with str_lit.form("edit_all_user_form"):
             new_u_full = str_lit.text_input("الاسم الكامل", value=str(usr_row["الاسم الكامل"]))
-            new_u_role = str_lit.selectbox("الصلاحية", ["مشرف عام (Admin)", "مدير فرع", "مستخدم عادي"], index=["مشرف عام (Admin)", "مدير فرع", "مستخدم عادي"].index(usr_row["الصلاحية"]) if usr_row["الصلاحية"] in ["مشرف عام (Admin)", "مدير فرع", "مستخدم عادي"] else 0)
+            
+            branches_list = ["المركز الرئيسي", "فرع الإسكندرية", "فرع الشرم"]
+            current_ub_idx = branches_list.index(usr_row["الفرع التابع"]) if usr_row["الفرع التابع"] in branches_list else 0
+            new_u_branch = str_lit.selectbox("الفرع التابع", branches_list, index=current_ub_idx)
+            
+            new_u_dept = str_lit.text_input("القسم التابع", value=str(usr_row["القسم التابع"]))
+            
+            roles_list = ["مشرف عام (Admin)", "مدير فرع", "مستخدم عادي"]
+            current_ur_idx = roles_list.index(usr_row["الصلاحية"]) if usr_row["الصلاحية"] in roles_list else 0
+            new_u_role = str_lit.selectbox("الصلاحية", roles_list, index=current_ur_idx)
+            
+            new_u_email = str_lit.text_input("البريد الإلكتروني", value=str(usr_row["البريد الإلكتروني"]))
             new_u_status = str_lit.selectbox("الحالة", ["نشط", "إيقاف"], index=0 if usr_row.get("الحالة") == "نشط" else 1)
             new_u_pattern = str_lit.text_input("الرسم السري", value=str(usr_row["الرسم السري"]))
 
             col_us1, col_us2 = str_lit.columns(2)
-            with col_us1: up_u_btn = str_lit.form_submit_button("💾 حفظ تعديلات المستخدم", use_container_width=True)
-            with col_us2: del_u_btn = str_lit.form_submit_button("🗑️ حذف هذا المستخدم", use_container_width=True)
+            with col_us1: up_u_btn = str_lit.form_submit_button("💾 حفظ كافة تعديلات المستخدم", use_container_width=True)
+            with col_us2: del_u_btn = str_lit.form_submit_button("🗑️ حذف هذا المستخدم نهائياً", use_container_width=True)
 
             if up_u_btn:
                 str_lit.session_state.users.at[usr_idx, "الاسم الكامل"] = new_u_full
+                str_lit.session_state.users.at[usr_idx, "الفرع التابع"] = new_u_branch
+                str_lit.session_state.users.at[usr_idx, "القسم التابع"] = new_u_dept
                 str_lit.session_state.users.at[usr_idx, "الصلاحية"] = new_u_role
+                str_lit.session_state.users.at[usr_idx, "البريد الإلكتروني"] = new_u_email
                 str_lit.session_state.users.at[usr_idx, "الحالة"] = new_u_status
                 str_lit.session_state.users.at[usr_idx, "الرسم السري"] = new_u_pattern
                 auto_save_data()
-                str_lit.success("✅ تم تحديث بيانات المستخدم بنجاح!")
+                str_lit.success("✅ تم تحديث كافة بيانات المستخدم بنجاح!")
                 str_lit.rerun()
 
             if del_u_btn:
@@ -1211,10 +1347,8 @@ if choice == "كشف الرواتب والمستحقات الشامل":
         df_sal["الصافي المستحق"] = df_sal["الراتب الأساسي"]
 
         col_fl1, col_fl2 = str_lit.columns(2)
-        with col_fl1:
-            branch_filter_opt = str_lit.selectbox("فلترة حسب الفرع", ["الكل"] + df_sal["الفرع"].unique().tolist())
-        with col_fl2:
-            name_filter_search = str_lit.text_input("بحث بالاسم أو الكود")
+        with col_fl1: branch_filter_opt = str_lit.selectbox("فلترة حسب الفرع", ["الكل"] + df_sal["الفرع"].unique().tolist())
+        with col_fl2: name_filter_search = str_lit.text_input("بحث بالاسم أو الكود")
 
         if branch_filter_opt != "الكل":
             df_sal = df_sal[df_sal["الفرع"] == branch_filter_opt]
