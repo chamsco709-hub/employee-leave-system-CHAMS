@@ -170,11 +170,28 @@ str_lit.session_state.company_info["license"] = company_license
 if 'theme_mode' not in str_lit.session_state:
     str_lit.session_state.theme_mode = "Light"
 
-def render_printable_table(df):
+# دالة عرض وتنسيق وتوسيط الجداول والسجلات حسب المدخلات
+def render_printable_table(df, table_title="جدول البيانات"):
     if df.empty:
-        str_lit.info("لا توجد بيانات متاحة للعرض.")
+        str_lit.info("لا توجد بيانات متاحة للعرض في هذا السجل.")
         return
     
+    str_lit.markdown(f"### 📊 {table_title}")
+    
+    with str_lit.expander("⚙️ خيارات تنسيق وفلترة الجدول (عرض/إخفاء الأعمدة)"):
+        all_cols = df.columns.tolist()
+        selected_cols = str_lit.multiselect(
+            "اختر الأعمدة المراد إظهارها في الجدول:", 
+            options=all_cols, 
+            default=all_cols,
+            key=f"ms_{uuid.uuid4()}"
+        )
+    
+    if selected_cols:
+        display_df = df[selected_cols]
+    else:
+        display_df = df
+        
     info = str_lit.session_state.company_info
     c_name = info.get("name", "")
     c_cr = info.get("cr", "")
@@ -185,17 +202,28 @@ def render_printable_table(df):
     user_role = str_lit.session_state.get('current_user_role', 'غير محدد')
     user_branch = str_lit.session_state.get('current_user_branch', 'غير محدد')
     
-    str_lit.dataframe(df, use_container_width=True)
+    # تطبيق تنسيق وتوسيط المحتويات في المنتصف تماماً
+    try:
+        styled_df = display_df.style.set_properties(**{
+            'text-align': 'center',
+            'vertical-align': 'middle'
+        }).set_table_styles([
+            {'selector': 'th', 'props': [('text-align', 'center'), ('background-color', '#E50914'), ('color', 'white')]},
+            {'selector': 'td', 'props': [('text-align', 'center')]}
+        ])
+        str_lit.dataframe(styled_df, use_container_width=True)
+    except Exception:
+        str_lit.dataframe(display_df, use_container_width=True)
     
     header_info_csv = f"# شركة: {c_name} | س.ت: {c_cr} | ب.ض: {c_tax} | ترخيص: {c_lic}\n"
     user_info_csv = f"# المسؤول: {logged_user} ({user_role}) | الفرع: {user_branch} | التاريخ: {datetime.now().strftime('%Y-%m-%d')}\n\n"
     
-    csv_body = df.to_csv(index=False)
+    csv_body = display_df.to_csv(index=False)
     full_csv_data = (header_info_csv + user_info_csv + csv_body).encode('utf-8-sig')
     
     unique_btn_key = f"dl_btn_{uuid.uuid4()}"
     str_lit.download_button(
-        label="📥 تحميل هذا الجدول كملف CSV",
+        label="📥 تحميل هذا السجل المنسق كملف CSV",
         data=full_csv_data,
         file_name=f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
         mime="text/csv",
@@ -617,7 +645,6 @@ if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم �
             with bc3:
                 str_lit.markdown(f'<div class="glass-card" style="border-right-color: #10B981;"><div class="glass-card-title">⏱️ حركات الحضور المسجلة</div><div class="glass-card-value" style="color: #10B981;">{b_att_count}</div></div>', unsafe_allow_html=True)
             
-            # مخطط بياني مرئي لكل فرع باستخدام مكتبة Streamlit المدمجة
             if not branch_emps.empty:
                 str_lit.markdown(f"**📈 مخطط الرواتب حسب الوظيفة في فرع ({branch}):**")
                 chart_data = branch_emps.set_index("الوظيفة")["الراتب الأساسي"]
@@ -626,7 +653,7 @@ if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم �
                 str_lit.markdown(f"**📋 جدول موظفي فرع ({branch}):**")
                 default_cols = ["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الراتب الأساسي", "مسوغات التعيين", "تاريخ بداية العقد", "تاريخ نهاية العقد"]
                 available_cols = [col for col in default_cols if col in branch_emps.columns]
-                render_printable_table(branch_emps[available_cols])
+                render_printable_table(branch_emps[available_cols], f"موظفي فرع {branch}")
             else:
                 str_lit.info(f"لا توجد موظفين مسجلين في فرع {branch}.")
             str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 10px 0;'>", unsafe_allow_html=True)
@@ -726,7 +753,7 @@ if choice == "تسجيل حضور وانصراف":
 
 if choice == "سجل الحضور والانصراف":
     str_lit.subheader("📋 سجل الحضور والانصراف الشامل")
-    render_printable_table(str_lit.session_state.attendance)
+    render_printable_table(str_lit.session_state.attendance, "سجل الحضور والانصراف")
 
 if choice == "تعديل أو حذف حركة حضور":
     str_lit.subheader("✏️ تعديل أو حذف حركة حضور والانصراف مسجلة")
@@ -739,8 +766,12 @@ if choice == "تعديل أو حذف حركة حضور":
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with str_lit.form("edit_att_form_full"):
             new_att_status = str_lit.selectbox("تعديل حالة الحضور", ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"], index=["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"].index(att_row["الحالة"]) if att_row["الحالة"] in ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"] else 0)
-            new_tardy = str_lit.number_input("تعديل دقائق التأخير", value=int(att_row.get("الت التأخير (دقيقة)" if "الت التأخير (دقيقة)" in att_row else att_row.get("التأخير (دقيقة)", 0))))
-            new_overtime = str_lit.number_input("تعديل دقائق الإضافي", value=int(att_row.get("إضافي (دقيقة)", 0)))
+            
+            default_tardy = int(att_row.get("التأخير (دقيقة)", 0))
+            new_tardy = str_lit.number_input("تعديل دقائق التأخير", value=default_tardy)
+            
+            default_overtime = int(att_row.get("إضافي (دقيقة)", 0))
+            new_overtime = str_lit.number_input("تعديل دقائق الإضافي", value=default_overtime)
 
             col_a1, col_a2 = str_lit.columns(2)
             with col_a1:
@@ -806,7 +837,7 @@ if choice == "سجل طلبات قيد الانتظار":
     str_lit.subheader("⏳ سجل طلبات الإجازات قيد الانتظار")
     if not str_lit.session_state.requests.empty:
         pending_df = str_lit.session_state.requests[str_lit.session_state.requests["الحالة"] == "قيد الانتظار"]
-        render_printable_table(pending_df)
+        render_printable_table(pending_df, "طلبات الإجازة قيد الانتظار")
     else:
         str_lit.info("لا توجد طلبات إجازة مسجلة.")
 
@@ -814,7 +845,7 @@ if choice == "سجل الطلبات المقبولة":
     str_lit.subheader("✅ سجل طلبات الإجازات المقبولة والمعتمدة")
     if not str_lit.session_state.requests.empty:
         acc_df = str_lit.session_state.requests[str_lit.session_state.requests["الحالة"] == "مقبول"]
-        render_printable_table(acc_df)
+        render_printable_table(acc_df, "طلبات الإجازة المقبولة")
     else:
         str_lit.info("لا توجد طلبات مقبولة.")
 
@@ -822,7 +853,7 @@ if choice == "سجل الطلبات المرفوضة":
     str_lit.subheader("❌ سجل طلبات الإجازات المرفوضة")
     if not str_lit.session_state.requests.empty:
         rej_df = str_lit.session_state.requests[str_lit.session_state.requests["الحالة"] == "مرفوض"]
-        render_printable_table(rej_df)
+        render_printable_table(rej_df, "طلبات الإجازة المرفوضة")
     else:
         str_lit.info("لا توجد طلبات مرفوضة.")
 
@@ -865,7 +896,7 @@ if choice == "تسجيل معاملة مالية":
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with str_lit.form("fin_trans_form_full"):
             f_emp = str_lit.selectbox("اختر الموظف", emp_names)
-            f_emp_rec = str_lit.session_state.employees[str_lit.session_state.employees["اسم الموظف"] == f].iloc[0]
+            f_emp_rec = str_lit.session_state.employees[str_lit.session_state.employees["اسم الموظف"] == f_emp].iloc[0]
             f_type = str_lit.selectbox("نوع المعاملة", ["سلفة", "حافز / مكافأة", "خصم غياب أو جزاء"])
             f_amount = str_lit.number_input("المبلغ / القيمة (ج.م)", min_value=0.0, value=500.0, step=50.0)
             f_reason = str_lit.text_input("البيان أو السبب بالتفصيل")
@@ -875,7 +906,7 @@ if choice == "تسجيل معاملة مالية":
                 new_fin_row = {
                     "التاريخ": f_date.strftime("%Y-%m-%d"),
                     "كود الموظف": f_emp_rec["كود الموظف"],
-                    "اسم الموظف": f,
+                    "اسم الموظف": f_emp,
                     "الفرع": f_emp_rec["الفرع"],
                     "النوع": f_type,
                     "المبلغ / القيمة": float(f_amount),
@@ -916,7 +947,7 @@ if choice == "تسجيل إذن (انصراف / تأخير)":
 
 if choice == "سجل المعاملات المالية":
     str_lit.subheader("📋 سجل المعاملات المالية والأذونات الشامل")
-    render_printable_table(str_lit.session_state.financial_transactions)
+    render_printable_table(str_lit.session_state.financial_transactions, "سجل المعاملات المالية والأذونات")
 
 if choice == "تعديل أو حذف معاملة مالية":
     str_lit.subheader("✏️ تعديل أو حذف معاملة مالية أو إذن مسجل")
@@ -985,7 +1016,7 @@ if choice == "إضافة موظف جديد":
             str_lit.error(f"خطأ في رفع الملف: {e}")
 
     str_lit.markdown("---")
-    str_lit.markdown("📌 **أرصدة الإجازات الإجمالية (بدون استهلاك يدوي):**")
+    str_lit.markdown("📌 **أرصدة الإجازات الإجمالية:**")
     col_b1, col_b2, col_b3, col_b4 = str_lit.columns(4)
     with col_b1: ann_total = str_lit.number_input("رصيد سنوي (إجمالي)", value=21)
     with col_b2: week_total = str_lit.number_input("رصيد أسبوعي (إجمالي)", value=4)
@@ -1025,7 +1056,7 @@ if choice == "رفع نموذج بيانات الموظفين":
         try:
             df_imported = pd.read_csv(uploaded_template)
             str_lit.markdown("### 📋 معاينة البيانات المستوردة:")
-            str_lit.dataframe(df_imported, use_container_width=True)
+            render_printable_table(df_imported, "معاينة الملف المستورد")
             
             if str_lit.button("📥 اعتماد ودمج هذه البيانات في قاعدة الموظفين", use_container_width=True):
                 str_lit.session_state.employees = pd.concat([str_lit.session_state.employees, df_imported], ignore_index=True)
@@ -1037,7 +1068,7 @@ if choice == "رفع نموذج بيانات الموظفين":
 
 if choice == "سجل الموظفين والأرصدة الشاملة":
     str_lit.subheader("👥 سجل الموظفين ومسوغات التعيين وتواريخ العقود الشاملة")
-    render_printable_table(str_lit.session_state.employees)
+    render_printable_table(str_lit.session_state.employees, "سجل الموظفين الشامل")
 
 if choice == "تعديل أو حذف موظف":
     str_lit.subheader("✏️ تعديل بيانات موظف وعقوده ومسوغاته أو حذفه")
@@ -1123,7 +1154,7 @@ if choice == "إضافة مستخدم جديد":
 
 if choice == "إدارة المستخدمين والصلاحيات والسجل":
     str_lit.subheader("🛡️ سجل مستخدمي النظام والصلاحيات")
-    render_printable_table(str_lit.session_state.users)
+    render_printable_table(str_lit.session_state.users, "سجل مستخدمي النظام")
 
 if choice == "تعديل أو حذف مستخدم":
     str_lit.subheader("✏️ تعديل صلاحيات مستخدم أو حالته أو حذفه")
@@ -1171,7 +1202,6 @@ if choice == "كشف الرواتب والمستحقات الشامل":
         df_sal["خصومات وإذونات"] = 0.0
         df_sal["الصافي المستحق"] = df_sal["الراتب الأساسي"]
 
-        # خيارات الفلترة حسب الفرع أو الاسم
         col_fl1, col_fl2 = str_lit.columns(2)
         with col_fl1:
             branch_filter_opt = str_lit.selectbox("فلترة حسب الفرع", ["الكل"] + df_sal["الفرع"].unique().tolist())
@@ -1183,7 +1213,7 @@ if choice == "كشف الرواتب والمستحقات الشامل":
         if name_filter_search.strip() != "":
             df_sal = df_sal[df_sal["اسم الموظف"].str.contains(name_filter_search, na=False) | df_sal["كود الموظف"].str.contains(name_filter_search, na=False)]
 
-        render_printable_table(df_sal)
+        render_printable_table(df_sal, "كشف الرواتب والمستحقات")
     else:
         str_lit.info("لا توجد بيانات رواتب لعرضها.")
 
@@ -1193,13 +1223,13 @@ if choice == "طباعة التقارير العامة":
     report_type = str_lit.selectbox("اختر نوع التقرير للطباعة", ["تقرير الموظفين الشامل", "تقرير الحضور والانصراف", "تقرير طلبات الإجازات", "تقرير المعاملات المالية"])
     
     if report_type == "تقرير الموظفين الشامل":
-        render_printable_table(str_lit.session_state.employees)
+        render_printable_table(str_lit.session_state.employees, "تقرير الموظفين الشامل")
     elif report_type == "تقرير الحضور والانصراف":
-        render_printable_table(str_lit.session_state.attendance)
+        render_printable_table(str_lit.session_state.attendance, "تقرير الحضور والانصراف")
     elif report_type == "تقرير طلبات الإجازات":
-        render_printable_table(str_lit.session_state.requests)
+        render_printable_table(str_lit.session_state.requests, "تقرير طلبات الإجازات")
     elif report_type == "تقرير المعاملات المالية":
-        render_printable_table(str_lit.session_state.financial_transactions)
+        render_printable_table(str_lit.session_state.financial_transactions, "تقرير المعاملات المالية")
 
 if choice == "إعدادات الشركة وبياناتها الشاملة":
     str_lit.subheader("⚙️ إعدادات وبيانات الشركة الرسمية ورفع الشعار (Logo)")
