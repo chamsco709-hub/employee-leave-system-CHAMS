@@ -1486,4 +1486,3 @@ elif choice == "مسح البيانات":
 
 str_lit.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 20px 0;'>", unsafe_allow_html=True)
 str_lit.markdown("<p style='text-align: center; color: #94A3B8; font-size: 11px;'>جميع الحقوق محفوظة © النظام المتكامل لإدارة الموارد البشرية (ERP)</p>", unsafe_allow_html=True)
-```eof
