@@ -249,7 +249,7 @@ str_lit.markdown(f"""
     }}
     
     .main-content-spacer {{
-        margin-top: 1px !important;
+        margin-top: 220px !important;
     }}
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {{
@@ -559,6 +559,44 @@ with col4:
 
 str_lit.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 8px 0 12px 0;'>", unsafe_allow_html=True)
 
+# نظام التنبيهات والرسائل التحذيرية الذكية (قبلها بشهر) في الشاشة الرئيسية
+if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم والمؤشرات":
+    str_lit.markdown(f'<div class="section-header">🔔 التنبيهات والإنذارات المبكرة (قبل انتهاء المدة بشهر)</div>', unsafe_allow_html=True)
+    
+    alerts_data = [
+        {"الموظف / البند": "أحمد محمود", "نوع المستند": "عقد العمل", "تاريخ الانتهاء": "2026-11-25"},
+        {"الموظف / البند": "فرع الإسكندرية", "نوع المستند": "رخصة النشاط", "تاريخ الانتهاء": "2026-12-05"},
+    ]
+    df_alerts = pd.DataFrame(alerts_data)
+    today = datetime.now()
+    warning_flag = False
+
+    if not df_alerts.empty:
+        for index, row in df_alerts.iterrows():
+            try:
+                exp_date = datetime.strptime(row["تاريخ الانتهاء"], "%Y-%m-%d")
+                days_remaining = (exp_date - today).days
+
+                if 0 <= days_remaining <= 30:
+                    warning_flag = True
+                    str_lit.warning(
+                        f"⚠️ **تنبيه هام:** {row['نوع المستند']} الخاص بـ ({row['الموظف / البند']}) متبقي على انتهائه **{days_remaining} يوم فقط** (تاريخ الانتهاء: {row['تاريخ الانتهاء']}).",
+                        icon="🚨"
+                    )
+                elif days_remaining < 0:
+                    warning_flag = True
+                    str_lit.error(
+                        f"❌ **تجاوز موعد الانتهاء:** {row['نوع المستند']} الخاص بـ ({row['الموظف / البند']}) انتهى منذ {-days_remaining} يوم!",
+                        icon="🚫"
+                    )
+            except Exception:
+                pass
+
+    if not warning_flag:
+        str_lit.success("✅ جميع التواريخ والمستندات سارية ولا توجد أي تحذيرات قريبة خلال الشهر القادم.")
+    
+    str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 10px 0;'>", unsafe_allow_html=True)
+
 if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم والمؤشرات":
     if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم والمؤشرات":
         str_lit.markdown(f'<div class="section-header">📊 داشبورد ومخطط بيانات لكل فرع (بيانات تفصيلية)</div>', unsafe_allow_html=True)
@@ -567,7 +605,7 @@ if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم �
             str_lit.markdown(f"### 📍 فرع: {branch}")
             branch_emps = str_lit.session_state.employees[str_lit.session_state.employees["الفرع"] == branch]
             b_count = len(branch_emps)
-            b_sal_total = float(branch_emps["الراتب الأساسي"].sum()) if not branch_emps.empty else 0.0
+            b_sal_total = float(branch_emps["الراتب الأساسي"].sum()) if (not branch_emps.empty and "الراتب الأساسي" in branch_emps.columns) else 0.0
             b_att = str_lit.session_state.attendance[str_lit.session_state.attendance["الفرع"] == branch] if not str_lit.session_state.attendance.empty else pd.DataFrame()
             b_att_count = len(b_att)
             
@@ -581,7 +619,9 @@ if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم �
             
             if not branch_emps.empty:
                 str_lit.markdown(f"**📋 جدول موظفي فرع ({branch}):**")
-                render_printable_table(branch_emps[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الراتب الأساسي"]])
+                default_cols = ["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الراتب الأساسي"]
+                available_cols = [col for col in default_cols if col in branch_emps.columns]
+                render_printable_table(branch_emps[available_cols])
             else:
                 str_lit.info(f"لا توجد موظفين مسجلين في فرع {branch}.")
             str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 10px 0;'>", unsafe_allow_html=True)
@@ -1429,3 +1469,21 @@ elif choice == "مسح البيانات":
             os.remove(COMPANY_FILE)
         str_lit.success("تم مسح البيانات بنجاح، جاري إعادة تشغيل النظام...")
         str_lit.rerun()
+        str_lit.session_state.requests = pd.DataFrame(columns=[
+            "رقم الطلب", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", "نوع الإجازة", "من تاريخ", "إلى تاريخ", "عدد الأيام", "السبب", "الحالة"
+        ])
+        str_lit.session_state.attendance = pd.DataFrame(columns=[
+            "التاريخ", "كود الموظف", "اسم الموظف", "الوظيفة", "الفرع", 
+            "بداية العمل الرسمية", "نهاية العمل الرسمية", "وقت الحضور الفعلي", "وقت الانصراف الفعلي", 
+            "فترة السماح (دقيقة)", "الحالة", "التأخير (دقيقة)", "إضافي (دقيقة)"
+        ])
+        str_lit.session_state.financial_transactions = pd.DataFrame(columns=[
+            "التاريخ", "كود الموظف", "اسم الموظف", "الفرع", "النوع", "المبلغ / القيمة", "البيان / السبب"
+        ])
+        auto_save_data()
+        str_lit.success("✅ تم تصفير بيانات المنظومة بنجاح!")
+        str_lit.rerun()
+
+str_lit.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 20px 0;'>", unsafe_allow_html=True)
+str_lit.markdown("<p style='text-align: center; color: #94A3B8; font-size: 11px;'>جميع الحقوق محفوظة © النظام المتكامل لإدارة الموارد البشرية (ERP)</p>", unsafe_allow_html=True)
+```eof
