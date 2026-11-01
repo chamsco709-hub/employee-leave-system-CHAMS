@@ -170,7 +170,7 @@ str_lit.session_state.company_info["license"] = company_license
 if 'theme_mode' not in str_lit.session_state:
     str_lit.session_state.theme_mode = "Light"
 
-# دالة الجداول الموحدة (مع محاذاة تامة سنتر وتنسيق كامل للتواريخ والأرقام)
+# دالة الجداول الموحدة (محاذاة سنتر تامة وتنسيق كامل للتواريخ والأرقام)
 def render_printable_table(df, table_title="جدول البيانات"):
     if df.empty:
         str_lit.info("لا توجد بيانات متاحة للعرض في هذا السجل.")
@@ -579,7 +579,7 @@ str_lit.markdown('</div>', unsafe_allow_html=True)
 str_lit.markdown('<div class="main-content-spacer"></div>', unsafe_allow_html=True)
 
 # -------------------------------------------------------------------------
-# زر تصفية منسدل (Popover Filter Button)
+# زر تصفية منسدل (Popover Filter Button) بتصحيح تام
 # -------------------------------------------------------------------------
 col_filter_btn, col_filter_info = str_lit.columns([1, 4])
 with col_filter_btn:
@@ -597,6 +597,9 @@ with col_filter_btn:
         if enable_date_filter:
             filter_start_date = str_lit.date_input("من تاريخ", value=date.today() - timedelta(days=30), key="pop_sdate")
             filter_end_date = str_lit.date_input("إلى تاريخ", value=date.today(), key="pop_edate")
+        else:
+            filter_start_date = date.today() - timedelta(days=30)
+            filter_end_date = date.today()
         
         if str_lit.button("🔄 إعادة ضبط الفلاتر", use_container_width=True, key="pop_reset"):
             str_lit.rerun()
@@ -605,6 +608,8 @@ else:
     selected_sidebar_status = "الكل"
     sidebar_search_text = ""
     enable_date_filter = False
+    filter_start_date = date.today() - timedelta(days=30)
+    filter_end_date = date.today()
 
 def apply_foodics_filter(df, date_col_name=None):
     if df.empty:
