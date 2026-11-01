@@ -8,8 +8,8 @@ import base64
 import uuid
 
 str_lit.set_page_config(
-    page_title="النظام المتكامل لإدارة الموارد البشرية",
-    page_icon="🏢",
+    page_title="النظام المتكامل لإدارة الموارد البشرية - Foodics ERP",
+    page_icon="🍔",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -170,6 +170,7 @@ str_lit.session_state.company_info["license"] = company_license
 if 'theme_mode' not in str_lit.session_state:
     str_lit.session_state.theme_mode = "Light"
 
+# دالة الجداول الموحدة (مع محاذاة تامة سنتر وتنسيق كامل للتواريخ والأرقام)
 def render_printable_table(df, table_title="جدول البيانات"):
     if df.empty:
         str_lit.info("لا توجد بيانات متاحة للعرض في هذا السجل.")
@@ -202,10 +203,10 @@ def render_printable_table(df, table_title="جدول البيانات"):
     user_branch = str_lit.session_state.get('current_user_branch', 'غير محدد')
     
     try:
-        # فرض محاذاة المنتصف التامة (Center) لكافة الخلايا، العناوين، الأرقام والتواريخ
         styled_df = display_df.style.set_properties(**{
             'text-align': 'center !important',
-            'vertical-align': 'middle !important'
+            'vertical-align': 'middle !important',
+            'white-space': 'nowrap !important'
         }).set_table_styles([
             {
                 'selector': 'th', 
@@ -214,7 +215,8 @@ def render_printable_table(df, table_title="جدول البيانات"):
                     ('background-color', '#0284C7'), 
                     ('color', 'white'),
                     ('vertical-align', 'middle !important'),
-                    ('direction', 'rtl')
+                    ('direction', 'rtl'),
+                    ('padding', '8px')
                 ]
             },
             {
@@ -222,7 +224,8 @@ def render_printable_table(df, table_title="جدول البيانات"):
                 'props': [
                     ('text-align', 'center !important'),
                     ('vertical-align', 'middle !important'),
-                    ('direction', 'rtl')
+                    ('direction', 'rtl'),
+                    ('padding', '6px')
                 ]
             }
         ])
@@ -247,21 +250,20 @@ def render_printable_table(df, table_title="جدول البيانات"):
 
 is_dark = str_lit.session_state.theme_mode == "Dark"
 
-bg_color = "linear-gradient(135deg, #121212 0%, #1A1A1A 50%, #0B0B0B 100%)" if is_dark else "linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 50%, #E2E8F0 100%)"
-text_color = "#F1F5F9" if is_dark else "#0F172A"
-card_bg = "rgba(30, 30, 30, 0.75)" if is_dark else "rgba(255, 255, 255, 0.9)"
-card_value_color = "#FFFFFF" if is_dark else "#0F172A"
-wrapper_bg = "#121212" if is_dark else "#FFFFFF"
-input_bg = "rgba(30, 41, 59, 0.9)" if is_dark else "#FFFFFF"
-input_text = "#FFFFFF" if is_dark else "#0F172A"
-input_border = "#475569" if is_dark else "#CBD5E1"
-header_bg = "rgba(30, 30, 30, 0.85)" if is_dark else "rgba(255, 255, 255, 0.95)"
-header_text = "#FFFFFF" if is_dark else "#0F172A"
+bg_color = "#F4F6F8" if not is_dark else "#121212"
+text_color = "#111827" if not is_dark else "#F9FAFB"
+card_bg = "#FFFFFF" if not is_dark else "#1E1E1E"
+card_value_color = "#111827" if not is_dark else "#FFFFFF"
+wrapper_bg = "#FFFFFF" if not is_dark else "#18181B"
+input_bg = "#F9FAFB" if not is_dark else "#27272A"
+input_text = "#111827" if not is_dark else "#FFFFFF"
+input_border = "#D1D5DB" if not is_dark else "#3F3F46"
+header_bg = "#FFFFFF" if not is_dark else "#18181B"
+header_text = "#111827" if not is_dark else "#FFFFFF"
 
 str_lit.markdown(f"""
     <style>
     header[data-testid="stHeader"] {{ visibility: hidden; height: 0px; }}
-    [data-testid="stSidebar"] {{ display: none !important; width: 0px !important; }}
     
     html, body, [class*="css"], .stMarkdown, div, span, p, h1, h2, h3, h4, h5, h6, label {{
         font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
@@ -288,8 +290,8 @@ str_lit.markdown(f"""
         z-index: 999999 !important;
         background: {wrapper_bg} !important;
         padding: 4px 15px 2px 15px !important;
-        border-bottom: 2px solid #E50914;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        border-bottom: 2px solid #00A3FF;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     }}
     
     .main-content-spacer {{
@@ -315,10 +317,10 @@ str_lit.markdown(f"""
     
     .glass-header {{
         background: {header_bg};
-        border: 1px solid rgba(229, 9, 20, 0.3);
+        border: 1px solid rgba(0, 163, 255, 0.2);
         color: {header_text} !important;
         padding: 0px !important;
-        border-radius: 8px;
+        border-radius: 10px;
         width: 100%;
         margin-bottom: 3px;
         display: flex;
@@ -328,8 +330,8 @@ str_lit.markdown(f"""
     
     .header-logo-box-full {{
         width: 65px;
-        background: rgba(229, 9, 20, 0.2);
-        border-left: 1px solid rgba(229, 9, 20, 0.4);
+        background: rgba(0, 163, 255, 0.1);
+        border-left: 1px solid rgba(0, 163, 255, 0.2);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -340,7 +342,7 @@ str_lit.markdown(f"""
     .header-top-system h2 {{
         font-size: 10.5px !important;
         font-weight: bold !important;
-        color: #F87171 !important;
+        color: #00A3FF !important;
         margin: 0 0 1px 0 !important;
     }}
     .comp-name-txt {{
@@ -350,40 +352,39 @@ str_lit.markdown(f"""
     }}
     .comp-info-txt {{
         font-size: 9px !important;
-        color: #94A3B8 !important;
+        color: #64748B !important;
         margin-top: 1px;
     }}
     
     .user-badge-box {{
-        background: rgba(229, 9, 20, 0.15);
-        border: 1px solid rgba(229, 9, 20, 0.4);
+        background: rgba(0, 163, 255, 0.1);
+        border: 1px solid rgba(0, 163, 255, 0.3);
         padding: 2px 6px;
-        border-radius: 5px;
+        border-radius: 6px;
         font-size: 10px;
-        color: #FCA5A5;
+        color: #0284C7;
         font-weight: bold;
         text-align: center;
         margin-bottom: 2px;
     }}
     
-    .glass-card {{
+    .foodics-card {{
         background: {card_bg};
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-right: 5px solid #E50914;
-        padding: 10px 14px;
+        border: 1px solid #E2E8F0;
+        border-right: 5px solid #00A3FF;
+        padding: 12px 16px;
         border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
         text-align: right !important;
         margin-bottom: 8px;
     }}
-    .glass-card-title {{
+    .foodics-card-title {{
         font-size: 11.5px;
-        color: #94A3B8;
+        color: #64748B;
         font-weight: bold;
         margin-bottom: 2px;
     }}
-    .glass-card-value {{
+    .foodics-card-value {{
         font-size: 20px;
         color: {card_value_color};
         font-weight: bold;
@@ -392,8 +393,8 @@ str_lit.markdown(f"""
     .section-header {{
         font-size: 15px !important;
         font-weight: bold !important;
-        color: #F87171 !important;
-        border-bottom: 2px solid #E50914;
+        color: #0284C7 !important;
+        border-bottom: 2px solid #00A3FF;
         padding-bottom: 6px;
         margin-top: 10px !important;
         margin-bottom: 10px !important;
@@ -402,11 +403,10 @@ str_lit.markdown(f"""
     
     .entry-form-area {{
         background: {card_bg};
-        backdrop-filter: blur(15px);
-        padding: 16px;
+        padding: 18px;
         border-radius: 14px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        border: 1px solid #E2E8F0;
         margin-bottom: 12px;
     }}
     </style>
@@ -429,7 +429,7 @@ def render_company_header():
     elif logo_val and (logo_val.startswith("http://") or logo_val.startswith("https://")):
         logo_html = f'<div class="header-logo-box-full"><img src="{logo_val}" style="width: 100%; height: 100%; object-fit: contain;" /></div>'
     else:
-        logo_html = '<div class="header-logo-box-full">🏢</div>'
+        logo_html = '<div class="header-logo-box-full">🍔</div>'
 
     contact_num = info.get("contact", "غير محدد")
     email_addr = info.get("email", "غير محدد")
@@ -443,7 +443,7 @@ def render_company_header():
         f"""
         <div class="glass-header">
             <div style="padding: 4px 10px; width: 100%;">
-                <div class="header-top-system"><h2>برنامج شؤون الموظفين والإدارة</h2></div>
+                <div class="header-top-system"><h2>نظام فودكس لإدارة الموارد البشرية (Foodics ERP)</h2></div>
                 <div class="comp-name-txt">{comp_name}</div>
                 <div class="comp-info-txt">📍 العنوان: {address_str} &nbsp;|&nbsp; 📋 س.ت: {cr_num} &nbsp;|&nbsp; 🧾 ب.ض: {tax_num} &nbsp;|&nbsp; 📞 هاتف: {contact_num} &nbsp;|&nbsp; ✉️ بريد: {email_addr} &nbsp;|&nbsp; 🔑 ترخيص: {lic_num}</div>
             </div>
@@ -467,10 +467,10 @@ if not str_lit.session_state.is_authenticated:
 
     str_lit.markdown(
         f"""
-        <div style="max-width: 480px; margin: 10px auto 20px auto; background: {card_bg}; backdrop-filter: blur(20px); padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; border: 1px solid rgba(255,255,255,0.08);">
-            <h2 style="color: #F87171; margin-bottom: 6px; font-size: 20px;">النظام المتكامل لشؤون الموظفين</h2>
+        <div style="max-width: 480px; margin: 10px auto 20px auto; background: {card_bg}; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; border: 1px solid #E2E8F0;">
+            <h2 style="color: #0284C7; margin-bottom: 6px; font-size: 20px;">تسجيل الدخول - نظام فودكس</h2>
             <p style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">{lic_info.get('name', '')}</p>
-            <p style="color: #94A3B8; font-size: 12px;">رقم الترخيص: {lic_info.get('license', '')}</p>
+            <p style="color: #64748B; font-size: 12px;">رقم الترخيص: {lic_info.get('license', '')}</p>
         </div>
         """,
         unsafe_allow_html=True
@@ -481,7 +481,7 @@ if not str_lit.session_state.is_authenticated:
             usernames = str_lit.session_state.users["اسم المستخدم"].tolist()
             selected_user_login = str_lit.selectbox("اختر المستخدم", usernames)
             pattern_input = str_lit.text_input("أدخل تسلسل الرسم السري", type="password", placeholder="مثل: 1-2-3")
-            if str_lit.form_submit_button("▶️ تشغيل النظام", use_container_width=True):
+            if str_lit.form_submit_button("▶️ دخول النظام", use_container_width=True):
                 user_record = str_lit.session_state.users[str_lit.session_state.users["اسم المستخدم"] == selected_user_login].iloc[0]
                 if user_record.get("الحالة", "نشط") == "إيقاف":
                     str_lit.error("❌ هذا المستخدم موقوف عن العمل!")
@@ -578,39 +578,98 @@ str_lit.markdown('</div>', unsafe_allow_html=True)
 
 str_lit.markdown('<div class="main-content-spacer"></div>', unsafe_allow_html=True)
 
-if "Admin" in user_role or "الإدارة العليا" in user_dept:
-    view_employees = str_lit.session_state.employees
-    view_requests = str_lit.session_state.requests
+# -------------------------------------------------------------------------
+# زر تصفية منسدل (Popover Filter Button)
+# -------------------------------------------------------------------------
+col_filter_btn, col_filter_info = str_lit.columns([1, 4])
+with col_filter_btn:
+    with str_lit.popover("⚙️ تصفية البيانات المتقدمة"):
+        str_lit.markdown("### 🍔 خيارات الفلتر")
+        available_branches = ["الكل", "المركز الرئيسي", "فرع الإسكندرية", "فرع الشرم"]
+        selected_sidebar_branch = str_lit.selectbox("📍 فرع المنشأة", available_branches, key="pop_branch")
+        
+        selected_sidebar_status = str_lit.selectbox("📌 حالة السجلات", ["الكل", "مقبول / معتمد", "قيد الانتظار", "مرفوض"], key="pop_status")
+        
+        sidebar_search_text = str_lit.text_input("🔍 بحث فوري بالاسم / الكود", placeholder="اكتب للفلترة...", key="pop_search")
+        
+        str_lit.markdown("---")
+        enable_date_filter = str_lit.checkbox("تفعيل فلتر التاريخ", key="pop_chk_date")
+        if enable_date_filter:
+            filter_start_date = str_lit.date_input("من تاريخ", value=date.today() - timedelta(days=30), key="pop_sdate")
+            filter_end_date = str_lit.date_input("إلى تاريخ", value=date.today(), key="pop_edate")
+        
+        if str_lit.button("🔄 إعادة ضبط الفلاتر", use_container_width=True, key="pop_reset"):
+            str_lit.rerun()
 else:
-    view_employees = str_lit.session_state.employees[str_lit.session_state.employees["الفرع"] == user_branch]
-    view_requests = str_lit.session_state.requests[str_lit.session_state.requests["الفرع"] == user_branch]
+    selected_sidebar_branch = "الكل"
+    selected_sidebar_status = "الكل"
+    sidebar_search_text = ""
+    enable_date_filter = False
 
-total_emps = len(view_employees)
-pending_requests = view_requests[view_requests['الحالة'] == 'قيد الانتظار'] if not view_requests.empty else pd.DataFrame()
+def apply_foodics_filter(df, date_col_name=None):
+    if df.empty:
+        return df
+    filtered_df = df.copy()
+    
+    if selected_sidebar_branch != "الكل" and "الفرع" in filtered_df.columns:
+        filtered_df = filtered_df[filtered_df["الفرع"] == selected_sidebar_branch]
+        
+    if selected_sidebar_status != "الكل" and "الحالة" in filtered_df.columns:
+        if selected_sidebar_status == "مقبول / معتمد":
+            filtered_df = filtered_df[filtered_df["الحالة"].isin(["مقبول", "معتمد"])]
+        else:
+            filtered_df = filtered_df[filtered_df["الحالة"] == selected_sidebar_status]
+            
+    if sidebar_search_text.strip() != "":
+        mask = False
+        for col in ["اسم الموظف", "كود الموظف", "رقم الطلب", "البيان / السبب"]:
+            if col in filtered_df.columns:
+                mask = mask | filtered_df[col].astype(str).str.contains(sidebar_search_text, case=False, na=False)
+        filtered_df = filtered_df[mask]
+        
+    if enable_date_filter and date_col_name and date_col_name in filtered_df.columns:
+        try:
+            filtered_df[date_col_name] = pd.to_datetime(filtered_df[date_col_name]).dt.date
+            filtered_df = filtered_df[
+                (filtered_df[date_col_name] >= filter_start_date) & 
+                (filtered_df[date_col_name] <= filter_end_date)
+            ]
+        except Exception:
+            pass
+            
+    return filtered_df
+
+filtered_employees = apply_foodics_filter(str_lit.session_state.employees, "تاريخ بداية العقد")
+filtered_requests = apply_foodics_filter(str_lit.session_state.requests, "من تاريخ")
+filtered_attendance = apply_foodics_filter(str_lit.session_state.attendance, "التاريخ")
+filtered_fin = apply_foodics_filter(str_lit.session_state.financial_transactions, "التاريخ")
+
+total_emps = len(filtered_employees)
+pending_requests = filtered_requests[filtered_requests['الحالة'] == 'قيد الانتظار'] if not filtered_requests.empty else pd.DataFrame()
 pending_count = len(pending_requests)
-accepted_count = len(view_requests[view_requests['الحالة'] == 'مقبول']) if not view_requests.empty else 0
+accepted_count = len(filtered_requests[filtered_requests['الحالة'] == 'مقبول']) if not filtered_requests.empty else 0
 
 col1, col2, col3, col4 = str_lit.columns(4)
 with col1:
-    str_lit.markdown(f'<div class="glass-card"><div class="glass-card-title">👥 إجمالي نجوم الشركة</div><div class="glass-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="foodics-card"><div class="foodics-card-title">👥 الموظفون (حسب الفلتر)</div><div class="foodics-card-value">{total_emps}</div></div>', unsafe_allow_html=True)
 with col2:
-    str_lit.markdown(f'<div class="glass-card" style="border-right-color: #F59E0B;"><div class="glass-card-title">⏳ عروض قيد الانتظار</div><div class="glass-card-value" style="color: #F59E0B;">{pending_count}</div></div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #F59E0B;"><div class="foodics-card-title">⏳ طلبات قيد الانتظار</div><div class="foodics-card-value" style="color: #F59E0B;">{pending_count}</div></div>', unsafe_allow_html=True)
 with col3:
-    str_lit.markdown(f'<div class="glass-card" style="border-right-color: #10B981;"><div class="glass-card-title">✅ العروض المقبولة</div><div class="glass-card-value" style="color: #10B981;">{accepted_count}</div></div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #10B981;"><div class="foodics-card-title">✅ الطلبات المقبولة</div><div class="foodics-card-value" style="color: #10B981;">{accepted_count}</div></div>', unsafe_allow_html=True)
 with col4:
     active_users_count = len(str_lit.session_state.users[str_lit.session_state.users["الحالة"] == "نشط"]) if not str_lit.session_state.users.empty else 0
-    str_lit.markdown(f'<div class="glass-card" style="border-right-color: #3B82F6;"><div class="glass-card-title">🛡️ المستخدمين النشطين</div><div class="glass-card-value" style="font-size: 18px; color: #3B82F6;">{active_users_count} مستخدم</div></div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #0284C7;"><div class="foodics-card-title">🛡️ المستخدمين النشطين</div><div class="foodics-card-value" style="font-size: 18px; color: #0284C7;">{active_users_count} مستخدم</div></div>', unsafe_allow_html=True)
 
-str_lit.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 8px 0 12px 0;'>", unsafe_allow_html=True)
+str_lit.markdown("<hr style='border: 0.5px solid #E2E8F0; margin: 8px 0 12px 0;'>", unsafe_allow_html=True)
 
 if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم والمؤشرات":
-    str_lit.markdown(f'<div class="section-header">🔔 التنبيهات والإنذارات المبكرة لعقود الموظفين (قبل انتهاء العقد بشهر)</div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="section-header">🔔 التنبيهات والإنذارات المبكرة لعقود الموظفين (حسب الفلتر النشط)</div>', unsafe_allow_html=True)
     
     today = datetime.now()
     warning_flag = False
 
-    if not str_lit.session_state.employees.empty:
-        for idx, emp_row in str_lit.session_state.employees.iterrows():
+    if not filtered_employees.empty:
+        for idx, emp_row in filtered_employees.iterrows():
             emp_name = emp_row.get("اسم الموظف", "غير معروف")
             end_contract_str = emp_row.get("تاريخ نهاية العقد", "")
             if end_contract_str:
@@ -634,21 +693,18 @@ if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم 
                     pass
 
     if not warning_flag:
-        str_lit.success("✅ جميع عقود ومستندات الموظفين سارية ولا توجد أي تحذيرات قريبة خلال الشهر القادم.")
+        str_lit.success("✅ جميع العقود والمستندات ضمن نطاق الفلتر سارية ولا توجد تحذيرات قريبة.")
     
-    str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 10px 0;'>", unsafe_allow_html=True)
+    str_lit.markdown("<hr style='border: 0.5px dashed #E2E8F0; margin: 10px 0;'>", unsafe_allow_html=True)
 
-    # ----------------------------------------------------
-    # قسم طلبات الإجازات المعلقة وإدارتها من لوحة التحكم
-    # ----------------------------------------------------
-    str_lit.markdown(f'<div class="section-header">⏳ طلبات الإجازات قيد الانتظار (إدارة سريعة وقبول / رفض)</div>', unsafe_allow_html=True)
-    if not str_lit.session_state.requests.empty:
-        pending_dash_reqs = str_lit.session_state.requests[str_lit.session_state.requests["الحالة"] == "قيد الانتظار"]
+    str_lit.markdown(f'<div class="section-header">⏳ طلبات الإجازات قيد الانتظار (إدارة فورية)</div>', unsafe_allow_html=True)
+    if not filtered_requests.empty:
+        pending_dash_reqs = filtered_requests[filtered_requests["الحالة"] == "قيد الانتظار"]
         if not pending_dash_reqs.empty:
             for p_idx, p_row in pending_dash_reqs.iterrows():
                 with str_lit.container():
                     str_lit.markdown(f"""
-                    <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 6px;">
+                    <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); padding: 10px; border-radius: 8px; margin-bottom: 6px;">
                         <b>طلب رقم:</b> {p_row['رقم الطلب']} &nbsp;|&nbsp; <b>الموظف:</b> {p_row['اسم الموظف']} &nbsp;|&nbsp; <b>النوع:</b> {p_row['نوع الإجازة']} ({p_row['عدد الأيام']} أيام)<br>
                         <b>من:</b> {p_row['من تاريخ']} <b>إلى:</b> {p_row['إلى تاريخ']} &nbsp;|&nbsp; <b>السبب:</b> {p_row['السبب']}
                     </div>
@@ -657,34 +713,33 @@ if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم 
                     c_btn1, c_btn2, c_btn3 = str_lit.columns([1, 1, 2])
                     with c_btn1:
                         if str_lit.button("✅ قبول", key=f"dash_acc_req_{p_row['رقم الطلب']}_{p_idx}"):
-                            str_lit.session_state.requests.at[p_idx, "الحالة"] = "مقبول"
+                            orig_idx = str_lit.session_state.requests[str_lit.session_state.requests['رقم الطلب'] == p_row['رقم الطلب']].index[0]
+                            str_lit.session_state.requests.at[orig_idx, "الحالة"] = "مقبول"
                             auto_save_data()
                             str_lit.success(f"✅ تم قبول طلب الإجازة للموظف {p_row['اسم الموظف']} بنجاح!")
                             str_lit.rerun()
                     with c_btn2:
                         if str_lit.button("❌ رفض", key=f"dash_rej_req_{p_row['رقم الطلب']}_{p_idx}"):
-                            str_lit.session_state.requests.at[p_idx, "الحالة"] = "مرفوض"
+                            orig_idx = str_lit.session_state.requests[str_lit.session_state.requests['رقم الطلب'] == p_row['رقم الطلب']].index[0]
+                            str_lit.session_state.requests.at[orig_idx, "الحالة"] = "مرفوض"
                             auto_save_data()
                             str_lit.warning(f"❌ تم رفض طلب الإجازة للموظف {p_row['اسم الموظف']}.")
                             str_lit.rerun()
         else:
-            str_lit.info("لا توجد طلبات إجازة قيد الانتظار حالياً.")
+            str_lit.info("لا توجد طلبات إجازة قيد الانتظار مطابقة للفلتر.")
     else:
         str_lit.info("لا توجد طلبات إجازة مسجلة.")
 
-    str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 10px 0;'>", unsafe_allow_html=True)
+    str_lit.markdown("<hr style='border: 0.5px dashed #E2E8F0; margin: 10px 0;'>", unsafe_allow_html=True)
 
-    # ----------------------------------------------------
-    # قسم المعاملات المالية والأذونات المعلقة وإدارتها من لوحة التحكم
-    # ----------------------------------------------------
-    str_lit.markdown(f'<div class="section-header">💵 المعاملات المالية والأذونات قيد الانتظار (إدارة سريعة وقبول / رفض)</div>', unsafe_allow_html=True)
-    if not str_lit.session_state.financial_transactions.empty:
-        pending_dash_fins = str_lit.session_state.financial_transactions[str_lit.session_state.financial_transactions["الحالة"] == "قيد الانتظار"]
+    str_lit.markdown(f'<div class="section-header">💵 المعاملات المالية قيد الانتظار (إدارة فورية)</div>', unsafe_allow_html=True)
+    if not filtered_fin.empty:
+        pending_dash_fins = filtered_fin[filtered_fin["الحالة"] == "قيد الانتظار"]
         if not pending_dash_fins.empty:
             for f_idx, f_row in pending_dash_fins.iterrows():
                 with str_lit.container():
                     str_lit.markdown(f"""
-                    <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 6px;">
+                    <div style="background: rgba(0, 163, 255, 0.08); border: 1px solid rgba(0, 163, 255, 0.2); padding: 10px; border-radius: 8px; margin-bottom: 6px;">
                         <b>التاريخ:</b> {f_row['التاريخ']} &nbsp;|&nbsp; <b>الموظف:</b> {f_row['اسم الموظف']} &nbsp;|&nbsp; <b>النوع:</b> {f_row['النوع']} ({f_row['المبلغ / القيمة']} ج.م)<br>
                         <b>البيان/السبب:</b> {f_row['البيان / السبب']}
                     </div>
@@ -704,43 +759,42 @@ if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم 
                             str_lit.warning(f"❌ تم رفض المعاملة للموظف {f_row['اسم الموظف']}.")
                             str_lit.rerun()
         else:
-            str_lit.info("لا توجد معاملات مالية أو أذونات قيد الانتظار حالياً.")
+            str_lit.info("لا توجد معاملات مالية قيد الانتظار مطابقة للفلتر.")
     else:
         str_lit.info("لا توجد معاملات مالية مسجلة.")
 
-if selected_main_cat == "الرئيسية" or choice == "لوحة التحكم والمؤشرات":
-    if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم والمؤشرات":
-        str_lit.markdown(f'<div class="section-header">📊 داشبورد ومخطط بياني ومؤشرات لكل فرع</div>', unsafe_allow_html=True)
-        all_branches = str_lit.session_state.employees["الفرع"].unique().tolist() if not str_lit.session_state.employees.empty else ["المركز الرئيسي"]
+if selected_main_cat == "الرئيسية" and choice == "لوحة التحكم والمؤشرات":
+    str_lit.markdown(f'<div class="section-header">📊 داشبورد ومخطط بياني ومؤشرات (حسب الفلتر النشط)</div>', unsafe_allow_html=True)
+    all_branches = filtered_employees["الفرع"].unique().tolist() if not filtered_employees.empty else ["المركز الرئيسي"]
+    
+    for branch in all_branches:
+        str_lit.markdown(f"### 📍 فرع: {branch}")
+        branch_emps = filtered_employees[filtered_employees["الفرع"] == branch]
+        b_count = len(branch_emps)
+        b_sal_total = float(branch_emps["الراتب الأساسي"].sum()) if (not branch_emps.empty and "الراتب الأساسي" in branch_emps.columns) else 0.0
+        b_att = filtered_attendance[filtered_attendance["الفرع"] == branch] if not filtered_attendance.empty else pd.DataFrame()
+        b_att_count = len(b_att)
         
-        for branch in all_branches:
-            str_lit.markdown(f"### 📍 فرع: {branch}")
-            branch_emps = str_lit.session_state.employees[str_lit.session_state.employees["الفرع"] == branch]
-            b_count = len(branch_emps)
-            b_sal_total = float(branch_emps["الراتب الأساسي"].sum()) if (not branch_emps.empty and "الراتب الأساسي" in branch_emps.columns) else 0.0
-            b_att = str_lit.session_state.attendance[str_lit.session_state.attendance["الفرع"] == branch] if not str_lit.session_state.attendance.empty else pd.DataFrame()
-            b_att_count = len(b_att)
+        bc1, bc2, bc3 = str_lit.columns(3)
+        with bc1:
+            str_lit.markdown(f'<div class="foodics-card"><div class="foodics-card-title">👥 عدد الموظفين بالفرع</div><div class="foodics-card-value">{b_count}</div></div>', unsafe_allow_html=True)
+        with bc2:
+            str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #0284C7;"><div class="foodics-card-title">💰 إجمالي رواتب الفرع</div><div class="foodics-card-value" style="font-size: 18px; color: #0284C7;">{b_sal_total:,.0f} ج.م</div></div>', unsafe_allow_html=True)
+        with bc3:
+            str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #10B981;"><div class="foodics-card-title">⏱️ حركات الحضور المسجلة</div><div class="foodics-card-value" style="color: #10B981;">{b_att_count}</div></div>', unsafe_allow_html=True)
+        
+        if not branch_emps.empty:
+            str_lit.markdown(f"**📈 مخطط الرواتب حسب الوظيفة في فرع ({branch}):**")
+            chart_data = branch_emps.set_index("الوظيفة")["الراتب الأساسي"]
+            str_lit.bar_chart(chart_data)
             
-            bc1, bc2, bc3 = str_lit.columns(3)
-            with bc1:
-                str_lit.markdown(f'<div class="glass-card"><div class="glass-card-title">👥 عدد الموظفين بالفرع</div><div class="glass-card-value">{b_count}</div></div>', unsafe_allow_html=True)
-            with bc2:
-                str_lit.markdown(f'<div class="glass-card" style="border-right-color: #3B82F6;"><div class="glass-card-title">💰 إجمالي رواتب الفرع</div><div class="glass-card-value" style="font-size: 18px; color: #3B82F6;">{b_sal_total:,.0f} ج.م</div></div>', unsafe_allow_html=True)
-            with bc3:
-                str_lit.markdown(f'<div class="glass-card" style="border-right-color: #10B981;"><div class="glass-card-title">⏱️ حركات الحضور المسجلة</div><div class="glass-card-value" style="color: #10B981;">{b_att_count}</div></div>', unsafe_allow_html=True)
-            
-            if not branch_emps.empty:
-                str_lit.markdown(f"**📈 مخطط الرواتب حسب الوظيفة في فرع ({branch}):**")
-                chart_data = branch_emps.set_index("الوظيفة")["الراتب الأساسي"]
-                str_lit.bar_chart(chart_data)
-                
-                str_lit.markdown(f"**📋 جدول موظفي فرع ({branch}):**")
-                default_cols = ["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الراتب الأساسي", "مسوغات التعيين", "تاريخ بداية العقد", "تاريخ نهاية العقد"]
-                available_cols = [col for col in default_cols if col in branch_emps.columns]
-                render_printable_table(branch_emps[available_cols], f"موظفي فرع {branch}")
-            else:
-                str_lit.info(f"لا توجد موظفين مسجلين في فرع {branch}.")
-            str_lit.markdown("<hr style='border: 0.5px dashed rgba(255,255,255,0.1); margin: 10px 0;'>", unsafe_allow_html=True)
+            str_lit.markdown(f"**📋 جدول موظفي فرع ({branch}):**")
+            default_cols = ["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الراتب الأساسي", "مسوغات التعيين", "تاريخ بداية العقد", "تاريخ نهاية العقد"]
+            available_cols = [col for col in default_cols if col in branch_emps.columns]
+            render_printable_table(branch_emps[available_cols], f"موظفي فرع {branch}")
+        else:
+            str_lit.info(f"لا توجد موظفين في فرع {branch} مطابقين للفلتر.")
+        str_lit.markdown("<hr style='border: 0.5px dashed #E2E8F0; margin: 10px 0;'>", unsafe_allow_html=True)
 
 if choice == "تسجيل حضور وانصراف":
     str_lit.subheader("⏱️ تسجيل حركة الحضور والانصراف")
@@ -831,15 +885,15 @@ if choice == "تسجيل حضور وانصراف":
         str_lit.markdown('</div>', unsafe_allow_html=True)
 
 if choice == "سجل الحضور والانصراف":
-    str_lit.subheader("📋 سجل الحضور والانصراف الشامل")
-    render_printable_table(str_lit.session_state.attendance, "سجل الحضور والانصراف")
+    str_lit.subheader("📋 سجل الحضور والانصراف (حسب الفلتر النشط)")
+    render_printable_table(filtered_attendance, "سجل الحضور والانصراف المفلتر")
 
 if choice == "تعديل أو حذف حركة حضور":
-    str_lit.subheader("✏️ تعديل أو حذف حركة حضور والانصراف مسجلة")
-    if not str_lit.session_state.attendance.empty:
-        att_options = [f"{row['التاريخ']} - {row['اسم الموظف']} ({row['الحالة']})" for idx, row in str_lit.session_state.attendance.iterrows()]
+    str_lit.subheader("✏️ تعديل أو حذف حركة حضور وانصراف مسجلة")
+    if not filtered_attendance.empty:
+        att_options = [f"{row['التاريخ']} - {row['اسم الموظف']} ({row['الحالة']})" for idx, row in filtered_attendance.iterrows()]
         selected_att_str = str_lit.selectbox("اختر حركة الحضور للتعديل أو الحذف", att_options)
-        selected_att_idx = att_options.index(selected_att_str)
+        selected_att_idx = filtered_attendance[filtered_attendance.apply(lambda r: f"{r['التاريخ']} - {r['اسم الموظف']} ({r['الحالة']})" == selected_att_str, axis=1)].index[0]
         att_row = str_lit.session_state.attendance.iloc[selected_att_idx]
 
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
@@ -871,7 +925,7 @@ if choice == "تعديل أو حذف حركة حضور":
                 str_lit.rerun()
         str_lit.markdown('</div>', unsafe_allow_html=True)
     else:
-        str_lit.info("لا توجد حركات حضور مسجلة حالياً.")
+        str_lit.info("لا توجد حركات حضور مطابقة للفلتر النشط.")
 
 if choice == "تسجيل طلب إجازة":
     str_lit.subheader("📝 تسجيل طلب إجازة جديد للموظف")
@@ -911,31 +965,31 @@ if choice == "تسجيل طلب إجازة":
         str_lit.markdown('</div>', unsafe_allow_html=True)
 
 if choice == "سجل طلبات قيد الانتظار":
-    str_lit.subheader("⏳ سجل طلبات الإجازات قيد الانتظار")
-    if not str_lit.session_state.requests.empty:
-        pending_df = str_lit.session_state.requests[str_lit.session_state.requests["الحالة"] == "قيد الانتظار"]
-        render_printable_table(pending_df, "طلبات الإجازة قيد الانتظار")
+    str_lit.subheader("⏳ سجل طلبات الإجازات قيد الانتظار (حسب الفلتر)")
+    if not filtered_requests.empty:
+        pending_df = filtered_requests[filtered_requests["الحالة"] == "قيد الانتظار"]
+        render_printable_table(pending_df, "طلبات الإجازة قيد الانتظار المفلترة")
     else:
-        str_lit.info("لا توجد طلبات إجازة مسجلة.")
+        str_lit.info("لا توجد طلبات إجازة مطابقة للفلتر.")
 
 if choice == "سجل الطلبات المقبولة":
-    str_lit.subheader("✅ سجل طلبات الإجازات المقبولة والمعتمدة")
-    if not str_lit.session_state.requests.empty:
-        acc_df = str_lit.session_state.requests[str_lit.session_state.requests["الحالة"] == "مقبول"]
-        render_printable_table(acc_df, "طلبات الإجازة المقبولة")
+    str_lit.subheader("✅ سجل طلبات الإجازات المقبولة والمعتمدة (حسب الفلتر)")
+    if not filtered_requests.empty:
+        acc_df = filtered_requests[filtered_requests["الحالة"] == "مقبول"]
+        render_printable_table(acc_df, "طلبات الإجازة المقبولة المفلترة")
     else:
-        str_lit.info("لا توجد طلبات مقبولة.")
+        str_lit.info("لا توجد طلبات مقبولة مطابقة للفلتر.")
 
 if choice == "سجل الطلبات المرفوضة":
-    str_lit.subheader("❌ سجل طلبات الإجازات المرفوضة")
-    if not str_lit.session_state.requests.empty:
-        rej_df = str_lit.session_state.requests[str_lit.session_state.requests["الحالة"] == "مرفوض"]
-        render_printable_table(rej_df, "طلبات الإجازة المرفوضة")
+    str_lit.subheader("❌ سجل طلبات الإجازات المرفوضة (حسب الفلتر)")
+    if not filtered_requests.empty:
+        rej_df = filtered_requests[filtered_requests["الحالة"] == "مرفوض"]
+        render_printable_table(rej_df, "طلبات الإجازة المرفوضة المفلترة")
     else:
-        str_lit.info("لا توجد طلبات مرفوضة.")
+        str_lit.info("لا توجد طلبات مرفوضة مطابقة للفلتر.")
 
 if choice == "إدارة واعتماد طلبات الإجازة":
-    str_lit.subheader("⚖️ إدارة واعتماد أو تعديل أو حذف طلبات الإجازة (من داخل السجل)")
+    str_lit.subheader("⚖️ إدارة واعتماد أو تعديل أو حذف طلبات الإجازة")
     if not str_lit.session_state.requests.empty:
         req_ids = str_lit.session_state.requests["رقم الطلب"].tolist()
         sel_req_id = str_lit.selectbox("اختر رقم الطلب للإدارة والاعتماد", req_ids)
@@ -1050,11 +1104,11 @@ if choice == "تسجيل إذن (انصراف / تأخير)":
         str_lit.markdown('</div>', unsafe_allow_html=True)
 
 if choice == "سجل المعاملات المالية والأذونات":
-    str_lit.subheader("📋 سجل المعاملات المالية والأذونات الشامل")
-    render_printable_table(str_lit.session_state.financial_transactions, "سجل المعاملات المالية والأذونات")
+    str_lit.subheader("📋 سجل المعاملات المالية والأذونات الشامل (حسب الفلتر)")
+    render_printable_table(filtered_fin, "سجل المعاملات المالية المفلتر")
 
 if choice == "إدارة واعتماد المعاملات والأذونات":
-    str_lit.subheader("⚖️ إدارة واعتماد أو تعديل أو حذف المعاملات المالية والأذونات (من داخل السجل)")
+    str_lit.subheader("⚖️ إدارة واعتماد أو تعديل أو حذف المعاملات المالية والأذونات")
     if not str_lit.session_state.financial_transactions.empty:
         fin_options = [f"{row['التاريخ']} - {row['اسم الموظف']} ({row['النوع']}: {row['المبلغ / القيمة']})" for idx, row in str_lit.session_state.financial_transactions.iterrows()]
         sel_fin = str_lit.selectbox("اختر المعاملة للاعتماد والتعديل", fin_options)
@@ -1186,8 +1240,8 @@ if choice == "رفع نموذج بيانات الموظفين":
             str_lit.error(f"❌ خطأ أثناء قراءة الملف: {e}")
 
 if choice == "سجل الموظفين والأرصدة الشاملة":
-    str_lit.subheader("👥 سجل الموظفين ومسوغات التعيين وتواريخ العقود الشاملة")
-    render_printable_table(str_lit.session_state.employees, "سجل الموظفين الشامل")
+    str_lit.subheader("👥 سجل الموظفين ومسوغات التعيين وتواريخ العقود (حسب الفلتر)")
+    render_printable_table(filtered_employees, "سجل الموظفين الشامل المفلتر")
 
 if choice == "تعديل أو حذف موظف":
     str_lit.subheader("✏️ تعديل كافة حقول بيانات موظف وعقوده ومسوغاته أو حذفه")
@@ -1356,39 +1410,29 @@ if choice == "تعديل أو حذف مستخدم":
         str_lit.markdown('</div>', unsafe_allow_html=True)
 
 if choice == "كشف الرواتب والمستحقات الشامل":
-    str_lit.subheader("💰 كشف الرواتب والمستحقات الشامل للشركة مع خيارات الفلترة")
-    if not str_lit.session_state.employees.empty:
-        df_sal = str_lit.session_state.employees[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "الراتب الأساسي"]].copy()
+    str_lit.subheader("💰 كشف الرواتب والمستحقات الشامل (حسب الفلتر)")
+    if not filtered_employees.empty:
+        df_sal = filtered_employees[["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "الفرع", "الراتب الأساسي"]].copy()
         df_sal["بدلات وحوافز"] = 0.0
         df_sal["خصومات وإذونات"] = 0.0
         df_sal["الصافي المستحق"] = df_sal["الراتب الأساسي"]
 
-        col_fl1, col_fl2 = str_lit.columns(2)
-        with col_fl1: branch_filter_opt = str_lit.selectbox("فلترة حسب الفرع", ["الكل"] + df_sal["الفرع"].unique().tolist())
-        with col_fl2: name_filter_search = str_lit.text_input("بحث بالاسم أو الكود")
-
-        if branch_filter_opt != "الكل":
-            df_sal = df_sal[df_sal["الفرع"] == branch_filter_opt]
-        if name_filter_search.strip() != "":
-            df_sal = df_sal[df_sal["اسم الموظف"].str.contains(name_filter_search, na=False) | df_sal["كود الموظف"].str.contains(name_filter_search, na=False)]
-
-        render_printable_table(df_sal, "كشف الرواتب والمستحقات")
+        render_printable_table(df_sal, "كشف الرواتب والمستحقات المفلتر")
     else:
-        str_lit.info("لا توجد بيانات رواتب لعرضها.")
+        str_lit.info("لا توجد بيانات رواتب مطابقة للفلتر.")
 
 if choice == "طباعة التقارير العامة":
-    str_lit.subheader("🖨️ طباعة التقارير العامة والشاملة للمنظومة")
-    str_lit.info("يمكنك معاينة وطباعة وتصدير تقارير الشركة والموظفين والرواتب بضغطة زر واحدة.")
+    str_lit.subheader("🖨️ طباعة التقارير العامة والشاملة (حسب الفلتر النشط)")
     report_type = str_lit.selectbox("اختر نوع التقرير للطباعة", ["تقرير الموظفين الشامل", "تقرير الحضور والانصراف", "تقرير طلبات الإجازات", "تقرير المعاملات المالية"])
     
     if report_type == "تقرير الموظفين الشامل":
-        render_printable_table(str_lit.session_state.employees, "تقرير الموظفين الشامل")
+        render_printable_table(filtered_employees, "تقرير الموظفين الشامل المفلتر")
     elif report_type == "تقرير الحضور والانصراف":
-        render_printable_table(str_lit.session_state.attendance, "تقرير الحضور والانصراف")
+        render_printable_table(filtered_attendance, "تقرير الحضور والانصراف المفلتر")
     elif report_type == "تقرير طلبات الإجازات":
-        render_printable_table(str_lit.session_state.requests, "تقرير طلبات الإجازات")
+        render_printable_table(filtered_requests, "تقرير طلبات الإجازات المفلتر")
     elif report_type == "تقرير المعاملات المالية":
-        render_printable_table(str_lit.session_state.financial_transactions, "تقرير المعاملات المالية")
+        render_printable_table(filtered_fin, "تقرير المعاملات المالية المفلتر")
 
 if choice == "إعدادات الشركة وبياناتها الشاملة":
     str_lit.subheader("⚙️ إعدادات وبيانات الشركة الرسمية ورفع الشعار (Logo)")
@@ -1436,8 +1480,6 @@ if choice == "إعدادات الشركة وبياناتها الشاملة":
 
 if choice == "تحميل النماذج (Templates)":
     str_lit.subheader("📥 اختيار وتحميل نماذج الإدخال الجاهزة للبرنامج")
-    str_lit.info("اختر نموذج الإدخال المطلوب تحميله بصيغة CSV لتعبئته ورفعه مرة أخرى بسهولة:")
-    
     selected_template_type = str_lit.selectbox("اختر النموذج المراد تحميله", [
         "نموذج بيانات الموظفين",
         "نموذج بيانات المستخدمين",
@@ -1539,5 +1581,5 @@ if choice == "مسح البيانات":
         str_lit.success("✅ تم تصفير بيانات المنظومة بنجاح!")
         str_lit.rerun()
 
-str_lit.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 20px 0;'>", unsafe_allow_html=True)
-str_lit.markdown("<p style='text-align: center; color: #94A3B8; font-size: 11px;'>جميع الحقوق محفوظة © النظام المتكامل لإدارة الموارد البشرية (ERP)</p>", unsafe_allow_html=True)
+str_lit.markdown("<hr style='border: 0.5px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+str_lit.markdown("<p style='text-align: center; color: #64748B; font-size: 11px;'>جميع الحقوق محفوظة © النظام المتكامل لإدارة الموارد البشرية (Foodics ERP)</p>", unsafe_allow_html=True)
