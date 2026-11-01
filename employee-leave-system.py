@@ -206,8 +206,22 @@ def render_printable_table(df, table_title="جدول البيانات"):
             'text-align': 'center',
             'vertical-align': 'middle'
         }).set_table_styles([
-            {'selector': 'th', 'props': [('text-align', 'center'), ('background-color', '#E50914'), ('color', 'white')]},
-            {'selector': 'td', 'props': [('text-align', 'center')]}
+            {
+                'selector': 'th', 
+                'props': [
+                    ('text-align', 'center'), 
+                    ('background-color', '#E50914'), 
+                    ('color', 'white'),
+                    ('vertical-align', 'middle')
+                ]
+            },
+            {
+                'selector': 'td', 
+                'props': [
+                    ('text-align', 'center'),
+                    ('vertical-align', 'middle')
+                ]
+            }
         ])
         str_lit.dataframe(styled_df, use_container_width=True)
     except Exception:
