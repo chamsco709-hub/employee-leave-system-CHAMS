@@ -311,7 +311,6 @@ str_lit.markdown(f"""
         padding: 6px 10px !important;
     }}
     
-    /* تنسيق أزرار شبكة البطاقات (Dashboard Grid) */
     .stButton > button {{
         border-radius: 12px !important;
         font-weight: bold !important;
@@ -473,7 +472,6 @@ def render_company_header():
         unsafe_allow_html=True
     )
 
-# شاشة تسجيل الدخول
 if not str_lit.session_state.is_authenticated:
     lic_info = get_client_license()
     
@@ -516,7 +514,6 @@ if not str_lit.session_state.is_authenticated:
                     str_lit.error("❌ الرسم السري غير صحيح!")
     str_lit.stop()
 
-# الشريط العلوي الثابت مع أيقونة المظهر وزر الخروج
 str_lit.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
 render_company_header()
 
@@ -537,7 +534,6 @@ with col_ub1:
     )
 
 with col_ub2:
-    # 5- تغيير المظهر إلى أيقونة
     theme_icon_main = "🌙" if str_lit.session_state.theme_mode == "Light" else "☀️"
     if str_lit.button(theme_icon_main, key="theme_icon_btn", use_container_width=True, help="تغيير المظهر (ليلي / نهاري)"):
         str_lit.session_state.theme_mode = "Dark" if str_lit.session_state.theme_mode == "Light" else "Light"
@@ -552,9 +548,7 @@ with col_ub3:
 str_lit.markdown('</div>', unsafe_allow_html=True)
 str_lit.markdown('<div class="main-content-spacer"></div>', unsafe_allow_html=True)
 
-# -------------------------------------------------------------------------
-# 1- إلغاء كلمة لوحة التحكم - شبكة البطاقات الرئيسية (Dashboard Grid)
-# -------------------------------------------------------------------------
+# شبكة البطاقات الرئيسية (Dashboard Grid)
 r1_c1, r1_c2, r1_c3 = str_lit.columns(3)
 with r1_c1:
     if str_lit.button("📊 المؤشرات والتحليلات", use_container_width=True):
@@ -608,9 +602,6 @@ with r3_c3:
 
 str_lit.markdown("<hr style='border: 0.5px solid #E2E8F0; margin: 12px 0;'>", unsafe_allow_html=True)
 
-# -------------------------------------------------------------------------
-# 2- تحويل العمليات الفرعية للقسم إلى بطاقات (Dashboard Grid) وإلغاء كلمة العمليات الفرعية
-# -------------------------------------------------------------------------
 selected_main_cat = str_lit.session_state.get("active_main_section", "الرئيسية")
 
 sub_options_map = {
@@ -663,7 +654,6 @@ sub_options_map = {
 
 current_sub_cards = sub_options_map.get(selected_main_cat, [("📈 المؤشرات والتحليلات", "المؤشرات والتحليلات")])
 
-# عرض بطاقات القسم الفرعية في شبكة (Dashboard Grid)
 if len(current_sub_cards) > 1:
     str_lit.markdown('<div class="sub-grid-container">', unsafe_allow_html=True)
     cols_per_row = min(len(current_sub_cards), 3)
@@ -683,9 +673,6 @@ if choice not in valid_sub_values:
     choice = valid_sub_values[0]
     str_lit.session_state.active_sub_choice = choice
 
-# -------------------------------------------------------------------------
-# 3- تم إلغاء تصفية البيانات واستخدام الجداول مباشرة
-# -------------------------------------------------------------------------
 df_all_employees = str_lit.session_state.employees
 df_active_employees = df_all_employees[df_all_employees["حالة الموظف"] == "نشط"] if not df_all_employees.empty else df_all_employees
 df_resigned_employees = df_all_employees[df_all_employees["حالة الموظف"].isin(["استقالة", "إيقاف"])] if not df_all_employees.empty else pd.DataFrame()
@@ -693,7 +680,6 @@ df_requests = str_lit.session_state.requests
 df_attendance = str_lit.session_state.attendance
 df_fin = str_lit.session_state.financial_transactions
 
-# بطاقات الـ KPI الإحصائية
 total_active_emps = len(df_active_employees)
 total_resigned_emps = len(df_resigned_employees)
 pending_count = len(df_requests[df_requests['الحالة'] == 'قيد الانتظار']) if not df_requests.empty else 0
@@ -711,9 +697,6 @@ with col4:
 
 str_lit.markdown("<hr style='border: 0.5px solid #E2E8F0; margin: 8px 0 12px 0;'>", unsafe_allow_html=True)
 
-# -------------------------------------------------------------------------
-# عرض المحتوى التنفيذي حسب البطاقة المختارة
-# -------------------------------------------------------------------------
 if choice == "المؤشرات والتحليلات":
     str_lit.markdown(f'<div class="section-header">🔔 التنبيهات والإنذارات المبكرة لعقود الموظفين</div>', unsafe_allow_html=True)
     today = datetime.now()
@@ -768,149 +751,93 @@ if choice == "المؤشرات والتحليلات":
             render_printable_table(branch_emps[available_cols], f"موظفي فرع {branch}")
         str_lit.markdown("<hr style='border: 0.5px dashed #E2E8F0; margin: 10px 0;'>", unsafe_allow_html=True)
 
-if choice == "تسجيل حضور وانصراف":
+elif choice == "تسجيل حضور وانصراف":
     str_lit.subheader("⏱️ تسجيل حركة الحضور والانصراف")
-    emp_names = str_lit.session_state.employees["اسم الموظف"].tolist()
+    emp_names = df_active_employees["اسم الموظف"].tolist() if not df_active_employees.empty else []
     if emp_names:
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with str_lit.form("att_form_custom_time_full"):
             selected_emp = str_lit.selectbox("اختر الموظف", emp_names)
             att_date = str_lit.date_input("تاريخ الحركة", value=date.today())
-            emp_info = str_lit.session_state.employees[str_lit.session_state.employees["اسم الموظف"] == selected_emp].iloc[0]
+            emp_info = df_active_employees[df_active_employees["اسم الموظف"] == selected_emp].iloc[0]
             c_job = emp_info["الوظيفة"]
             c_branch = emp_info["الفرع"]
             str_lit.info(f"📍 الفرع: {c_branch} &nbsp;|&nbsp; 💼 الوظيفة: {c_job}")
             
             str_lit.markdown("---")
-            str_lit.markdown("🕒 **المواعيد الرسمية للعمل:**")
-            col_rs1, col_rs2, col_rs3 = str_lit.columns(3)
-            with col_rs1: start_h = str_lit.selectbox("ساعة البداية الرسمية", list(range(1, 13)), index=7)
-            with col_rs2: start_m = str_lit.selectbox("دقيقة البداية (00-59)", list(range(0, 60)), index=0)
-            with col_rs3: start_ampm = str_lit.selectbox("فترة البداية", ["AM", "PM"], index=0)
-
-            col_re1, col_re2, col_re3 = str_lit.columns(3)
-            with col_re1: end_h = str_lit.selectbox("ساعة النهاية الرسمية", list(range(1, 13)), index=3)
-            with col_re2: end_m = str_lit.selectbox("دقيقة النهاية (00-59)", list(range(0, 60)), index=0)
-            with col_re3: end_ampm = str_lit.selectbox("فترة النهاية", ["AM", "PM"], index=1)
-
-            grace_period_min = str_lit.number_input("فترة السماح (بالدقائق)", min_value=0, max_value=60, value=15)
-
-            str_lit.markdown("---")
-            str_lit.markdown("⏰ **الأوقات الفعلية للحضور والانصراف:**")
             col_in1, col_in2, col_in3 = str_lit.columns(3)
             with col_in1: act_in_h = str_lit.selectbox("ساعة الحضور الفعلي", list(range(1, 13)), index=7, key="ain_h")
-            with col_in2: act_in_m = str_lit.selectbox("دقيقة الحضور الفعلي (00-59)", list(range(0, 60)), index=0, key="ain_m")
-            with col_in3: act_in_ampm = str_lit.selectbox("فترة الحضور الفعلي", ["AM", "PM"], index=0, key="ain_ap")
+            with col_in2: act_in_m = str_lit.selectbox("دقيقة الحضور (00-59)", list(range(0, 60)), index=0, key="ain_m")
+            with col_in3: act_in_ampm = str_lit.selectbox("فترة الحضور", ["AM", "PM"], index=0, key="ain_ap")
 
             col_out1, col_out2, col_out3 = str_lit.columns(3)
             with col_out1: act_out_h = str_lit.selectbox("ساعة الانصراف الفعلي", list(range(1, 13)), index=3, key="aout_h")
-            with col_out2: act_out_m = str_lit.selectbox("دقيقة الانصراف الفعلي (00-59)", list(range(0, 60)), index=0, key="aout_m")
-            with col_out3: act_out_ampm = str_lit.selectbox("فترة الانصراف الفعلي", ["AM", "PM"], index=1, key="aout_ap")
+            with col_out2: act_out_m = str_lit.selectbox("دقيقة الانصراف (00-59)", list(range(0, 60)), index=0, key="aout_m")
+            with col_out3: act_out_ampm = str_lit.selectbox("فترة الانصراف", ["AM", "PM"], index=1, key="aout_ap")
 
             att_status = str_lit.selectbox("حالة الحضور", ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"])
             
-            if str_lit.form_submit_button("💾 حساب تلقائي وحفظ الحركة", use_container_width=True):
-                def to_minutes(h, m, ampm):
-                    hour_24 = h % 12
-                    if ampm == "PM": hour_24 += 12
-                    return hour_24 * 60 + m
-
-                start_total_min = to_minutes(start_h, start_m, start_ampm)
-                end_total_min = to_minutes(end_h, end_m, end_ampm)
-                act_in_total_min = to_minutes(act_in_h, act_in_m, act_in_ampm)
-                act_out_total_min = to_minutes(act_out_h, act_out_m, act_out_ampm)
-
-                worked_minutes = act_out_total_min - act_in_total_min
-                if worked_minutes < 0: worked_minutes += 24 * 60
-
-                standard_minutes = end_total_min - start_total_min
-                if standard_minutes < 0: standard_minutes += 24 * 60
-
-                overtime_min = 0
-                tardy_min = 0
-
-                in_diff = act_in_total_min - start_total_min
-                if in_diff > grace_period_min: tardy_min += (in_diff - grace_period_min)
-
-                diff_total = worked_minutes - standard_minutes
-                if diff_total > 0: overtime_min = int(diff_total)
-
+            if str_lit.form_submit_button("💾 حفظ حركة الحضور والانصراف", use_container_width=True):
                 new_att_row = {
                     "التاريخ": att_date.strftime("%Y-%m-%d"),
                     "كود الموظف": emp_info["كود الموظف"],
                     "اسم الموظف": selected_emp,
                     "الوظيفة": c_job,
                     "الفرع": c_branch,
-                    "بداية العمل الرسمية": f"{start_h:02d}:{start_m:02d} {start_ampm}",
-                    "نهاية العمل الرسمية": f"{end_h:02d}:{end_m:02d} {end_ampm}",
+                    "بداية العمل الرسمية": "08:00 AM",
+                    "نهاية العمل الرسمية": "04:00 PM",
                     "وقت الحضور الفعلي": f"{act_in_h:02d}:{act_in_m:02d} {act_in_ampm}",
                     "وقت الانصراف الفعلي": f"{act_out_h:02d}:{act_out_m:02d} {act_out_ampm}",
-                    "فترة السماح (دقيقة)": int(grace_period_min),
+                    "فترة السماح (دقيقة)": 15,
                     "الحالة": att_status,
-                    "التأخير (دقيقة)": int(tardy_min),
-                    "إضافي (دقيقة)": int(overtime_min)
+                    "التأخير (دقيقة)": 0,
+                    "إضافي (دقيقة)": 0
                 }
-
                 str_lit.session_state.attendance = pd.concat([str_lit.session_state.attendance, pd.DataFrame([new_att_row])], ignore_index=True)
                 auto_save_data()
                 str_lit.success("✅ تم تسجيل وحفظ حركة الحضور والانصراف بنجاح!")
         str_lit.markdown('</div>', unsafe_allow_html=True)
+    else:
+        str_lit.warning("لا يوجد موظفون نشطون حالياً لتسجيل الحضور.")
 
-if choice == "سجل الحضور والانصراف":
-    str_lit.subheader("📋 سجل الحضور والانصراف (حسب الفلتر النشط)")
-    render_printable_table(filtered_attendance, "سجل الحضور والانصراف المفلتر")
+elif choice == "سجل الحضور والانصراف":
+    render_printable_table(df_attendance, "سجل الحضور والانصراف الشامل")
 
 elif choice == "تعديل أو حذف حركة حضور":
     str_lit.subheader("✏️ تعديل أو حذف حركة حضور والانصراف")
-    if not str_lit.session_state.attendance.empty:
-        att_indices = str_lit.session_state.attendance.index.tolist()
+    if not df_attendance.empty:
+        att_indices = df_attendance.index.tolist()
         selected_att_idx = str_lit.selectbox("اختر رقم السجل للتعديل أو الحذف", att_indices)
-        record = str_lit.session_state.attendance.loc[selected_att_idx]
+        record = df_attendance.loc[selected_att_idx]
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
         with str_lit.form("edit_att_form_comprehensive"):
-            emp_names = str_lit.session_state.employees["اسم الموظف"].tolist()
+            emp_names = df_all_employees["اسم الموظف"].tolist()
             current_emp_idx = emp_names.index(record["اسم الموظف"]) if record["اسم الموظف"] in emp_names else 0
             edit_emp = str_lit.selectbox("اسم الموظف", emp_names, index=current_emp_idx)
-            try:
-                default_date = datetime.strptime(str(record["التاريخ"]), "%Y-%m-%d").date()
-            except:
-                default_date = date.today()
+            try: default_date = datetime.strptime(str(record["التاريخ"]), "%Y-%m-%d").date()
+            except: default_date = date.today()
             edit_date = str_lit.date_input("تاريخ الحركة", value=default_date)
             
-            str_lit.markdown("---")
-            edit_start_work = str_lit.text_input("بداية العمل الرسمية", value=str(record["بداية العمل الرسمية"]))
-            edit_end_work = str_lit.text_input("نهاية العمل الرسمية", value=str(record["نهاية العمل الرسمية"]))
-            edit_grace = str_lit.number_input("فترة السماح (دقيقة)", value=int(record.get("فترة السماح (دقيقة)", 15)))
-
-            str_lit.markdown("---")
             edit_act_in = str_lit.text_input("وقت الحضور الفعلي", value=str(record["وقت الحضور الفعلي"]))
             edit_act_out = str_lit.text_input("وقت الانصراف الفعلي", value=str(record["وقت الانصراف الفعلي"]))
             status_list = ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"]
             current_stat_idx = status_list.index(record["الحالة"]) if record["الحالة"] in status_list else 0
             edit_status = str_lit.selectbox("حالة الحضور", status_list, index=current_stat_idx)
             
-            edit_tardy = str_lit.number_input("التأخير (دقيقة)", value=int(record["التأخير (دقيقة)"]))
-            edit_over = str_lit.number_input("إضافي (دقيقة)", value=int(record["إضافي (دقيقة)"]))
-            
             col_eb1, col_eb2 = str_lit.columns(2)
             with col_eb1:
-                if str_lit.form_submit_button("💾 حفظ كافة التعديلات", use_container_width=True):
-                    emp_row = str_lit.session_state.employees[str_lit.session_state.employees["اسم الموظف"] == edit_emp].iloc[0]
+                if str_lit.form_submit_button("💾 حفظ التعديلات", use_container_width=True):
+                    emp_row = df_all_employees[df_all_employees["اسم الموظف"] == edit_emp].iloc[0]
                     str_lit.session_state.attendance.at[selected_att_idx, "اسم الموظف"] = edit_emp
                     str_lit.session_state.attendance.at[selected_att_idx, "كود الموظف"] = emp_row["كود الموظف"]
                     str_lit.session_state.attendance.at[selected_att_idx, "الوظيفة"] = emp_row["الوظيفة"]
                     str_lit.session_state.attendance.at[selected_att_idx, "الفرع"] = emp_row["الفرع"]
                     str_lit.session_state.attendance.at[selected_att_idx, "التاريخ"] = str(edit_date)
-                    str_lit.session_state.attendance.at[selected_att_idx, "بداية العمل الرسمية"] = edit_start_work
-                    str_lit.session_state.attendance.at[selected_att_idx, "نهاية العمل الرسمية"] = edit_end_work
-                    str_lit.session_state.attendance.at[selected_att_idx, "فترة السماح (دقيقة)"] = edit_grace
                     str_lit.session_state.attendance.at[selected_att_idx, "وقت الحضور الفعلي"] = edit_act_in
                     str_lit.session_state.attendance.at[selected_att_idx, "وقت الانصراف الفعلي"] = edit_act_out
                     str_lit.session_state.attendance.at[selected_att_idx, "الحالة"] = edit_status
-                    str_lit.session_state.attendance.at[selected_att_idx, "التأخير (دقيقة)"] = edit_tardy
-                    str_lit.session_state.attendance.at[selected_att_idx, "إضافي (دقيقة)"] = edit_over
                     auto_save_data()
-                    str_lit.success("تم تحديث كافة حقول سجل الحضور والانصراف بنجاح!")
+                    str_lit.success("تم تحديث سجل الحضور والانصراف بنجاح!")
                     str_lit.rerun()
             with col_eb2:
                 if str_lit.form_submit_button("🗑️ حذف السجل", use_container_width=True):
@@ -921,6 +848,7 @@ elif choice == "تعديل أو حذف حركة حضور":
         str_lit.markdown('</div>', unsafe_allow_html=True)
     else:
         str_lit.info("لا توجد سجلات حضور متاحة للتعديل.")
+
 elif choice == "تسجيل طلب إجازة":
     str_lit.subheader("📝 تسجيل طلب إجازة جديد للموظف")
     emp_names = df_active_employees["اسم الموظف"].tolist() if not df_active_employees.empty else []
@@ -1102,9 +1030,6 @@ elif choice == "إدارة واعتماد المعاملات والأذونات"
     else:
         str_lit.info("لا توجد معاملات مالية مسجلة.")
 
-# -------------------------------------------------------------------------
-# 4- إدارة الموظفين (نشط / استقالة / إيقاف) وسجل المستقيلين وتعديلهم
-# -------------------------------------------------------------------------
 elif choice == "إضافة موظف جديد":
     str_lit.subheader("➕ إضافة موظف جديد، مسوغات التعيين وتحديد الحالة والعقود")
     str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
