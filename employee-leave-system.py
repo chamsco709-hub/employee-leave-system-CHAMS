@@ -548,10 +548,10 @@ with col_ub3:
 str_lit.markdown('</div>', unsafe_allow_html=True)
 str_lit.markdown('<div class="main-content-spacer"></div>', unsafe_allow_html=True)
 
-# 1. بطاقة (Dashboard Grid) وتسمى الرئيسية وتحتوي علي اعتماد طلبات الاجازة والتنبيهات والإنذارات المبكرة
+# أزرار التحكم (Dashboard Grid)
 r1_c1, r1_c2, r1_c3 = str_lit.columns(3)
 with r1_c1:
-    if str_lit.button("📊 الرئيسية (المؤشرات والإنذارات)", use_container_width=True):
+    if str_lit.button("📊 الرئيسية (الاعتمادات والإنذارات)", use_container_width=True):
         str_lit.session_state.active_main_section = "الرئيسية"
         str_lit.session_state.active_sub_choice = "المؤشرات والتحليلات"
         str_lit.rerun()
@@ -568,7 +568,7 @@ with r1_c3:
 
 r2_c1, r2_c2, r2_c3 = str_lit.columns(3)
 with r2_c1:
-    if str_lit.button("📝 طلبات الإجازات واعتمادها", use_container_width=True):
+    if str_lit.button("📝 طلبات الإجازات وتعديلها وحذفها", use_container_width=True):
         str_lit.session_state.active_main_section = "طلبات الاجازة"
         str_lit.session_state.active_sub_choice = "تسجيل طلب إجازة"
         str_lit.rerun()
@@ -618,7 +618,7 @@ sub_options_map = {
         ("⏳ طلبات قيد الانتظار", "سجل طلبات قيد الانتظار"),
         ("✅ الطلبات المقبولة", "سجل الطلبات المقبولة"),
         ("❌ الطلبات المرفوضة", "سجل الطلبات المرفوضة"),
-        ("✏️ تعديل أو حذف أو اعتماد طلب", "تعديل أو حذف أو اعتماد طلب إجازة")
+        ("✏️ تعديل أو حذف طلب إجازة", "تعديل أو حذف طلب إجازة")
     ],
     "المعاملات المالية": [
         ("💵 تسجيل معاملة مالية", "تسجيل معاملة مالية"),
@@ -679,26 +679,41 @@ df_resigned_employees = df_all_employees[df_all_employees["حالة الموظف
 df_requests = str_lit.session_state.requests
 df_attendance = str_lit.session_state.attendance
 df_fin = str_lit.session_state.financial_transactions
+df_users_local = str_lit.session_state.users
 
 total_active_emps = len(df_active_employees)
-total_resigned_emps = len(df_resigned_employees)
-pending_count = len(df_requests[df_requests['الحالة'] == 'قيد الانتظار']) if not df_requests.empty else 0
-accepted_count = len(df_requests[df_requests['الحالة'] == 'مقبول']) if not df_requests.empty else 0
+total_active_users = len(df_users_local[df_users_local["الحالة"] == "نشط"]) if not df_users_local.empty else 0
 
+# بطاقات الإحصائيات العلوية
 col1, col2, col3, col4 = str_lit.columns(4)
 with col1:
-    str_lit.markdown(f'<div class="foodics-card"><div class="foodics-card-title">👥 الموظفون النشطون</div><div class="foodics-card-value">{total_active_emps}</div></div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="foodics-card"><div class="foodics-card-title">👥 عدد الموظفين النشطين</div><div class="foodics-card-value">{total_active_emps}</div></div>', unsafe_allow_html=True)
 with col2:
-    str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #EF4444;"><div class="foodics-card-title">🚪 المستقيلون / الموقوفون</div><div class="foodics-card-value" style="color: #EF4444;">{total_resigned_emps}</div></div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #10B981;"><div class="foodics-card-title">🛡️ عدد المستخدمين النشطين</div><div class="foodics-card-value" style="color: #10B981;">{total_active_users}</div></div>', unsafe_allow_html=True)
 with col3:
-    str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #F59E0B;"><div class="foodics-card-title">⏳ طلبات قيد الانتظار</div><div class="foodics-card-value" style="color: #F59E0B;">{pending_count}</div></div>', unsafe_allow_html=True)
+    pending_req_cnt = len(df_requests[df_requests['الحالة'] == 'قيد الانتظار']) if not df_requests.empty else 0
+    str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #F59E0B;"><div class="foodics-card-title">⏳ طلبات قيد الانتظار</div><div class="foodics-card-value" style="color: #F59E0B;">{pending_req_cnt}</div></div>', unsafe_allow_html=True)
 with col4:
-    str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #10B981;"><div class="foodics-card-title">✅ الطلبات المقبولة</div><div class="foodics-card-value" style="color: #10B981;">{accepted_count}</div></div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #0284C7;"><div class="foodics-card-title">📋 إجمالي حركات الحضور</div><div class="foodics-card-value" style="color: #0284C7;">{len(df_attendance)}</div></div>', unsafe_allow_html=True)
 
 str_lit.markdown("<hr style='border: 0.5px solid #E2E8F0; margin: 8px 0 12px 0;'>", unsafe_allow_html=True)
 
 if choice == "المؤشرات والتحليلات":
-    str_lit.markdown(f'<div class="section-header">🔔 التنبيهات والإنذارات المبكرة لعقود الموظفين</div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="section-header">🔔 بطاقة الرئيسية: اعتماد طلبات الإجازة (إبداء الرأي) والتنبيهات والإنذارات المبكرة لعقود الانتهاء</div>', unsafe_allow_html=True)
+    
+    col_d_act1, col_d_act2 = str_lit.columns(2)
+    with col_d_act1:
+        if str_lit.button("✅ الذهاب لاعتماد طلبات الإجازة وإبداء الرأي السريع", use_container_width=True):
+            str_lit.session_state.active_main_section = "طلبات الاجازة"
+            str_lit.session_state.active_sub_choice = "تعديل أو حذف طلب إجازة"
+            str_lit.rerun()
+    with col_d_act2:
+        if str_lit.button("👥 استعراض بطاقات انزلاق الموظفين النشطين", use_container_width=True):
+            str_lit.session_state.active_main_section = "شؤون الموظفين"
+            str_lit.session_state.active_sub_choice = "سجل الموظفين النشطين والشامل"
+            str_lit.rerun()
+
+    str_lit.markdown("---")
     today = datetime.now()
     warning_flag = False
 
@@ -724,7 +739,8 @@ if choice == "المؤشرات والتحليلات":
         str_lit.success("✅ جميع عقود الموظفين النشطين سارية ولا توجد تحذيرات قريبة.")
     
     str_lit.markdown("<hr style='border: 0.5px dashed #E2E8F0; margin: 10px 0;'>", unsafe_allow_html=True)
-    str_lit.markdown(f'<div class="section-header">📊 المؤشرات والتحليلات الإحصائية لكل فرع (عدد الموظفين النشطين والمخططات)</div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="section-header">📊 بطاقة المؤشرات والتحليلات (عدد الموظفين لكل فرع، عدد الموظفين النشطين، ومخططات الأعمدة لكل فرع)</div>', unsafe_allow_html=True)
+    
     all_branches = df_active_employees["الفرع"].unique().tolist() if not df_active_employees.empty else ["المركز الرئيسي"]
     
     for branch in all_branches:
@@ -732,19 +748,15 @@ if choice == "المؤشرات والتحليلات":
         branch_emps = df_active_employees[df_active_employees["الفرع"] == branch]
         b_count = len(branch_emps)
         b_sal_total = float(branch_emps["الراتب الأساسي"].sum()) if (not branch_emps.empty and "الراتب الأساسي" in branch_emps.columns) else 0.0
-        b_att = df_attendance[df_attendance["الفرع"] == branch] if not df_attendance.empty else pd.DataFrame()
-        b_att_count = len(b_att)
         
-        bc1, bc2, bc3 = str_lit.columns(3)
+        bc1, bc2 = str_lit.columns(2)
         with bc1:
-            str_lit.markdown(f'<div class="foodics-card"><div class="foodics-card-title">👥 عدد الموظفين النشطين بالفرع</div><div class="foodics-card-value">{b_count}</div></div>', unsafe_allow_html=True)
+            str_lit.markdown(f'<div class="foodics-card"><div class="foodics-card-title">👥 عدد الموظفين النشطين في فرع {branch}</div><div class="foodics-card-value">{b_count}</div></div>', unsafe_allow_html=True)
         with bc2:
             str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #0284C7;"><div class="foodics-card-title">💰 إجمالي رواتب فرع {branch}</div><div class="foodics-card-value" style="font-size: 18px; color: #0284C7;">{b_sal_total:,.0f} ج.م</div></div>', unsafe_allow_html=True)
-        with bc3:
-            str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #10B981;"><div class="foodics-card-title">⏱️ حركات الحضور المسجلة</div><div class="foodics-card-value" style="color: #10B981;">{b_att_count}</div></div>', unsafe_allow_html=True)
         
         if not branch_emps.empty:
-            str_lit.markdown(f"**📈 المخطط البياني بالأعمدة لفرع {branch} (توزيع الرواتب حسب الوظيفة):**")
+            str_lit.markdown(f"**📈 المخطط البياني بالأعمدة لكل فرع (توزيع الرواتب حسب الوظيفة):**")
             chart_data = branch_emps.set_index("الوظيفة")["الراتب الأساسي"]
             str_lit.bar_chart(chart_data)
             default_cols = ["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "حالة الموظف", "الراتب الأساسي", "تاريخ بداية العقد", "تاريخ نهاية العقد"]
@@ -943,16 +955,16 @@ elif choice == "سجل الطلبات المرفوضة":
     rej_df = df_requests[df_requests["الحالة"] == "مرفوض"] if not df_requests.empty else pd.DataFrame()
     render_printable_table(rej_df, "طلبات الإجازة المرفوضة")
 
-elif choice == "تعديل أو حذف أو اعتماد طلب إجازة":
-    str_lit.subheader("✏️ تعديل أو حذف أو اعتماد (إبداء الرأي) في طلبات الإجازة")
+elif choice == "تعديل أو حذف طلب إجازة":
+    str_lit.subheader("✏️ بطاقة تعديل أو حذف طلب الإجازة أو اعتماد الطلب (إبداء الرأي)")
     if not df_requests.empty:
         req_ids = df_requests["رقم الطلب"].tolist()
-        sel_req_id = str_lit.selectbox("اختر رقم الطلب للإدارة", req_ids)
+        sel_req_id = str_lit.selectbox("اختر رقم الطلب لتعديله أو حذفه أو اعتماده", req_ids)
         req_idx = df_requests[df_requests["رقم الطلب"] == sel_req_id].index[0]
         req_row = df_requests.loc[req_idx]
 
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with str_lit.form("manage_req_form_integrated"):
+        with str_lit.form("edit_delete_req_form"):
             str_lit.markdown(f"**الموظف:** {req_row['اسم الموظف']} ({req_row['كود الموظف']}) | **الفرع:** {req_row['الفرع']}")
             status_options = ["قيد الانتظار", "مقبول", "مرفوض"]
             current_st_idx = status_options.index(req_row["الحالة"]) if req_row["الحالة"] in status_options else 0
@@ -960,8 +972,8 @@ elif choice == "تعديل أو حذف أو اعتماد طلب إجازة":
             edit_r_reason = str_lit.text_input("ملاحظات / سبب", value=str(req_row["السبب"]))
 
             col_rq1, col_rq2 = str_lit.columns(2)
-            with col_rq1: up_req_btn = str_lit.form_submit_button("💾 حفظ الاعتماد وتحديث الطلب", use_container_width=True)
-            with col_rq2: del_req_btn = str_lit.form_submit_button("🗑️ حذف الطلب", use_container_width=True)
+            with col_rq1: up_req_btn = str_lit.form_submit_button("💾 حفظ تعديلات طلب الإجازة واعتماده", use_container_width=True)
+            with col_rq2: del_req_btn = str_lit.form_submit_button("🗑️ حذف هذا الطلب نهائياً", use_container_width=True)
 
             if up_req_btn:
                 str_lit.session_state.requests.at[req_idx, "الحالة"] = edit_r_status
@@ -977,7 +989,7 @@ elif choice == "تعديل أو حذف أو اعتماد طلب إجازة":
                 str_lit.rerun()
         str_lit.markdown('</div>', unsafe_allow_html=True)
     else:
-        str_lit.info("لا توجد طلبات إجازة مسجلة.")
+        str_lit.info("لا توجد طلبات إجازة مسجلة لتعديلها أو حذفها.")
 
 elif choice == "تسجيل معاملة مالية":
     str_lit.subheader("💵 تسجيل معاملة مالية (سلفة، حافز، أو خصم)")
