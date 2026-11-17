@@ -551,12 +551,12 @@ str_lit.markdown('<div class="main-content-spacer"></div>', unsafe_allow_html=Tr
 # أزرار التحكم الرئيسية (Dashboard Grid)
 r1_c1, r1_c2, r1_c3 = str_lit.columns(3)
 with r1_c1:
-    if str_lit.button("🏠 بطاقة الرئيسية المستقلة", use_container_width=True):
+    if str_lit.button("🏠 بطاقة الرئيسية (الاعتمادات والإنذارات)", use_container_width=True):
         str_lit.session_state.active_main_section = "الرئيسية"
         str_lit.session_state.active_sub_choice = "بطاقة الرئيسية"
         str_lit.rerun()
 with r1_c2:
-    if str_lit.button("📈 المؤشرات والتحليلات المستقلة", use_container_width=True):
+    if str_lit.button("📈 بطاقة المؤشرات والتحليلات", use_container_width=True):
         str_lit.session_state.active_main_section = "المؤشرات والتحليلات"
         str_lit.session_state.active_sub_choice = "بطاقة المؤشرات والتحليلات"
         str_lit.rerun()
@@ -684,29 +684,12 @@ df_attendance = str_lit.session_state.attendance
 df_fin = str_lit.session_state.financial_transactions
 df_users_local = str_lit.session_state.users
 
-total_active_emps = len(df_active_employees)
-total_active_users = len(df_users_local[df_users_local["الحالة"] == "نشط"]) if not df_users_local.empty else 0
-
-# بطاقات الإحصائيات العلوية العامة
-col1, col2, col3, col4 = str_lit.columns(4)
-with col1:
-    str_lit.markdown(f'<div class="foodics-card"><div class="foodics-card-title">👥 عدد الموظفين النشطين</div><div class="foodics-card-value">{total_active_emps}</div></div>', unsafe_allow_html=True)
-with col2:
-    str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #10B981;"><div class="foodics-card-title">🛡️ عدد المستخدمين النشطين</div><div class="foodics-card-value" style="color: #10B981;">{total_active_users}</div></div>', unsafe_allow_html=True)
-with col3:
-    pending_req_cnt = len(df_requests[df_requests['الحالة'] == 'قيد الانتظار']) if not df_requests.empty else 0
-    str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #F59E0B;"><div class="foodics-card-title">⏳ طلبات قيد الانتظار</div><div class="foodics-card-value" style="color: #F59E0B;">{pending_req_cnt}</div></div>', unsafe_allow_html=True)
-with col4:
-    str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #0284C7;"><div class="foodics-card-title">📋 إجمالي حركات الحضور</div><div class="foodics-card-value" style="color: #0284C7;">{len(df_attendance)}</div></div>', unsafe_allow_html=True)
-
-str_lit.markdown("<hr style='border: 0.5px solid #E2E8F0; margin: 8px 0 12px 0;'>", unsafe_allow_html=True)
-
 if choice == "بطاقة الرئيسية":
-    str_lit.markdown(f'<div class="section-header">🏠 بطاقة الرئيسية: الإنذارات المبكرة لعقود الانتهاء واعتماد طلبات الإجازة السريع (Feedback)</div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="section-header">🏠 بطاقة الرئيسية: اعتماد طلبات الإجازة (إبداء الرأي Feedback) والإنذارات المبكرة لعقود الانتهاء</div>', unsafe_allow_html=True)
     
     col_d_act1, col_d_act2 = str_lit.columns(2)
     with col_d_act1:
-        if str_lit.button("📈 الانتقال لبطاقة المؤشرات والتحليلات", use_container_width=True):
+        if str_lit.button("📈 الانتقال إلى بطاقة المؤشرات والتحليلات", use_container_width=True):
             str_lit.session_state.active_main_section = "المؤشرات والتحليلات"
             str_lit.session_state.active_sub_choice = "بطاقة المؤشرات والتحليلات"
             str_lit.rerun()
@@ -776,8 +759,24 @@ if choice == "بطاقة الرئيسية":
         str_lit.success("✅ جميع عقود الموظفين النشطين سارية ولا توجد تحذيرات قريبة.")
 
 elif choice == "بطاقة المؤشرات والتحليلات":
-    str_lit.markdown(f'<div class="section-header">📈 بطاقة المؤشرات والتحليلات المستقلة (عدد الموظفين لكل فرع، عدد الموظفين النشطين، ومخططات الأعمدة)</div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="section-header">📈 بطاقة المؤشرات والتحليلات (عدد الموظفين لكل فرع، عدد الموظفين النشطين، والمخططات البيانية بالأعمدة)</div>', unsafe_allow_html=True)
     
+    total_active_emps = len(df_active_employees)
+    total_active_users = len(df_users_local[df_users_local["الحالة"] == "نشط"]) if not df_users_local.empty else 0
+    pending_req_cnt = len(df_requests[df_requests['الحالة'] == 'قيد الانتظار']) if not df_requests.empty else 0
+
+    col1, col2, col3, col4 = str_lit.columns(4)
+    with col1:
+        str_lit.markdown(f'<div class="foodics-card"><div class="foodics-card-title">👥 عدد الموظفين النشطين</div><div class="foodics-card-value">{total_active_emps}</div></div>', unsafe_allow_html=True)
+    with col2:
+        str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #10B981;"><div class="foodics-card-title">🛡️ عدد المستخدمين النشطين</div><div class="foodics-card-value" style="color: #10B981;">{total_active_users}</div></div>', unsafe_allow_html=True)
+    with col3:
+        str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #F59E0B;"><div class="foodics-card-title">⏳ طلبات قيد الانتظار</div><div class="foodics-card-value" style="color: #F59E0B;">{pending_req_cnt}</div></div>', unsafe_allow_html=True)
+    with col4:
+        str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #0284C7;"><div class="foodics-card-title">📋 إجمالي حركات الحضور</div><div class="foodics-card-value" style="color: #0284C7;">{len(df_attendance)}</div></div>', unsafe_allow_html=True)
+
+    str_lit.markdown("<hr style='border: 0.5px solid #E2E8F0; margin: 12px 0;'>", unsafe_allow_html=True)
+
     all_branches = df_active_employees["الفرع"].unique().tolist() if not df_active_employees.empty else ["المركز الرئيسي"]
     
     for branch in all_branches:
@@ -993,31 +992,62 @@ elif choice == "سجل الطلبات المرفوضة":
     render_printable_table(rej_df, "طلبات الإجازة المرفوضة")
 
 elif choice == "تعديل أو حذف طلب إجازة":
-    str_lit.subheader("✏️ بطاقة تعديل أو حذف طلب الإجازة أو اعتماد الطلب (إبداء الرأي)")
+    str_lit.subheader("✏️ بطاقة تعديل أو حذف طلب الإجازة (تعديل كامل لكافة حقول الطلب)")
     if not df_requests.empty:
         req_ids = df_requests["رقم الطلب"].tolist()
-        sel_req_id = str_lit.selectbox("اختر رقم الطلب لتعديله أو حذفه أو اعتماده", req_ids)
+        sel_req_id = str_lit.selectbox("اختر رقم الطلب لتعديله أو حذفه", req_ids)
         req_idx = df_requests[df_requests["رقم الطلب"] == sel_req_id].index[0]
         req_row = df_requests.loc[req_idx]
 
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with str_lit.form("edit_delete_req_form"):
-            str_lit.markdown(f"**الموظف:** {req_row['اسم الموظف']} ({req_row['كود الموظف']}) | **الفرع:** {req_row['الفرع']}")
+        with str_lit.form("edit_delete_req_form_full"):
+            emp_names_list = df_active_employees["اسم الموظف"].tolist() if not df_active_employees.empty else [req_row['اسم الموظف']]
+            curr_emp_name = req_row['اسم الموظف']
+            edit_req_emp = str_lit.selectbox("اسم الموظف صاحب الطلب", emp_names_list, index=emp_names_list.index(curr_emp_name) if curr_emp_name in emp_names_list else 0)
+            
+            leave_types = ["إجازة سنوية", "إجازة أسبوعية", "إجازة رسمية", "إجازة مرضية", "إجازة بدون أجر"]
+            curr_leave_t = req_row['نوع الإجازة']
+            edit_leave_type = str_lit.selectbox("نوع الإجازة", leave_types, index=leave_types.index(curr_leave_t) if curr_leave_t in leave_types else 0)
+
+            try: def_s_date = datetime.strptime(str(req_row['من تاريخ']), "%Y-%m-%d").date()
+            except: def_s_date = date.today()
+            try: def_e_date = datetime.strptime(str(req_row['إلى تاريخ']), "%Y-%m-%d").date()
+            except: def_e_date = date.today() + timedelta(days=1)
+
+            col_ed_d1, col_ed_d2 = str_lit.columns(2)
+            with col_ed_d1: edit_start_d = str_lit.date_input("من تاريخ", value=def_s_date)
+            with col_ed_d2: edit_end_d = str_lit.date_input("إلى تاريخ", value=def_e_date)
+
+            edit_reason = str_lit.text_input("السبب / ملاحظات الطلب", value=str(req_row['السبب']))
+
             status_options = ["قيد الانتظار", "مقبول", "مرفوض"]
-            current_st_idx = status_options.index(req_row["الحالة"]) if req_row["الحالة"] in status_options else 0
-            edit_r_status = str_lit.selectbox("حالة الاعتماد والقرار (إبداء الرأي)", status_options, index=current_st_idx)
-            edit_r_reason = str_lit.text_input("ملاحظات / سبب", value=str(req_row["السبب"]))
+            curr_st = req_row["الحالة"]
+            edit_r_status = str_lit.selectbox("حالة الاعتماد والقرار (إبداء الرأي)", status_options, index=status_options.index(curr_st) if curr_st in status_options else 0)
 
             col_rq1, col_rq2 = str_lit.columns(2)
-            with col_rq1: up_req_btn = str_lit.form_submit_button("💾 حفظ تعديلات طلب الإجازة واعتماده", use_container_width=True)
+            with col_rq1: up_req_btn = str_lit.form_submit_button("💾 حفظ كافة التعديلات للطلب", use_container_width=True)
             with col_rq2: del_req_btn = str_lit.form_submit_button("🗑️ حذف هذا الطلب نهائياً", use_container_width=True)
 
             if up_req_btn:
-                str_lit.session_state.requests.at[req_idx, "الحالة"] = edit_r_status
-                str_lit.session_state.requests.at[req_idx, "السبب"] = edit_r_reason
-                auto_save_data()
-                str_lit.success(f"✅ تم تحديث حالة الطلب وإبداء الرأي بنجاح كـ ({edit_r_status})!")
-                str_lit.rerun()
+                delta_days = (edit_end_d - edit_start_d).days + 1
+                if delta_days <= 0:
+                    str_lit.error("❌ تاريخ النهاية يجب أن يكون بعد تاريخ البداية!")
+                else:
+                    emp_info_rec = df_active_employees[df_active_employees["اسم الموظف"] == edit_req_emp].iloc[0] if not df_active_employees.empty else None
+                    str_lit.session_state.requests.at[req_idx, "اسم الموظف"] = edit_req_emp
+                    if emp_info_rec is not None:
+                        str_lit.session_state.requests.at[req_idx, "كود الموظف"] = emp_info_rec["كود الموظف"]
+                        str_lit.session_state.requests.at[req_idx, "الوظيفة"] = emp_info_rec["الوظيفة"]
+                        str_lit.session_state.requests.at[req_idx, "الفرع"] = emp_info_rec["الفرع"]
+                    str_lit.session_state.requests.at[req_idx, "نوع الإجازة"] = edit_leave_type
+                    str_lit.session_state.requests.at[req_idx, "من تاريخ"] = edit_start_d.strftime("%Y-%m-%d")
+                    str_lit.session_state.requests.at[req_idx, "إلى تاريخ"] = edit_end_d.strftime("%Y-%m-%d")
+                    str_lit.session_state.requests.at[req_idx, "عدد الأيام"] = int(delta_days)
+                    str_lit.session_state.requests.at[req_idx, "السبب"] = edit_reason
+                    str_lit.session_state.requests.at[req_idx, "الحالة"] = edit_r_status
+                    auto_save_data()
+                    str_lit.success("✅ تم تحديث كافة حقول طلب الإجازة بنجاح تام!")
+                    str_lit.rerun()
 
             if del_req_btn:
                 str_lit.session_state.requests = str_lit.session_state.requests.drop(req_idx).reset_index(drop=True)
