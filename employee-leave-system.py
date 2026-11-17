@@ -291,7 +291,7 @@ str_lit.markdown(f"""
     }}
     
     .main-content-spacer {{
-        margin-top: 90px !important;
+        margin-top: 1px !important;
     }}
     
     label p, .stRadio label, .stSelectbox label, .stTextInput label, .stNumberInput label, .stDateInput label {{
@@ -437,7 +437,7 @@ if 'current_user_dept' not in str_lit.session_state: str_lit.session_state.curre
 if 'current_user_branch' not in str_lit.session_state: str_lit.session_state.current_user_branch = ""
 if 'current_user_role' not in str_lit.session_state: str_lit.session_state.current_user_role = ""
 if 'active_main_section' not in str_lit.session_state: str_lit.session_state.active_main_section = "الرئيسية"
-if 'active_sub_choice' not in str_lit.session_state: str_lit.session_state.active_sub_choice = "بطاقة الرئيسية"
+if 'active_sub_choice' not in str_lit.session_state: str_lit.session_state.active_sub_choice = "الرئيسية"
 
 def render_company_header():
     info = str_lit.session_state.company_info
@@ -551,14 +551,14 @@ str_lit.markdown('<div class="main-content-spacer"></div>', unsafe_allow_html=Tr
 # أزرار التحكم الرئيسية (Dashboard Grid)
 r1_c1, r1_c2, r1_c3 = str_lit.columns(3)
 with r1_c1:
-    if str_lit.button("🏠 بطاقة الرئيسية (الاعتمادات والإنذارات)", use_container_width=True):
+    if str_lit.button("🏠  الرئيسية", use_container_width=True):
         str_lit.session_state.active_main_section = "الرئيسية"
-        str_lit.session_state.active_sub_choice = "بطاقة الرئيسية"
+        str_lit.session_state.active_sub_choice = " الرئيسية"
         str_lit.rerun()
 with r1_c2:
-    if str_lit.button("📈 بطاقة المؤشرات والتحليلات", use_container_width=True):
+    if str_lit.button("📈  المؤشرات والتحليلات", use_container_width=True):
         str_lit.session_state.active_main_section = "المؤشرات والتحليلات"
-        str_lit.session_state.active_sub_choice = "بطاقة المؤشرات والتحليلات"
+        str_lit.session_state.active_sub_choice = " المؤشرات والتحليلات"
         str_lit.rerun()
 with r1_c3:
     if str_lit.button("⏱️ الحضور والانصراف", use_container_width=True):
@@ -606,10 +606,10 @@ selected_main_cat = str_lit.session_state.get("active_main_section", "الرئي
 
 sub_options_map = {
     "الرئيسية": [
-        ("🏠 بطاقة الرئيسية", "بطاقة الرئيسية")
+        ("🏠  الرئيسية", " الرئيسية")
     ],
     "المؤشرات والتحليلات": [
-        ("📈 بطاقة المؤشرات والتحليلات", "بطاقة المؤشرات والتحليلات")
+        ("📈  المؤشرات والتحليلات", " المؤشرات والتحليلات")
     ],
     "الحضور والانصراف": [
         ("➕ تسجيل حضور وانصراف", "تسجيل حضور وانصراف"),
@@ -655,7 +655,7 @@ sub_options_map = {
     ]
 }
 
-current_sub_cards = sub_options_map.get(selected_main_cat, [("🏠 بطاقة الرئيسية", "بطاقة الرئيسية")])
+current_sub_cards = sub_options_map.get(selected_main_cat, [("🏠  الرئيسية", " الرئيسية")])
 
 if len(current_sub_cards) > 1:
     str_lit.markdown('<div class="sub-grid-container">', unsafe_allow_html=True)
@@ -684,10 +684,9 @@ df_attendance = str_lit.session_state.attendance
 df_fin = str_lit.session_state.financial_transactions
 df_users_local = str_lit.session_state.users
 
-if choice == "بطاقة الرئيسية":
-    str_lit.markdown(f'<div class="section-header">🏠 بطاقة الرئيسية: اعتماد طلبات الإجازة (إبداء الرأي Feedback مع إدخال سبب الرفض) والإنذارات المبكرة لعقود الانتهاء</div>', unsafe_allow_html=True)
+if choice == " الرئيسية":
     
-    str_lit.markdown("### 💬 اعتماد طلبات الإجازة السريع (Feedback Button):")
+    str_lit.markdown("### 💬 اعتماد طلبات الإجازة السريع :")
     
     pending_requests = df_requests[df_requests["الحالة"] == "قيد الانتظار"] if not df_requests.empty else pd.DataFrame()
     if not pending_requests.empty:
@@ -705,9 +704,9 @@ if choice == "بطاقة الرئيسية":
                     
                     col_fb1, col_fb2 = str_lit.columns(2)
                     with col_fb1:
-                        accept_btn = str_lit.form_submit_button(f"✅ قبول الطلب (Feedback)", use_container_width=True)
+                        accept_btn = str_lit.form_submit_button(f"✅ قبول الطلب ", use_container_width=True)
                     with col_fb2:
-                        reject_btn = str_lit.form_submit_button(f"❌ رفض الطلب (Feedback)", use_container_width=True)
+                        reject_btn = str_lit.form_submit_button(f"❌ رفض الطلب ", use_container_width=True)
                         
                     if accept_btn:
                         df_requests.at[p_idx, "الحالة"] = "مقبول"
@@ -753,7 +752,7 @@ if choice == "بطاقة الرئيسية":
     if not warning_flag:
         str_lit.success("✅ جميع عقود الموظفين النشطين سارية ولا توجد تحذيرات قريبة.")
 
-elif choice == "بطاقة المؤشرات والتحليلات":
+elif choice == " المؤشرات والتحليلات":
     str_lit.markdown(f'<div class="section-header">📈 بطاقة المؤشرات والتحليلات (عدد الموظفين لكل فرع، عدد الموظفين النشطين، والمخططات البيانية بالأعمدة)</div>', unsafe_allow_html=True)
     
     total_active_emps = len(df_active_employees)
@@ -1054,7 +1053,7 @@ elif choice == "تعديل أو حذف طلب إجازة":
         str_lit.info("لا توجد طلبات إجازة مسجلة لتعديلها أو حذفها.")
 
 elif choice == "تسجيل معاملة مالية":
-    str_lit.subheader("💵 تسجيل معاملة مالية (سلفة، حافز، أو خصم)")
+    str_lit.subheader("💵 تسجيل معاملة مالية ")
     emp_names = df_active_employees["اسم الموظف"].tolist() if not df_active_employees.empty else []
     if emp_names:
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
