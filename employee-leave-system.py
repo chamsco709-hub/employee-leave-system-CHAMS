@@ -685,21 +685,8 @@ df_fin = str_lit.session_state.financial_transactions
 df_users_local = str_lit.session_state.users
 
 if choice == "بطاقة الرئيسية":
-    str_lit.markdown(f'<div class="section-header">🏠 بطاقة الرئيسية: اعتماد طلبات الإجازة (إبداء الرأي Feedback) والإنذارات المبكرة لعقود الانتهاء</div>', unsafe_allow_html=True)
+    str_lit.markdown(f'<div class="section-header">🏠 بطاقة الرئيسية: اعتماد طلبات الإجازة (إبداء الرأي Feedback مع إدخال سبب الرفض) والإنذارات المبكرة لعقود الانتهاء</div>', unsafe_allow_html=True)
     
-    col_d_act1, col_d_act2 = str_lit.columns(2)
-    with col_d_act1:
-        if str_lit.button("📈 الانتقال إلى بطاقة المؤشرات والتحليلات", use_container_width=True):
-            str_lit.session_state.active_main_section = "المؤشرات والتحليلات"
-            str_lit.session_state.active_sub_choice = "بطاقة المؤشرات والتحليلات"
-            str_lit.rerun()
-    with col_d_act2:
-        if str_lit.button("📝 الذهاب لبطاقة تعديل وحذف طلبات الإجازة", use_container_width=True):
-            str_lit.session_state.active_main_section = "طلبات الاجازة"
-            str_lit.session_state.active_sub_choice = "تعديل أو حذف طلب إجازة"
-            str_lit.rerun()
-
-    str_lit.markdown("---")
     str_lit.markdown("### 💬 اعتماد طلبات الإجازة السريع (Feedback Button):")
     
     pending_requests = df_requests[df_requests["الحالة"] == "قيد الانتظار"] if not df_requests.empty else pd.DataFrame()
@@ -708,27 +695,35 @@ if choice == "بطاقة الرئيسية":
             with str_lit.container():
                 str_lit.markdown(f"""
                 <div style="background: {card_bg}; padding: 12px; border-radius: 10px; border: 1px solid #00A3FF; margin-bottom: 8px;">
-                    <b>رقم الطلب:</b> {p_row['رقم الطلب']} &nbsp;|&nbsp; <b>الموظف:</b> {p_row['اسم الموظف']} &nbsp;|&nbsp; <b>النوع:</b> {p_row['نوع الإجازة']} &nbsp;|&nbsp; <b>الفترة:</b> {p_row['من تاريخ']} إلى {p_row['إلى تاريخ']} ({p_row['عدد الأيام']} يوم)
+                    <b>رقم الطلب:</b> {p_row['رقم الطلب']} &nbsp;|&nbsp; <b>الموظف:</b> {p_row['اسم الموظف']} &nbsp;|&nbsp; <b>النوع:</b> {p_row['نوع الإجازة']} &nbsp;|&nbsp; <b>الفترة:</b> {p_row['من تاريخ']} إلى {p_row['إلى تاريخ']} ({p_row['عدد الأيام']} يوم)<br>
+                    <b>السبب الأصلي:</b> {p_row['السبب']}
                 </div>
                 """, unsafe_allow_html=True)
                 
-                col_fb1, col_fb2, col_fb3 = str_lit.columns([2, 2, 3])
-                with col_fb1:
-                    if str_lit.button(f"✅ قبول (Feedback)", key=f"accept_fb_{p_idx}", use_container_width=True):
+                with str_lit.form(key=f"feedback_form_{p_idx}"):
+                    reject_reason_input = str_lit.text_input("سبب الرفض (مطلوب في حال الرغبة برفض الطلب):", value="", key=f"rej_reason_{p_idx}")
+                    
+                    col_fb1, col_fb2 = str_lit.columns(2)
+                    with col_fb1:
+                        accept_btn = str_lit.form_submit_button(f"✅ قبول الطلب (Feedback)", use_container_width=True)
+                    with col_fb2:
+                        reject_btn = str_lit.form_submit_button(f"❌ رفض الطلب (Feedback)", use_container_width=True)
+                        
+                    if accept_btn:
                         df_requests.at[p_idx, "الحالة"] = "مقبول"
                         str_lit.session_state.requests = df_requests
                         auto_save_data()
                         str_lit.success(f"تم اعتماد قبول طلب الموظف ({p_row['اسم الموظف']}) بنجاح!")
                         str_lit.rerun()
-                with col_fb2:
-                    if str_lit.button(f"❌ رفض (Feedback)", key=f"reject_fb_{p_idx}", use_container_width=True):
+                        
+                    if reject_btn:
                         df_requests.at[p_idx, "الحالة"] = "مرفوض"
+                        if reject_reason_input.strip():
+                            df_requests.at[p_idx, "السبب"] = f"{p_row['السبب']} | سبب الرفض: {reject_reason_input.strip()}"
                         str_lit.session_state.requests = df_requests
                         auto_save_data()
                         str_lit.warning(f"تم رفض طلب الموظف ({p_row['اسم الموظف']}).")
                         str_lit.rerun()
-                with col_fb3:
-                    str_lit.markdown(f"<span style='font-size: 11px; color: #64748B;'>السبب: {p_row['السبب']}</span>", unsafe_allow_html=True)
     else:
         str_lit.info("لا توجد طلبات إجازة معلقة قيد الانتظار حالياً للإعتماد.")
 
