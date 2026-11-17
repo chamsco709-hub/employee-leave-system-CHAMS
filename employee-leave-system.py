@@ -35,12 +35,10 @@ company_license = client_data["license"]
 company_display_name = client_data["name"]
 
 COMPANIES_DIR = "client_companies_data"
-if not os.path.exists(COMPANIES_DIR):
-    os.makedirs(COMPANIES_DIR)
+os.makedirs(COMPANIES_DIR, exist_ok=True)
 
 DOCS_DIR = "client_employees_docs"
-if not os.path.exists(DOCS_DIR):
-    os.makedirs(DOCS_DIR)
+os.makedirs(DOCS_DIR, exist_ok=True)
 
 COMPANY_FILE = os.path.join(COMPANIES_DIR, f"{company_id}_data.json")
 
@@ -170,7 +168,6 @@ str_lit.session_state.company_info["license"] = company_license
 if 'theme_mode' not in str_lit.session_state:
     str_lit.session_state.theme_mode = "Light"
 
-# دالة الجداول الموحدة (محاذاة سنتر تامة للتواريخ والأرقام والنصوص)
 def render_printable_table(df, table_title="جدول البيانات"):
     if df.empty:
         str_lit.info("لا توجد بيانات متاحة للعرض في هذا السجل.")
@@ -296,7 +293,6 @@ str_lit.markdown(f"""
         margin-top: 150px !important;
     }}
     
-    /* تصميم الروابط والبطاقات الملونة على طراز إبراهيم محمد علي */
     .dashboard-title-box {{
         background: linear-gradient(135deg, #2C1810, #3E2723);
         color: white;
@@ -391,7 +387,6 @@ if not str_lit.session_state.is_authenticated:
                     str_lit.error("❌ الرسم السري غير صحيح!")
     str_lit.stop()
 
-# الشريط العلوي الثابت مع زر الفلتر المنسدل
 str_lit.markdown('<div class="sticky-top-wrapper">', unsafe_allow_html=True)
 col_top_h1, col_top_h2, col_top_h3 = str_lit.columns([3, 2, 1])
 with col_top_h1:
@@ -412,9 +407,6 @@ with col_top_h3:
 str_lit.markdown('</div>', unsafe_allow_html=True)
 str_lit.markdown('<div class="main-content-spacer"></div>', unsafe_allow_html=True)
 
-# -------------------------------------------------------------------------
-# زر تصفية البيانات المنسدل (Popover Filter Button)
-# -------------------------------------------------------------------------
 col_filter_btn, col_filter_info = str_lit.columns([1, 4])
 selected_sidebar_branch = "الكل"
 selected_sidebar_status = "الكل"
@@ -480,9 +472,6 @@ filtered_requests = apply_foodics_filter(str_lit.session_state.requests, "من �
 filtered_attendance = apply_foodics_filter(str_lit.session_state.attendance, "التاريخ")
 filtered_fin = apply_foodics_filter(str_lit.session_state.financial_transactions, "التاريخ")
 
-# -------------------------------------------------------------------------
-# شبكة البطاقات الرئيسية الـ 9 مثل الصورة تماماً
-# -------------------------------------------------------------------------
 str_lit.markdown("""
     <div class="dashboard-title-box">
         <h2>سيستم الموارد البشرية المتكامل</h2>
@@ -490,7 +479,6 @@ str_lit.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# الصف الأول من البطاقات
 r1_c1, r1_c2, r1_c3 = str_lit.columns(3)
 with r1_c1:
     if str_lit.button("🔴 الغياب", use_container_width=True):
@@ -505,7 +493,6 @@ with r1_c3:
         str_lit.session_state.active_section = "سجل الموظفين والأرصدة الشاملة"
         str_lit.rerun()
 
-# الصف الثاني من البطاقات
 r2_c1, r2_c2, r2_c3 = str_lit.columns(3)
 with r2_c1:
     if str_lit.button("🔘 السلف", use_container_width=True):
@@ -520,7 +507,6 @@ with r2_c3:
         str_lit.session_state.active_section = "تسجيل طلب إجازة"
         str_lit.rerun()
 
-# الصف الثالث من البطاقات
 r3_c1, r3_c2, r3_c3 = str_lit.columns(3)
 with r3_c1:
     if str_lit.button("🟩 برمجة النظام", use_container_width=True):
@@ -537,15 +523,12 @@ with r3_c3:
 
 str_lit.markdown("<br>", unsafe_allow_html=True)
 
-# -------------------------------------------------------------------------
-# بطاقات الـ KPI الإحصائية السفلية (مثل الصورة)
-# -------------------------------------------------------------------------
 total_emps_kpi = len(filtered_employees)
 total_att_kpi = len(filtered_attendance)
 total_abs_kpi = len(filtered_attendance[filtered_attendance["الحالة"] == "غياب"]) if not filtered_attendance.empty else 0
 total_req_kpi = len(filtered_requests) if not filtered_requests.empty else 0
 total_sal_kpi = float(filtered_employees["الراتب الأساسي"].sum()) if not filtered_employees.empty else 0.0
-total_adv_kpi = 14000.0 # قيمة افتراضية أو محسوبة
+total_adv_kpi = 14000.0
 total_contracts_end = 8
 
 kpi_c1, kpi_c2, kpi_c3, kpi_c4 = str_lit.columns(4)
@@ -570,7 +553,6 @@ with kpi_c8:
 
 str_lit.markdown("<hr style='border: 0.5px solid #E2E8F0; margin: 15px 0;'>", unsafe_allow_html=True)
 
-# قائمة منسدلة لاختيار العمليات التنفيذية
 if 'active_section' not in str_lit.session_state:
     str_lit.session_state.active_section = "لوحة التحكم والمؤشرات"
 
@@ -595,7 +577,6 @@ str_lit.session_state.active_section = selected_op
 
 str_lit.markdown("<hr style='border: 0.5px dashed #E2E8F0; margin: 10px 0;'>", unsafe_allow_html=True)
 
-# تنفيذ العمليات بناءً على الاختيار
 if selected_op == "لوحة التحكم والمؤشرات":
     str_lit.markdown("### 📊 لوحة التحكم والتحليلات الشاملة")
     render_printable_table(filtered_employees, "ملخص بيانات الموظفين النشطين")
