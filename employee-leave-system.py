@@ -800,90 +800,92 @@ elif choice == "تسجيل حضور وانصراف":
     else:
         str_lit.warning("لا يوجد موظفون نشطون حالياً لتسجيل الحضور.")
 
-elif choice == "سجل الحضور والانصراف":
-    render_printable_table(df_attendance, "سجل الحضور والانصراف الشامل")
-
-elif choice == "تعديل أو حذف حركة حضور":
-    str_lit.subheader("✏️ تعديل أو حذف حركة حضور والانصراف")
-    if not df_attendance.empty:
-        att_indices = df_attendance.index.tolist()
-        selected_att_idx = str_lit.selectbox("اختر رقم السجل للتعديل أو الحذف", att_indices)
-        record = df_attendance.loc[selected_att_idx]
-        str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with str_lit.form("edit_att_form_comprehensive"):
-            emp_names = df_all_employees["اسم الموظف"].tolist()
-            current_emp_idx = emp_names.index(record["اسم الموظف"]) if record["اسم الموظف"] in emp_names else 0
-            edit_emp = str_lit.selectbox("اسم الموظف", emp_names, index=current_emp_idx)
-            try: default_date = datetime.strptime(str(record["التاريخ"]), "%Y-%m-%d").date()
-            except: default_date = date.today()
-            edit_date = str_lit.date_input("تاريخ الحركة", value=default_date)
-            
-            edit_act_in = str_lit.text_input("وقت الحضور الفعلي", value=str(record["وقت الحضور الفعلي"]))
-            edit_act_out = str_lit.text_input("وقت الانصراف الفعلي", value=str(record["وقت الانصراف الفعلي"]))
-            status_list = ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"]
-            current_stat_idx = status_list.index(record["الحالة"]) if record["الحالة"] in status_list else 0
-            edit_status = str_lit.selectbox("حالة الحضور", status_list, index=current_stat_idx)
-            
-            col_eb1, col_eb2 = str_lit.columns(2)
-            with col_eb1:
-                if str_lit.form_submit_button("💾 حفظ التعديلات", use_container_width=True):
-                    emp_row = df_all_employees[df_all_employees["اسم الموظف"] == edit_emp].iloc[0]
-                    str_lit.session_state.attendance.at[selected_att_idx, "اسم الموظف"] = edit_emp
-                    str_lit.session_state.attendance.at[selected_att_idx, "كود الموظف"] = emp_row["كود الموظف"]
-                    str_lit.session_state.attendance.at[selected_att_idx, "الوظيفة"] = emp_row["الوظيفة"]
-                    str_lit.session_state.attendance.at[selected_att_idx, "الفرع"] = emp_row["الفرع"]
-                    str_lit.session_state.attendance.at[selected_att_idx, "التاريخ"] = str(edit_date)
-                    str_lit.session_state.attendance.at[selected_att_idx, "وقت الحضور الفعلي"] = edit_act_in
-                    str_lit.session_state.attendance.at[selected_att_idx, "وقت الانصراف الفعلي"] = edit_act_out
-                    str_lit.session_state.attendance.at[selected_att_idx, "الحالة"] = edit_status
-                    auto_save_data()
-                    str_lit.success("تم تحديث سجل الحضور والانصراف بنجاح!")
-                    str_lit.rerun()
-            with col_eb2:
-                if str_lit.form_submit_button("🗑️ حذف السجل", use_container_width=True):
-                    str_lit.session_state.attendance = str_lit.session_state.attendance.drop(selected_att_idx).reset_index(drop=True)
-                    auto_save_data()
-                    str_lit.success("تم حذف السجل بنجاح!")
-                    str_lit.rerun()
-        str_lit.markdown('</div>', unsafe_allow_html=True)
-    else:
-        str_lit.info("لا توجد سجلات حضور متاحة للتعديل.")
-
-elif choice == "تسجيل طلب إجازة":
-    str_lit.subheader("📝 تسجيل طلب إجازة جديد للموظف")
-    emp_names = df_active_employees["اسم الموظف"].tolist() if not df_active_employees.empty else []
+if choice == "تسجيل حضور وانصراف":
+    str_lit.subheader("⏱️ تسجيل حركة الحضور والانصراف")
+    emp_names = str_lit.session_state.employees["اسم الموظف"].tolist()
     if emp_names:
         str_lit.markdown('<div class="entry-form-area">', unsafe_allow_html=True)
-        with str_lit.form("request_vacation_form_full"):
-            req_emp_name = str_lit.selectbox("اختر الموظف", emp_names)
-            emp_rec = df_active_employees[df_active_employees["اسم الموظف"] == req_emp_name].iloc[0]
-            req_type = str_lit.selectbox("نوع الإجازة", ["إجازة سنوية", "إجازة أسبوعية", "إجازة رسمية", "إجازة مرضية", "إجازة بدون أجر"])
-            col_d1, col_d2 = str_lit.columns(2)
-            with col_d1: req_start_date = str_lit.date_input("من تاريخ", value=date.today())
-            with col_d2: req_end_date = str_lit.date_input("إلى تاريخ", value=date.today() + timedelta(days=1))
-            req_reason = str_lit.text_input("سبب طلب الإجازة")
+        with str_lit.form("att_form_custom_time_full"):
+            selected_emp = str_lit.selectbox("اختر الموظف", emp_names)
+            att_date = str_lit.date_input("تاريخ الحركة", value=date.today())
+            emp_info = str_lit.session_state.employees[str_lit.session_state.employees["اسم الموظف"] == selected_emp].iloc[0]
+            c_job = emp_info["الوظيفة"]
+            c_branch = emp_info["الفرع"]
+            str_lit.info(f"📍 الفرع: {c_branch} &nbsp;|&nbsp; 💼 الوظيفة: {c_job}")
             
-            if str_lit.form_submit_button("💾 تقديم طلب الإجازة", use_container_width=True):
-                delta_days = (req_end_date - req_start_date).days + 1
-                if delta_days <= 0:
-                    str_lit.error("❌ تاريخ النهاية يجب أن يكون بعد تاريخ البداية!")
-                else:
-                    new_req_row = {
-                        "رقم الطلب": f"REQ-{len(str_lit.session_state.requests)+1:03d}",
-                        "كود الموظف": emp_rec["كود الموظف"],
-                        "اسم الموظف": req_emp_name,
-                        "الوظيفة": emp_rec["الوظيفة"],
-                        "الفرع": emp_rec["الفرع"],
-                        "نوع الإجازة": req_type,
-                        "من تاريخ": req_start_date.strftime("%Y-%m-%d"),
-                        "إلى تاريخ": req_end_date.strftime("%Y-%m-%d"),
-                        "عدد الأيام": int(delta_days),
-                        "السبب": req_reason,
-                        "الحالة": "قيد الانتظار"
-                    }
-                    str_lit.session_state.requests = pd.concat([str_lit.session_state.requests, pd.DataFrame([new_req_row])], ignore_index=True)
-                    auto_save_data()
-                    str_lit.success("✅ تم تقديم طلب الإجازة بنجاح وهو قيد الانتظار للإعتماد!")
+            str_lit.markdown("---")
+            str_lit.markdown("🕒 **المواعيد الرسمية للعمل:**")
+            col_rs1, col_rs2, col_rs3 = str_lit.columns(3)
+            with col_rs1: start_h = str_lit.selectbox("ساعة البداية الرسمية", list(range(1, 13)), index=7)
+            with col_rs2: start_m = str_lit.selectbox("دقيقة البداية (00-59)", list(range(0, 60)), index=0)
+            with col_rs3: start_ampm = str_lit.selectbox("فترة البداية", ["AM", "PM"], index=0)
+
+            col_re1, col_re2, col_re3 = str_lit.columns(3)
+            with col_re1: end_h = str_lit.selectbox("ساعة النهاية الرسمية", list(range(1, 13)), index=3)
+            with col_re2: end_m = str_lit.selectbox("دقيقة النهاية (00-59)", list(range(0, 60)), index=0)
+            with col_re3: end_ampm = str_lit.selectbox("فترة النهاية", ["AM", "PM"], index=1)
+
+            grace_period_min = str_lit.number_input("فترة السماح (بالدقائق)", min_value=0, max_value=60, value=15)
+
+            str_lit.markdown("---")
+            str_lit.markdown("⏰ **الأوقات الفعلية للحضور والانصراف:**")
+            col_in1, col_in2, col_in3 = str_lit.columns(3)
+            with col_in1: act_in_h = str_lit.selectbox("ساعة الحضور الفعلي", list(range(1, 13)), index=7, key="ain_h")
+            with col_in2: act_in_m = str_lit.selectbox("دقيقة الحضور الفعلي (00-59)", list(range(0, 60)), index=0, key="ain_m")
+            with col_in3: act_in_ampm = str_lit.selectbox("فترة الحضور الفعلي", ["AM", "PM"], index=0, key="ain_ap")
+
+            col_out1, col_out2, col_out3 = str_lit.columns(3)
+            with col_out1: act_out_h = str_lit.selectbox("ساعة الانصراف الفعلي", list(range(1, 13)), index=3, key="aout_h")
+            with col_out2: act_out_m = str_lit.selectbox("دقيقة الانصراف الفعلي (00-59)", list(range(0, 60)), index=0, key="aout_m")
+            with col_out3: act_out_ampm = str_lit.selectbox("فترة الانصراف الفعلي", ["AM", "PM"], index=1, key="aout_ap")
+
+            att_status = str_lit.selectbox("حالة الحضور", ["حضور منتظم", "إجازة أسبوعية", "إجازة سنوية", "إجازة مرضية", "إجازة بدون أجر", "غياب"])
+            
+            if str_lit.form_submit_button("💾 حساب تلقائي وحفظ الحركة", use_container_width=True):
+                def to_minutes(h, m, ampm):
+                    hour_24 = h % 12
+                    if ampm == "PM": hour_24 += 12
+                    return hour_24 * 60 + m
+
+                start_total_min = to_minutes(start_h, start_m, start_ampm)
+                end_total_min = to_minutes(end_h, end_m, end_ampm)
+                act_in_total_min = to_minutes(act_in_h, act_in_m, act_in_ampm)
+                act_out_total_min = to_minutes(act_out_h, act_out_m, act_out_ampm)
+
+                worked_minutes = act_out_total_min - act_in_total_min
+                if worked_minutes < 0: worked_minutes += 24 * 60
+
+                standard_minutes = end_total_min - start_total_min
+                if standard_minutes < 0: standard_minutes += 24 * 60
+
+                overtime_min = 0
+                tardy_min = 0
+
+                in_diff = act_in_total_min - start_total_min
+                if in_diff > grace_period_min: tardy_min += (in_diff - grace_period_min)
+
+                diff_total = worked_minutes - standard_minutes
+                if diff_total > 0: overtime_min = int(diff_total)
+
+                new_att_row = {
+                    "التاريخ": att_date.strftime("%Y-%m-%d"),
+                    "كود الموظف": emp_info["كود الموظف"],
+                    "اسم الموظف": selected_emp,
+                    "الوظيفة": c_job,
+                    "الفرع": c_branch,
+                    "بداية العمل الرسمية": f"{start_h:02d}:{start_m:02d} {start_ampm}",
+                    "نهاية العمل الرسمية": f"{end_h:02d}:{end_m:02d} {end_ampm}",
+                    "وقت الحضور الفعلي": f"{act_in_h:02d}:{act_in_m:02d} {act_in_ampm}",
+                    "وقت الانصراف الفعلي": f"{act_out_h:02d}:{act_out_m:02d} {act_out_ampm}",
+                    "فترة السماح (دقيقة)": int(grace_period_min),
+                    "الحالة": att_status,
+                    "التأخير (دقيقة)": int(tardy_min),
+                    "إضافي (دقيقة)": int(overtime_min)
+                }
+
+                str_lit.session_state.attendance = pd.concat([str_lit.session_state.attendance, pd.DataFrame([new_att_row])], ignore_index=True)
+                auto_save_data()
+                str_lit.success("✅ تم تسجيل وحفظ حركة الحضور والانصراف بنجاح!")
         str_lit.markdown('</div>', unsafe_allow_html=True)
 
 elif choice == "سجل طلبات قيد الانتظار":
