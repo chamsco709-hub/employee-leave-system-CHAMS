@@ -437,7 +437,7 @@ if 'current_user_dept' not in str_lit.session_state: str_lit.session_state.curre
 if 'current_user_branch' not in str_lit.session_state: str_lit.session_state.current_user_branch = ""
 if 'current_user_role' not in str_lit.session_state: str_lit.session_state.current_user_role = ""
 if 'active_main_section' not in str_lit.session_state: str_lit.session_state.active_main_section = "الرئيسية"
-if 'active_sub_choice' not in str_lit.session_state: str_lit.session_state.active_sub_choice = "المؤشرات والتحليلات"
+if 'active_sub_choice' not in str_lit.session_state: str_lit.session_state.active_sub_choice = "بطاقة الرئيسية"
 
 def render_company_header():
     info = str_lit.session_state.company_info
@@ -548,51 +548,51 @@ with col_ub3:
 str_lit.markdown('</div>', unsafe_allow_html=True)
 str_lit.markdown('<div class="main-content-spacer"></div>', unsafe_allow_html=True)
 
-# أزرار التحكم (Dashboard Grid)
+# أزرار التحكم الرئيسية (Dashboard Grid)
 r1_c1, r1_c2, r1_c3 = str_lit.columns(3)
 with r1_c1:
-    if str_lit.button("📊 الرئيسية (الاعتمادات والإنذارات)", use_container_width=True):
+    if str_lit.button("🏠 بطاقة الرئيسية المستقلة", use_container_width=True):
         str_lit.session_state.active_main_section = "الرئيسية"
-        str_lit.session_state.active_sub_choice = "المؤشرات والتحليلات"
+        str_lit.session_state.active_sub_choice = "بطاقة الرئيسية"
         str_lit.rerun()
 with r1_c2:
+    if str_lit.button("📈 المؤشرات والتحليلات المستقلة", use_container_width=True):
+        str_lit.session_state.active_main_section = "المؤشرات والتحليلات"
+        str_lit.session_state.active_sub_choice = "بطاقة المؤشرات والتحليلات"
+        str_lit.rerun()
+with r1_c3:
     if str_lit.button("⏱️ الحضور والانصراف", use_container_width=True):
         str_lit.session_state.active_main_section = "الحضور والانصراف"
         str_lit.session_state.active_sub_choice = "تسجيل حضور وانصراف"
         str_lit.rerun()
-with r1_c3:
+
+r2_c1, r2_c2, r2_c3 = str_lit.columns(3)
+with r2_c1:
     if str_lit.button("👥 شؤون الموظفين والعقود", use_container_width=True):
         str_lit.session_state.active_main_section = "شؤون الموظفين"
         str_lit.session_state.active_sub_choice = "سجل الموظفين النشطين والشامل"
         str_lit.rerun()
-
-r2_c1, r2_c2, r2_c3 = str_lit.columns(3)
-with r2_c1:
-    if str_lit.button("📝 طلبات الإجازات وتعديلها وحذفها", use_container_width=True):
-        str_lit.session_state.active_main_section = "طلبات الاجازة"
-        str_lit.session_state.active_sub_choice = "تسجيل طلب إجازة"
-        str_lit.rerun()
 with r2_c2:
+    if str_lit.button("📝 طلبات الإجازات (تعديل وحذف)", use_container_width=True):
+        str_lit.session_state.active_main_section = "طلبات الاجازة"
+        str_lit.session_state.active_sub_choice = "تعديل أو حذف طلب إجازة"
+        str_lit.rerun()
+with r2_c3:
     if str_lit.button("💵 المعاملات المالية والسلف", use_container_width=True):
         str_lit.session_state.active_main_section = "المعاملات المالية"
         str_lit.session_state.active_sub_choice = "تسجيل معاملة مالية"
         str_lit.rerun()
-with r2_c3:
+
+r3_c1, r3_c2, r3_c3 = str_lit.columns(3)
+with r3_c1:
     if str_lit.button("💰 كشف الرواتب", use_container_width=True):
         str_lit.session_state.active_main_section = "كشف الرواتب"
         str_lit.session_state.active_sub_choice = "كشف الرواتب والمستحقات الشامل"
         str_lit.rerun()
-
-r3_c1, r3_c2, r3_c3 = str_lit.columns(3)
-with r3_c1:
+with r3_c2:
     if str_lit.button("🛡️ إدارة المستخدمين", use_container_width=True):
         str_lit.session_state.active_main_section = "المستخدمين"
         str_lit.session_state.active_sub_choice = "إدارة المستخدمين والصلاحيات والسجل"
-        str_lit.rerun()
-with r3_c2:
-    if str_lit.button("🖨️ التقارير العامة", use_container_width=True):
-        str_lit.session_state.active_main_section = "التقارير"
-        str_lit.session_state.active_sub_choice = "طباعة التقارير العامة"
         str_lit.rerun()
 with r3_c3:
     if str_lit.button("⚙️ إعدادات وأدوات النظام", use_container_width=True):
@@ -606,7 +606,10 @@ selected_main_cat = str_lit.session_state.get("active_main_section", "الرئي
 
 sub_options_map = {
     "الرئيسية": [
-        ("📈 المؤشرات والتحليلات", "المؤشرات والتحليلات")
+        ("🏠 بطاقة الرئيسية", "بطاقة الرئيسية")
+    ],
+    "المؤشرات والتحليلات": [
+        ("📈 بطاقة المؤشرات والتحليلات", "بطاقة المؤشرات والتحليلات")
     ],
     "الحضور والانصراف": [
         ("➕ تسجيل حضور وانصراف", "تسجيل حضور وانصراف"),
@@ -652,7 +655,7 @@ sub_options_map = {
     ]
 }
 
-current_sub_cards = sub_options_map.get(selected_main_cat, [("📈 المؤشرات والتحليلات", "المؤشرات والتحليلات")])
+current_sub_cards = sub_options_map.get(selected_main_cat, [("🏠 بطاقة الرئيسية", "بطاقة الرئيسية")])
 
 if len(current_sub_cards) > 1:
     str_lit.markdown('<div class="sub-grid-container">', unsafe_allow_html=True)
@@ -684,7 +687,7 @@ df_users_local = str_lit.session_state.users
 total_active_emps = len(df_active_employees)
 total_active_users = len(df_users_local[df_users_local["الحالة"] == "نشط"]) if not df_users_local.empty else 0
 
-# بطاقات الإحصائيات العلوية
+# بطاقات الإحصائيات العلوية العامة
 col1, col2, col3, col4 = str_lit.columns(4)
 with col1:
     str_lit.markdown(f'<div class="foodics-card"><div class="foodics-card-title">👥 عدد الموظفين النشطين</div><div class="foodics-card-value">{total_active_emps}</div></div>', unsafe_allow_html=True)
@@ -698,8 +701,8 @@ with col4:
 
 str_lit.markdown("<hr style='border: 0.5px solid #E2E8F0; margin: 8px 0 12px 0;'>", unsafe_allow_html=True)
 
-if choice == "المؤشرات والتحليلات":
-    str_lit.markdown(f'<div class="section-header">🔔 بطاقة الرئيسية: اعتماد طلبات الإجازة (إبداء الرأي) والتنبيهات والإنذارات المبكرة لعقود الانتهاء</div>', unsafe_allow_html=True)
+if choice == "بطاقة الرئيسية":
+    str_lit.markdown(f'<div class="section-header">🏠 بطاقة الرئيسية: اعتماد طلبات الإجازة (إبداء الرأي) والتنبيهات والإنذارات المبكرة لعقود الانتهاء</div>', unsafe_allow_html=True)
     
     col_d_act1, col_d_act2 = str_lit.columns(2)
     with col_d_act1:
@@ -708,9 +711,9 @@ if choice == "المؤشرات والتحليلات":
             str_lit.session_state.active_sub_choice = "تعديل أو حذف طلب إجازة"
             str_lit.rerun()
     with col_d_act2:
-        if str_lit.button("👥 استعراض بطاقات انزلاق الموظفين النشطين", use_container_width=True):
-            str_lit.session_state.active_main_section = "شؤون الموظفين"
-            str_lit.session_state.active_sub_choice = "سجل الموظفين النشطين والشامل"
+        if str_lit.button("📈 الانتقال لبطاقة المؤشرات والتحليلات", use_container_width=True):
+            str_lit.session_state.active_main_section = "المؤشرات والتحليلات"
+            str_lit.session_state.active_sub_choice = "بطاقة المؤشرات والتحليلات"
             str_lit.rerun()
 
     str_lit.markdown("---")
@@ -737,9 +740,9 @@ if choice == "المؤشرات والتحليلات":
 
     if not warning_flag:
         str_lit.success("✅ جميع عقود الموظفين النشطين سارية ولا توجد تحذيرات قريبة.")
-    
-    str_lit.markdown("<hr style='border: 0.5px dashed #E2E8F0; margin: 10px 0;'>", unsafe_allow_html=True)
-    str_lit.markdown(f'<div class="section-header">📊 بطاقة المؤشرات والتحليلات (عدد الموظفين لكل فرع، عدد الموظفين النشطين، ومخططات الأعمدة لكل فرع)</div>', unsafe_allow_html=True)
+
+elif choice == "بطاقة المؤشرات والتحليلات":
+    str_lit.markdown(f'<div class="section-header">📈 بطاقة المؤشرات والتحليلات المستقلة (عدد الموظفين لكل فرع، عدد الموظفين النشطين، ومخططات الأعمدة)</div>', unsafe_allow_html=True)
     
     all_branches = df_active_employees["الفرع"].unique().tolist() if not df_active_employees.empty else ["المركز الرئيسي"]
     
@@ -756,7 +759,7 @@ if choice == "المؤشرات والتحليلات":
             str_lit.markdown(f'<div class="foodics-card" style="border-right-color: #0284C7;"><div class="foodics-card-title">💰 إجمالي رواتب فرع {branch}</div><div class="foodics-card-value" style="font-size: 18px; color: #0284C7;">{b_sal_total:,.0f} ج.م</div></div>', unsafe_allow_html=True)
         
         if not branch_emps.empty:
-            str_lit.markdown(f"**📈 المخطط البياني بالأعمدة لكل فرع (توزيع الرواتب حسب الوظيفة):**")
+            str_lit.markdown(f"**📈 المخطط البياني بالأعمدة لكل فرع على حدة (توزيع الرواتب حسب الوظيفة):**")
             chart_data = branch_emps.set_index("الوظيفة")["الراتب الأساسي"]
             str_lit.bar_chart(chart_data)
             default_cols = ["كود الموظف", "اسم الموظف", "الوظيفة", "القسم", "حالة الموظف", "الراتب الأساسي", "تاريخ بداية العقد", "تاريخ نهاية العقد"]
